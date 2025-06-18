@@ -1,0 +1,7 @@
+{
+  "name": "byh16m",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
