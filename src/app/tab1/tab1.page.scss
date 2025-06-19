@@ -1,0 +1,180 @@
+
+.mainToolBar{
+    content: "";
+    // display: table;
+    // display: flex;
+    // flex-direction: column;
+    clear: both;
+    // height: 12vh;
+    padding: .3rem 0 .3rem 0;
+}
+
+
+.column {
+    float: left;
+    padding:.3rem 0 .3rem .2rem;
+  }
+
+.left{
+    width: 15%;
+    padding: .3rem 0 .3rem .4rem;
+    // background-color: beige;
+  }
+
+.right{
+    
+    padding: 1.2rem 0 .3rem 0;
+    width: 15%;
+    ion-button{
+        font-size: 1rem;
+    }
+  }
+  
+.middle {
+    padding: 1rem 0 0.5rem 0;
+    
+    width: 70%;
+    ion-title{
+        font-size: 1rem;
+        text-align: center;
+        padding-bottom: .3rem;
+    }
+
+    .ios{
+        margin-top:-20px;
+    }
+}
+
+
+.mainTitle{
+    font-size: 5vw;
+}
+
+.logo_header{
+    width: 16vw;
+    height: 13vw;
+}
+
+.version{
+    text-align: center;
+    font-size: 2.2vw;
+}
+
+.doorsButton-toggle{
+    display: flex;
+    align-items: center;
+    font-size: 0.7em;
+    justify-content:center;
+    width: 100%;
+    background: transperent;
+    padding-top: -10px;
+    // padding-bottom: 18px;
+    margin-top: 10px;
+    
+    .ios{
+        margin-top: 40px;
+    }
+}
+
+
+.doorsButton{
+    height: 80px;
+    // margin:20px;
+    --background:#64AA95;
+    --o-animation: 20px;
+    box-shadow: 0px 10px 15px rgba(182, 170, 170, 0.3);
+}
+
+.doorsButton-outline-green{
+    border: 2px solid #64AA95;
+    color: #64AA95;
+    font-size: 1.1rem;
+    height: 80px;
+    --o-animation: 20px;
+}
+
+.doorsButton-outline-blue{
+    border: 2px solid #6599CE;
+    color: #6599CE;
+    font-size: 1.1rem;
+    height: 80px;
+    --o-animation: 20px;
+}
+
+
+.doorsButton-green{
+    // border: 2px solid #64AA95;
+    color: white;
+    --background: #64AA95;
+    font-size: 4vw;
+    margin-left: 4vw;
+    height: 10vh;
+    width: 40vw;
+    --o-animation: 20px;
+    --border-radius: 15px;
+}
+
+.doorsButton-blue{
+    // border: 2px solid #6599CE;
+    color:white;
+    --background: #6599CE;
+    font-size: 4vw;
+    height: 10vh;
+    width: 40vw;
+    margin-right: 4vw;
+    --o-animation: 20px;
+    --border-radius: 15px;
+}
+
+// .info{
+//     margin-top: 115px !important;
+// }
+
+
+.logout{
+    --background:#6599CE;
+}
+
+.section-SendSMS-hide{
+    ion-item{
+        display:none;
+    }
+    // --ion-div-color:green;
+    // #formSendSMS{
+    //     display: none;
+    // }
+}
+
+.section-SendSMS-show {
+
+    // ion-header{
+    //     background-color: #64AA95;
+    // }
+
+    // --ion-div-color: red;
+    // #formSendSMS{
+    //     display: inline;
+    // }
+}
+
+
+ion-item-divider{
+    margin-top: 0px;
+    min-height: 5px!important;
+}
+
+ion-popover {
+    &::part(content) {
+      min-width: 230px;
+    }
+  }
+
+ .logged{
+    font-size: .8rem;
+    z-index: 1;
+    right: 65px;
+    bottom: 4px;
+    top:2px;
+    // background-color: var(--ion-color-secondary);
+    // padding: 9px;
+ }
