@@ -35,3 +35,514 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+
+// Accordion -------------------------------
+ion-accordion.accordion-expanding ion-item[slot="header"],
+ion-accordion.accordion-expanded ion-item[slot="header"]{
+    --background:#0c0254;
+    --color:#fff;
+    font-weight: 600;
+    ion-icon{
+        color: #fff;
+    }
+    border-bottom: 2px solid #fff;
+}
+
+ion-accordion.accordion-collapsed ion-item[slot="header"],
+ion-accordion.accordion-collapsing ion-item[slot="header"]{
+    --background: var(--ion-color-primary);
+    --color: #fff;
+    font-weight: 600;
+    ion-icon{
+        color:#fff
+    }
+    border-bottom: 2px solid #fff;
+}
+
+
+
+
+.my-modal {
+    .modal-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: block;
+        --width: 100%;
+        --height: 100%;
+    }
+}
+
+ion-menu-button{
+    font-size: 2em !important;
+  }
+
+.title{
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    padding-left: 0px;
+}
+
+.titleBlue{
+    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.3);
+    --background:#6599CE;
+    color:#fff
+}
+
+
+
+.titleGreen{
+    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.3);
+    --background:#64AA95;
+    color:#fff
+}
+
+.icon_exit{
+    font-size: 38px;
+    padding-left: 10px;
+}
+
+.basic-alert{
+    .alert-wrapper {
+        .alert-head {
+          background: white;
+          // color: navy;
+          height: 30px;
+          padding: 0;
+            h2{
+                color: navy;
+            }
+        }
+        .alert-message{
+          margin-top:20px; 
+        }
+      }
+}
+
+.modalcloseButton{
+    margin-left: 10px;
+    font-size: 30px;
+}
+
+.aperturas{
+    background-color: white;
+    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.3);
+
+    display: flex;
+    justify-content: space-between;
+
+    width: 100%;
+    overflow: hidden;
+    // height: 12vh;
+    padding: .8vh 1.5vw .8vh 1.5vw;
+}
+
+.aperturas ion-button{
+    border-radius: 20px;
+    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.3);
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    -ms-border-radius: 20px;
+    -o-border-radius: 20px;
+}
+
+.button-blue{
+    --background: #6599CE;
+}
+
+.button-green{
+    --background: #64AA95;
+}
+
+
+.main-buttons{
+    border-radius: 10px;
+    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.3);
+    background-color: lightgray;
+    color: black;
+    font-size: 1em;
+    margin: 20px auto;
+    width: 80%;
+    height: 60px;
+}
+
+.main-buttons-blue{
+    border-radius: 10px;
+    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.3);
+    background-color: #6599CE;
+    color: #fff;
+    font-size: 1em;
+    margin: 20px auto;
+    width: 80%;
+    height: 60px;
+}
+
+.main-buttons ion-icon{
+    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.3);
+    right:0;
+    position: absolute;
+}
+
+.titleButtonBlue{
+    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.3);
+    // background-color:white;
+    margin:15px;
+    border-radius: 100%;
+    --background:#6599CE;
+}
+
+.titleButtonGreen{
+    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.3);
+    // background-color:white;
+    margin:15px;
+    border-radius: 100%;
+    --background:#64AA95;
+    // object-position: center;
+    // width: 60px;
+    // height: 60px;
+    // padding: 0 0 -10px 0;
+    // font-size: 3em;
+}
+
+.buttonAdd{
+    border-radius: 100%;
+    // height: 70px;
+    width: auto;
+    // --ionicon-stroke-width: 16px;
+}
+
+.my-modal-class {
+    --background: #222;
+  }
+
+  .submit{
+      font-size: 1.5em;
+      height: 40px;
+      width: 100%;
+    //   margin:10px auto 10px auto;
+  }
+
+  .Validation{
+      color:rgba(255, 77, 0, 0.989);
+  }
+
+  .inputValue{
+      font-weight: bold;
+  }
+
+  .labelInput{
+      color: red;
+  }
+
+//   --- ACCORDION section  -----
+
+ion-content{
+    --background: var(--ion-color-light);
+}
+
+.accordion-list{
+    --ion-item-background: #fff;
+    min-height: 62px;
+    margin-top: 2px;
+
+    .section, .section-active, .section-expired{
+        border-radius: 5px;
+        max-width: 95% !important;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 5px;
+    }
+
+    ion-icon{
+        color: #000;
+    }
+
+}
+
+
+.section{
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.3);
+    --ion-item-background:#64AA95;
+    --ion-item-color:#fff;
+
+    .ios{
+        padding-top: 5px;
+    }
+}
+
+.section_blue{
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.3);
+    --ion-item-background:#6599CE;
+    --ion-item-color:#fff;
+}
+
+.section-expired{
+    // margin-top: -6px;
+    padding-top: -6px;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.3);
+    --ion-item-background:lightgray;
+    --ion-item-color:gray;
+}
+
+.section-active{
+    --ion-item-background:#64AA95;
+    --ion-item-color: #fff;
+    font-weight: 600;
+
+    ion-icon{
+        color:#fff;
+    }
+}
+
+.detail-list{
+    padding:0px;
+    margin: 0px;
+    .detail, .detail-active{
+        margin-bottom:2px;
+    }
+}
+
+.detail{
+    padding-left:12px;
+    max-width: 97% !important;
+    --ion-item-background:#efeeee;
+    --ion-item-color: #000;
+    padding-top: 8px;
+}
+
+.detail-active{
+    --ion-item-background: #fad86b;
+    --ion-item-color:#fff;
+
+    ion-icon{
+        color: #fff;
+    }
+}
+
+.product-list{
+    padding:0px;
+    margin:0px;
+}
+
+.detail-item{
+    border-radius: 5px;
+    margin-top:2px;
+    margin-bottom:1px;
+}
+
+
+// RANGE SECTION  -------------------
+.limits{
+    color: #a2d2ff !important;
+    font-size: 1.3em !important;
+  }
+
+  ion-range{
+   margin-top: 20px;
+  --bar-background: #a2d2ff;
+  --bar-background-active: #bde0fe;
+  --bar-height: 6px;
+  --bar-border-radius: 8px;
+  --knob-background: #e46d83fb;
+  --knob-size: 40px;
+  --pin-background: #dd344ef9;
+  --pin-color: #fff;
+  }
+  
+  ion-range::part(pin) {
+    transform: scale(1.01);
+    top: -20px;
+  }
+
+
+// ---- Lines used to fix ion-select-option width (
+// .alert-tappable.alert-radio{
+//     height: auto;
+//     contain: content;
+//     // --min-height: auto;
+// }
+
+// .alert-radio-label.sc-ion-alert-md,
+// .alert-radio-label.sc-ion-alert-ios{
+//     white-space: normal;
+// }
+
+// .alert-checkbox-label.sc-ion-alert-md,
+// .alert-checkbox-label.sc-ion-alert-ios {
+//    white-space: normal;
+// }
+// .alert-tappable.alert-checkbox {
+//    height: auto;
+//    contain: content;
+// }
+
+
+// ion-alert.select-alert {
+//     --background: black!important;
+
+//     button {
+//         color: white !important;
+//         font-size: 1.1em !important;
+//     }
+
+//     .sc-ion-alert-md,
+//     .sc-ion-alert-ios
+//      {
+//         color: yellow;
+//     }
+// }
+
+
+
+// ------------------------------------------
+
+// ion-toggle{
+
+//     --handle-box-shadow: 0 3px 12px rgba(255, 98, 0, 0.6), 0 3px 1px rgba(50, 70, 255, 0.6);
+
+// }
+
+// ----  Main logo section  -----------------------------------------------
+
+// .login_logo {
+//     position:relative;
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//     justify-content:center ;
+//     height: 200px;
+//     top:-60px;
+
+//     img{
+//         border-radius: 50%;
+//         border: 2px solid #fff;
+//         position: absolute;
+//     }
+// }
+
+// .resetPwd-Link{
+//     margin-top: 15px;
+//     text-align: center!important;
+
+//     a{
+//     color: #6599CE;
+//     }
+// }
+
+// // Small phones
+//     @media only screen and (min-width: 200px) {
+//         .login_logo {
+//             img{
+//                 margin-bottom: 20px;
+//                 width: 170px;
+//                 height: 170px;
+//             }
+//      }
+//     }
+
+//     // Large phones
+//     @media only screen and (min-width: 400px) {
+//         .login_logo {
+//             img{
+//                 margin-bottom: 40px;
+//                 width: 190px;
+//                 height: 190px;
+//             }
+//      }
+//     }
+
+//     // Tablets
+//     @media only screen and (min-width: 768px) {
+//         .login_logo {
+//             img{
+//                 margin-bottom: 180px;
+//                 width: 300px;
+//                 height: 300px;
+
+//             }
+//      }
+
+//     }
+
+
+// Button 
+.button-17 {
+    align-items: center;
+    appearance: none;
+    background-color: #fff;
+    border-radius: 24px;
+    border-style: none;
+    box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px,rgba(0, 0, 0, .14) 0 6px 10px 0,rgba(0, 0, 0, .12) 0 1px 18px 0;
+    box-sizing: border-box;
+    color: #3c4043;
+    cursor: pointer;
+    display: inline-flex;
+    fill: currentcolor;
+    font-family: "Google Sans",Roboto,Arial,sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    height: 38px;
+    justify-content: center;
+    letter-spacing: .25px;
+    line-height: normal;
+    margin-bottom: 10px;
+    max-width: 100%;
+    overflow: visible;
+    padding: 2px 24px;
+    position: relative;
+    text-align: center;
+    text-transform: none;
+    transition: box-shadow 280ms cubic-bezier(.4, 0, .2, 1),opacity 15ms linear 30ms,transform 270ms cubic-bezier(0, 0, .2, 1) 0ms;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: auto;
+    will-change: transform,opacity;
+    z-index: 0;
+  }
+
+//   Button-17
+  .button-17:hover {
+    background: #F6F9FE;
+    color: #174ea6;
+  }
+  
+  .button-17:active {
+    box-shadow: 0 4px 4px 0 rgb(60 64 67 / 30%), 0 8px 12px 6px rgb(60 64 67 / 15%);
+    outline: none;
+  }
+  
+  .button-17:focus {
+    outline: none;
+    border: 2px solid #4285f4;
+  }
+  
+  .button-17:not(:disabled) {
+    box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+  }
+  
+  .button-17:not(:disabled):hover {
+    box-shadow: rgba(60, 64, 67, .3) 0 2px 3px 0, rgba(60, 64, 67, .15) 0 6px 10px 4px;
+  }
+  
+  .button-17:not(:disabled):focus {
+    box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+  }
+  
+  .button-17:not(:disabled):active {
+    box-shadow: rgba(60, 64, 67, .3) 0 4px 4px 0, rgba(60, 64, 67, .15) 0 8px 12px 6px;
+  }
+  
+  .button-17:disabled {
+    box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+  }
+  
+  .reenviar{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }

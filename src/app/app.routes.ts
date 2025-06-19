@@ -29,4 +29,8 @@ export const routes: Routes = [
     path: 'backstage',
     loadComponent: () => import('./modals/backstage/backstage.page').then( m => m.BackstagePage)
   },
+  {
+    path: 'login',
+    loadComponent: () => import('./pages/login/login.page').then( m => m.LoginPage)
+  },
 ];
