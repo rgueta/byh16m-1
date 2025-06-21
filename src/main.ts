@@ -17,4 +17,5 @@ bootstrapApplication(AppComponent, {
     provideHttpClient(),
     SMS,ScreenOrientation,Sim
   ],
+  
 });
