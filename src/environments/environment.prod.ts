@@ -1,5 +1,5 @@
 export const environment = {
-  production: true,
+  production: false,
   app : {
     version: "1.0.4",
     Description: "Main tab data information feed",

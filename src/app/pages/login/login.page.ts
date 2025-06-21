@@ -15,8 +15,12 @@ import { Capacitor } from "@capacitor/core";
 import { UpdUsersPage } from "../../modals/upd-users/upd-users.page";
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonHeader, IonToolbar,  
+import { IonContent, IonHeader, IonToolbar,
   IonButton, IonIcon, IonInput, IonItem} from '@ionic/angular/standalone';
+
+import {addIcons} from "ionicons";
+import { eye, eyeOffOutline } from 'ionicons/icons';
+
 
 
 const USER_ROLES = 'my-roles';
@@ -33,7 +37,7 @@ const ADMIN_DEVICE = 'admin_device';
     standalone: true,
     imports: [IonContent, IonHeader, IonToolbar, IonButton,
       CommonModule, FormsModule, IonIcon, IonInput, IonItem,
-      ReactiveFormsModule]
+      ReactiveFormsModule],
 })
 
 export class LoginPage implements OnInit {
@@ -42,7 +46,7 @@ export class LoginPage implements OnInit {
   configApp! : {};
 
   showPassword:boolean = false;
-  passwordToggleIcon = 'eye';
+  passwordToggleIcon:string = "eye";
 
   // Easy access for form fields
    get email() {
@@ -77,7 +81,9 @@ export class LoginPage implements OnInit {
     private platform: Platform,
     private api : DatabaseService,
     public toolService:ToolsService,
-  ) { }
+  ) { 
+    addIcons({ eye, eyeOffOutline });
+  }
      
   async ngOnInit() {
     
@@ -108,6 +114,8 @@ export class LoginPage implements OnInit {
     });
 
     await Device.getInfo().then(async (DeviceInfo: any) => {
+
+      console.log('DeviceInfo:', DeviceInfo);
 
       this.device_info = await JSON.parse(JSON.stringify(DeviceInfo));
 
