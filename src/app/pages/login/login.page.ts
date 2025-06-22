@@ -11,6 +11,7 @@ import { RequestsPage } from "../../modals/requests/requests.page";
 import { Sim } from "@ionic-native/sim/ngx"; 
 import { DatabaseService } from "../../services/database.service";
 import { ToolsService } from 'src/app/services/tools.service';
+import {NetworkService} from "../../services/network.service"
 import { Capacitor } from "@capacitor/core";
 import { UpdUsersPage } from "../../modals/upd-users/upd-users.page";
 import { FormsModule } from '@angular/forms';
@@ -20,8 +21,7 @@ import { IonContent, IonHeader, IonToolbar,
 
 import {addIcons} from "ionicons";
 import { eye, eyeOffOutline } from 'ionicons/icons';
-
-
+import { catchError, switchMap, throwError } from 'rxjs';
 
 const USER_ROLES = 'my-roles';
 const USER_ROLE = 'my-role';
@@ -81,6 +81,7 @@ export class LoginPage implements OnInit {
     private platform: Platform,
     private api : DatabaseService,
     public toolService:ToolsService,
+    public networkService:NetworkService
   ) { 
     addIcons({ eye, eyeOffOutline });
   }
@@ -188,72 +189,72 @@ export class LoginPage implements OnInit {
     this.orientation.lock(this.orientation.ORIENTATIONS.PORTRAIT)
   }
 
-
   async login() {
-
-    if(! await this.toolService.verifyNetStatus())
-    {
+    const netStatus = await this.networkService.checkInternetConnection();
+    if (!netStatus) {
+      console.error('NO hay internee');
       await this.toolService.toastAlert('No hay acceso a internet',
       0,['Ok'],'middle');
       return;
     }
+    else{
+      const loading = await this.loadingController.create();
+      await loading.present();
+      this.authService.login(this.credentials.value).subscribe(
+        async res => {        
+          await loading.dismiss();
+          const roles:any = await localStorage.getItem(USER_ROLES); // typeof object
 
-    const loading = await this.loadingController.create();
-    await loading.present();
-    this.authService.login(this.credentials.value).subscribe(
-      async res => {        
-        await loading.dismiss();
-        const roles:any = await localStorage.getItem(USER_ROLES); // typeof object
-
-       for(const val_myrole of JSON.parse(roles)){
-          if(localStorage.getItem('locked') === 'true')
-          {
-            await this.lockedUser('Usuario bloqueado !');
-            return;
-          }
-          if(val_myrole.name === 'admin' || val_myrole.name === 'neighbor'
-          || val_myrole.name === 'neighborAdmin'
-          ){
-
-
-            this.router.navigateByUrl('/tabs', { replaceUrl: true });
-          }else{
-           this.router.navigateByUrl('/store', { replaceUrl: true });
-          }
-        };
-
-        // get config info
-        this.getConfigApp();
-
-      },
-      async err  =>{
-        if (err.error.errId == 1){
-          console.log('Abrir registro');
-        }
-        await loading.dismiss();
-
-        let msgErr='';
-
-        const alert = await this.alertController.create({
-          header: msgErr,
-          message: err.error.ErrMsg,
-          buttons: [
+        for(const val_myrole of JSON.parse(roles)){
+            if(localStorage.getItem('locked') === 'true')
             {
-              text : 'Registro nuevo ?',
-              role : 'registro',
-              handler : () => {
-               this.newUser();
-              }
-            },
-            { text : 'OK'}
-          ],
-        });
+              await this.lockedUser('Usuario bloqueado !');
+              return;
+            }
+            if(val_myrole.name === 'admin' || val_myrole.name === 'neighbor'
+            || val_myrole.name === 'neighborAdmin'
+            ){
 
-        await alert.present();
-      }
-    );
-  }
 
+              this.router.navigateByUrl('/tabs', { replaceUrl: true });
+            }else{
+            this.router.navigateByUrl('/store', { replaceUrl: true });
+            }
+          };
+          // get config info
+          this.getConfigApp();
+
+        },
+        async err  =>{
+          if (err.error.errId == 1){
+            console.log('Abrir registro');
+          }
+          await loading.dismiss();
+
+          let msgErr='';
+
+          const alert = await this.alertController.create({
+            header: msgErr,
+            message: err.error.ErrMsg,
+            buttons: [
+              {
+                text : 'Registro nuevo ?',
+                role : 'registro',
+                handler : () => {
+                this.newUser();
+                }
+              },
+              { text : 'OK'}
+            ],
+          });
+
+          await alert.present();
+        }
+      
+      )
+    }
+  
+}
 
   togglePassword():void{
     this.showPassword = !this.showPassword;
@@ -264,6 +265,9 @@ export class LoginPage implements OnInit {
       this.passwordToggleIcon = 'eye';
     }
   }
+
+ 
+
 
 async newUser(){
     const modal = await this.modalController.create({

@@ -67,7 +67,7 @@ export const Utils = {
         netStatus = await localStorage.getItem('netStatus');
       }
 
-      if(localStorage.getItem('visitors') !== null){
+      if(localStorage.getItem('visitors') != null){
         // myVisitors = await JSON.parse(localStorage.getItem('visitors'));
         myVisitors = await localStorage.getItem('visitors');
       }

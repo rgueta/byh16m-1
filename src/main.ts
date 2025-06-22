@@ -7,7 +7,7 @@ import { AppComponent } from './app/app.component';
 import { provideHttpClient } from '@angular/common/http';
 import { SMS, SmsOptions } from '@ionic-native/sms/ngx';
 import { ScreenOrientation } from "@ionic-native/screen-orientation/ngx"
-import { Sim } from "@ionic-native/sim/ngx"; 
+import { Sim } from "@ionic-native/sim/ngx";
 
 bootstrapApplication(AppComponent, {
   providers: [
