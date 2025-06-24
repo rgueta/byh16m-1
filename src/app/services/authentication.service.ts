@@ -72,10 +72,8 @@ export class AuthenticationService {
 
   login(credentials: {email:string, pwd:string}): Observable<any> {
     tokens:this.Tokens;
-
     return this.http.post(`${this.REST_API_SERVER}api/auth/signin`, credentials).pipe(
       switchMap(async (tokens:any) =>{
-        
         this.currentAccessToken = await tokens.accessToken;
 
         this.MyRole(tokens.roles).then(async val_role => {

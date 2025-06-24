@@ -128,7 +128,7 @@ export class LoginPage implements OnInit {
 
        this.device_info.uuid = await this.device_uuid;
        await localStorage.setItem(DEVICE_PKG, await JSON.stringify(this.device_info));
-  
+       localStorage.setItem('devicePlatform',this.device_info.platform)
        if (this.device_info.platform === 'android') {
          try {
             delete this.device_info.memUsed

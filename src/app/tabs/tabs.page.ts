@@ -1,18 +1,25 @@
 import { Component, EnvironmentInjector, inject } from '@angular/core';
-import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/angular/standalone';
+import { IonTabs, IonTabBar, IonTabButton, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { triangle, ellipse, square } from 'ionicons/icons';
+import { settingsOutline, peopleOutline, keyOutline, timeOutline,
+  homeOutline,
+ } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
   styleUrls: ['tabs.page.scss'],
-  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel],
+  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon],
 })
 export class TabsPage {
+  MyRole : string | null = 'visitor';
   public environmentInjector = inject(EnvironmentInjector);
 
   constructor() {
-    addIcons({ triangle, ellipse, square });
+    addIcons({ settingsOutline, peopleOutline, keyOutline, timeOutline,homeOutline });
+  }
+
+  async ionViewWillEnter(){
+    this.MyRole = localStorage.getItem('my-role');
   }
 }

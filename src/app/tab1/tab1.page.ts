@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
-import {ModalController, AlertController, LoadingController} from '@ionic/angular/standalone';
+import { Component, Input, OnInit} from '@angular/core';
+import {ModalController, AlertController,
+   LoadingController, isPlatform} from '@ionic/angular/standalone';
 import { environment } from "../../environments/environment";
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonLabel,
   IonButton, IonButtons,IonFab, IonFabButton,IonFabList, IonPopover,
@@ -9,7 +10,10 @@ import { IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonLabel,
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { addIcons } from 'ionicons';
-import { ellipsisVerticalOutline } from 'ionicons/icons';
+import { ellipsisVerticalOutline,chevronUpOutline, chevronDownOutline,
+add,personOutline, lockClosedOutline,personAddOutline,personCircleOutline,
+toggleOutline
+ } from 'ionicons/icons';
 import { UsersPage } from "../modals/users/users.page";
 import { VisitorListPage } from '../modals/visitor-list/visitor-list.page';
 import { FamilyPage } from '../modals/family/family.page';
@@ -23,6 +27,11 @@ import { BackstagePage } from "../modals/backstage/backstage.page";
 import { FormsModule } from '@angular/forms';
 import { ToolsService } from "../services/tools.service";
 import { SMS, SmsOptions } from '@ionic-native/sms/ngx';
+import {
+  ActionPerformed, PushNotificationSchema, PushNotifications, Token,
+} from '@capacitor/push-notifications';
+import { FCM } from "@capacitor-community/fcm"
+import { ScreenOrientation } from "@ionic-native/screen-orientation/ngx";
 
 @Component({
   selector: 'app-tab1',
@@ -37,28 +46,28 @@ import { SMS, SmsOptions } from '@ionic-native/sms/ngx';
   ]
 })
 
-export class Tab1Page {
+export class Tab1Page implements OnInit{
   public localInfo : any = [];
   public codes: [] = [];
   @Input() msg: string = '';
   @Input() sim: string = '';
   myToast:any;
   myRoles:any;
-  public MyRole : string = 'visitor';
+  public MyRole : string | null= 'visitor';
   isAndroid:any;
   currentUser = '';
   public version = '';
-  public coreName = '';
-  public coreId = '';
+  public coreName: string  | null = '';
+  public coreId: string  | null = '';
   twilio_client : any;
-  userId : string = '';
+  userId : string | null = '';
   id : number = 0;
   btnVisible : boolean = true;
   titleMenuButtons = 'Ocultar botones'
   
   infoPanel : any;
-  myEmail = '';
-  myName = '';
+  myEmail: string | null =  '';
+  myName : string| null = '';
   REST_API_SERVER = environment.cloud.server_url;
   iosOrAndroid: boolean = false;
   demoMode:boolean = false;
@@ -73,9 +82,105 @@ export class Tab1Page {
     private router: Router,
     private toolService: ToolsService,
     private loadingController : LoadingController,
+    private screenOrientation: ScreenOrientation,
   ) {
-    addIcons({ ellipsisVerticalOutline });
+    addIcons({ ellipsisVerticalOutline,chevronUpOutline,chevronDownOutline,
+      add,personOutline, lockClosedOutline,personAddOutline,
+      personCircleOutline,toggleOutline
+    });
   }
+
+  async ionViewWillEnter(){
+    this.MyRole = localStorage.getItem('my-role');
+    this.myEmail = localStorage.getItem('my-email');
+    this.myName = localStorage.getItem('my-name');
+    this.remote = await localStorage.getItem('remote') === 'true';
+
+    if (localStorage.getItem('demoMode')){
+      this.demoMode = localStorage.getItem('demoMode') == 'true' ? true : false
+    }
+
+    console.log('Valor del remote: ', this.remote);
+    if (!this.remote){
+      document.getElementById("infoSection")!.style.setProperty('margin-top', '15px','important') ;
+      
+      console.log('Si entreeeee');
+    }
+
+  }
+
+    async ngOnInit(){
+    const sim = await localStorage.getItem('my-core-sim');
+    this.userId = await localStorage.getItem('my-userId');
+    this.coreName = await localStorage.getItem('core-name');
+    this.coreId = await localStorage.getItem('core-id')
+
+    // -----------------firebase Push notification
+    PushNotifications.requestPermissions().then(resul => {
+      if(resul.receive === 'granted'){
+        PushNotifications.register();
+      }else{
+        this.toolService.toastAlert('Push notification not granted..!',0,['Ok'],'middle');
+      }
+    });
+
+    PushNotifications.addListener('registration', (token: Token) => {
+      console.log('Push registration success, token: ' + token.value);
+    });
+
+    //  Subscribe to a specific topic
+    FCM.subscribeTo({ topic: localStorage.getItem('core-id') })
+    .then() 
+    .catch((err) => console.log(err));
+
+
+    // Enable the auto initialization of the library
+    FCM.setAutoInit({ enabled: true }).then();
+
+
+    PushNotifications.addListener('registrationError', (error: any) => {
+      alert('Error on registration: ' + JSON.stringify(error));
+    });
+
+    // pushNotification Received event
+    PushNotifications.addListener(
+      'pushNotificationReceived',
+      (notification: PushNotificationSchema) => {
+        this.toolService.toastAlert((notification.body!),0,['Ok'],'middle');
+      },
+    );
+
+    // pushNotification clicked Action Performed event
+    PushNotifications.addListener(
+      'pushNotificationActionPerformed',
+      (notification: ActionPerformed) => {
+        // alert('Push action performed: ' + JSON.stringify(notification));
+      },
+    );
+  
+    // -----------------------------------------------------
+
+// this.init();
+    this.version = environment.app.version;
+    if(isPlatform('cordova') || isPlatform('ios')){
+      this.lockToPortrait();
+    }else if(isPlatform('android')){
+      this.isAndroid = true;
+    }
+
+    // getting info data
+    if(environment.app.debugging){
+      console.log('collect Info jumped, because debugging!');
+      await this.toolService.toastAlert('collect Info jumped, because debugging!',0,['Ok'],'bottom');
+    }else{
+      this.collectInfo();
+    }
+
+    this.infoPanel = document.getElementById("infoSection");
+    this.infoPanel.style.marginTop = "115px";
+
+  }
+
 
   toggleButtons(){
     this.btnVisible = !this.btnVisible;
@@ -157,6 +262,12 @@ async scheduleBasic(msg:any){
 
   async fcmNotification(){
     this.api.postData(`api/alerts/${localStorage.getItem('core-id')}/peatonal open/`,'')
+  }
+
+
+  lockToPortrait(){
+    if (['android', 'ios'].indexOf(localStorage.getItem('devicePlatform')!))
+    this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.PORTRAIT);
   }
 
   async logout(){
