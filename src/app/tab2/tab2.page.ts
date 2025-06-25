@@ -6,11 +6,10 @@ import { IonHeader, IonToolbar, IonTitle, IonContent,IonIcon,
 import { DatabaseService } from '../services/database.service';
 import { ToolsService } from "../services/tools.service";
 import { addIcons } from 'ionicons';
-import { ellipsisVerticalOutline,chevronUpOutline, chevronDownOutline,
-add,personOutline, lockClosedOutline,personAddOutline,personCircleOutline,
-toggleOutline,calendar, search
- } from 'ionicons/icons';
+import { chevronUpOutline, chevronDownOutline,calendar, search,
+ chevronForwardOutline} from 'ionicons/icons';
  import { NgStyle, DatePipe, NgFor, NgIf } from '@angular/common';
+ import {NetworkService} from "../services/network.service"
 
 
 const USERID = 'my-userId';
@@ -46,12 +45,12 @@ export class Tab2Page implements OnInit{
 
   constructor(
     public api : DatabaseService,
-    private toolsService:ToolsService
+    private toolsService:ToolsService,
+    public networkService:NetworkService
   ) { 
 
-     addIcons({ ellipsisVerticalOutline,chevronUpOutline,chevronDownOutline,
-      add,personOutline, lockClosedOutline,personAddOutline,
-      personCircleOutline,toggleOutline, calendar, search
+     addIcons({chevronUpOutline,chevronDownOutline,chevronForwardOutline,
+      calendar, search
     });
 
   }
@@ -107,17 +106,16 @@ export class Tab2Page implements OnInit{
   }
 
   async getEvents(){
-
-    if(! await this.toolsService.verifyNetStatus()){
+    if(!await this.networkService.checkInternetConnection()){
       this.toolsService.toastAlert('No hay Acceso a internet',0,['Ok'],'middle');
       return;
     }
-    
+
     try{
       await this.api.getData('api/codeEvent/' + 
         this.myUserId + '/' + this.Initial + '/' + this.Final).subscribe(async result =>{
         this.EventsList = await result;
-      
+          
         if(this.EventsList.length > 0){
           this.EventsList.forEach(async (item:any) =>{
             let d = new Date(item.createdAt.replace('Z',''));

@@ -1,0 +1,39 @@
+
+ion-modal {
+    &.bottom-end {
+      align-items: flex-end;
+      --height: auto;
+      .ion-page {
+        position: relative;
+        display: block;
+        contain: content;
+      }
+    }
+  }
+
+.itemFilter {
+    // display: flex;
+    align-content:space-between;
+}
+
+.filterDate{
+    // display: flex;
+    color: black;
+    font-size:0.9em;
+    vertical-align: middle;
+    margin: 0 20px 0 5px;
+    text-align: center;
+    // width: 60%;
+    padding-left: 0px;
+
+}
+
+.lblFilterDate{
+    display: inline;
+    font-size:0.9em;
+
+}
+
+.lstInitial{
+    margin-bottom: 3px ;
+}

@@ -31,7 +31,6 @@ export class NetworkService {
   }
 
   private updateNetworkStatus(status: ConnectionStatus) {
-    console.log('Network status changed:', status);
     this.networkStatusSubject.next(status);
     localStorage.setItem('netStatus', status.connected? 'true' : 'false' )
   }

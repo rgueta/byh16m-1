@@ -38,4 +38,32 @@ export const routes: Routes = [
     path: 'login',
     loadComponent: () => import('./pages/login/login.page').then( m => m.LoginPage)
   },
+  {
+    path: 'codes',
+    loadComponent: () => import('./pages/codes/codes.page').then( m => m.CodesPage)
+  },
+  {
+    path: 'upd-codes-modal',
+    loadComponent: () => import('./modals/upd-codes-modal/upd-codes-modal.page').then( m => m.UpdCodesModalPage)
+  },
+  {
+    path: 'visitors',
+    loadComponent: () => import('./modals/visitors/visitors.page').then( m => m.VisitorsPage)
+  },
+  {
+    path: 'admin',
+    loadComponent: () => import('./pages/admin/admin.page').then( m => m.AdminPage)
+  },
+  {
+    path: 'upd-cores',
+    loadComponent: () => import('./modals/upd-cores/upd-cores.page').then( m => m.UpdCoresPage)
+  },
+  {
+    path: 'upd-cpus',
+    loadComponent: () => import('./modals/upd-cpus/upd-cpus.page').then( m => m.UpdCpusPage)
+  },
+  {
+    path: 'info',
+    loadComponent: () => import('./modals/info/info.page').then( m => m.InfoPage)
+  },
 ];

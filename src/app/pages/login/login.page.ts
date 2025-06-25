@@ -259,7 +259,7 @@ export class LoginPage implements OnInit {
   togglePassword():void{
     this.showPassword = !this.showPassword;
     if(this.passwordToggleIcon == 'eye'){
-      this.passwordToggleIcon = 'eye-off';
+      this.passwordToggleIcon = 'eye-off-outline';
     }
     else{
       this.passwordToggleIcon = 'eye';

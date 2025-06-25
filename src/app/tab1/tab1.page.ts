@@ -32,6 +32,7 @@ import {
 } from '@capacitor/push-notifications';
 import { FCM } from "@capacitor-community/fcm"
 import { ScreenOrientation } from "@ionic-native/screen-orientation/ngx";
+ import {NetworkService} from "../services/network.service"
 
 @Component({
   selector: 'app-tab1',
@@ -83,6 +84,7 @@ export class Tab1Page implements OnInit{
     private toolService: ToolsService,
     private loadingController : LoadingController,
     private screenOrientation: ScreenOrientation,
+    public networkService:NetworkService
   ) {
     addIcons({ ellipsisVerticalOutline,chevronUpOutline,chevronDownOutline,
       add,personOutline, lockClosedOutline,personAddOutline,
@@ -300,7 +302,7 @@ async modalBackstage(){
 
 async collectInfo(){
   let timestamp: string = '';
-  if(await this.toolService.verifyNetStatus()){
+  if(await this.networkService.checkInternetConnection()){
 
     // get last api call variable
     if(!localStorage.getItem('lastInfo_updated')){
