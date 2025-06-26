@@ -101,8 +101,7 @@ export class Tab1Page implements OnInit{
     if (localStorage.getItem('demoMode')){
       this.demoMode = localStorage.getItem('demoMode') == 'true' ? true : false
     }
-
-    console.log('Valor del remote: ', this.remote);
+    
     if (!this.remote){
       document.getElementById("infoSection")!.style.setProperty('margin-top', '15px','important') ;
       

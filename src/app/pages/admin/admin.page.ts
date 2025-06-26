@@ -17,8 +17,11 @@ import { UpdUsersPage } from "../../modals/upd-users/upd-users.page";
 import { BackstagePage } from "../../modals/backstage/backstage.page";
 import { NgFor, NgIf } from '@angular/common';
 import { addIcons } from 'ionicons';
-import { chevronUpOutline, chevronDownOutline, 
-  addOutline, chevronForwardOutline,people, trashOutline} from 'ionicons/icons';
+import { chevronUpOutline, chevronDownOutline,callOutline,
+  gridOutline, chevronForwardOutline,people, trashOutline,
+  saveOutline,  cogOutline,  peopleOutline,  personAddOutline,
+  calculator,  readerOutline,  arrowForwardCircleOutline,
+  optionsOutline} from 'ionicons/icons';
 
 const TWILIO = 'twilio';
 const EMAIL_TO_VISITOR = 'emailToVisitor'
@@ -35,7 +38,6 @@ const EMAIL_TO_CORE = 'emailToCore'
     IonLabel,IonItem, IonToggle,IonIcon,IonList,IonAccordion,IonAccordionGroup,
     IonInput,IonRefresher,IonRefresherContent,IonRouterOutlet,IonMenu,
     IonMenuButton,IonButtons
-
   ]
 })
 export class AdminPage implements OnInit {
@@ -134,20 +136,15 @@ export class AdminPage implements OnInit {
         private toolService:ToolsService,
         private loadingController : LoadingController
     ) {
-      addIcons({chevronUpOutline,chevronDownOutline,chevronForwardOutline,
-       people,trashOutline
+      addIcons({chevronUpOutline,chevronDownOutline,
+      chevronForwardOutline,gridOutline,callOutline,
+       people,trashOutline,saveOutline,cogOutline,
+       peopleOutline,personAddOutline,calculator, readerOutline,
+       arrowForwardCircleOutline,optionsOutline
     });
     }
 
-  
   async ngOnInit() {
-    console.log('Llegue al init de admin...');
-
-  }
-
-
-  async ngOnInit_() {
-    console.log('Llegue al init de admin...');
     this.core_sim = await localStorage.getItem('my-core-sim')!;
     this.userId = await localStorage.getItem('my-userId')!;
     this.emailToVisitor = await (localStorage.getItem('emailToVisitor') === 'true');
@@ -168,22 +165,29 @@ export class AdminPage implements OnInit {
   }
 
   async getCores(){
-    await this.api.getData('api/cores/admin/'  + this.userId).subscribe(async result =>{
-      this.CoresList = await result;
-      this.CoresList[0].open = true;
-    },error => {
-      console.log('Error response --> ', JSON.stringify(error))
+    this.api.getData(`api/cores/admin/${this.userId}/`)
+    .subscribe({ 
+      next: async (result) => {
+        this.CoresList = await result;
+        this.CoresList[0].open = true;
+      }, 
+      error: (err) => {
+        console.log('Error --> ', err.message);
+      }
     });
   }
 
   async getRoles(){
-    this.api.getData('api/roles/' + localStorage.getItem('my-userId'))
-      .subscribe(async (result: any) => {
+    this.api.getData(`api/roles/${localStorage.getItem('my-userId')}/`)
+      .subscribe({
+        next: async (result) => {
         this.RoleList = await result;
         localStorage.setItem('roles',JSON.stringify(result));
-      }, (error:any) => {
-        console.log('Error response --> ', JSON.stringify(error));
-      });
+        }, 
+        error: (err) => {
+          console.log('Error --> ', JSON.stringify(err));
+        }
+    });
   }
 
 

@@ -131,10 +131,9 @@ export class DatabaseService {
     'authorization' : `Bearer ${token}`,
     }
     }
-
+    
     return this.http.get(this.REST_API_SERVER + collection ,options);
   }
-
 
 //--- POST data to server
 

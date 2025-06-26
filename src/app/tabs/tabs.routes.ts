@@ -28,7 +28,7 @@ export const routes: Routes = [
       },
       {
         path: 'admin',
-        loadChildren: () => import('../pages/admin/admin.page').then(m => m.AdminPage)
+        loadComponent: () => import('../pages/admin/admin.page').then(m => m.AdminPage)
       },
       {
         path: '',
