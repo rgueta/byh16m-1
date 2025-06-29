@@ -70,4 +70,12 @@ export const routes: Routes = [
     path: 'contacts',
     loadComponent: () => import('./modals/contacts/contacts.page').then( m => m.ContactsPage)
   },
+  {
+    path: 'visitor-list',
+    loadComponent: () => import('./modals/visitor-list/visitor-list.page').then( m => m.VisitorListPage)
+  },
+  {
+    path: 'users',
+    loadComponent: () => import('./modals/users/users.page').then( m => m.UsersPage)
+  },
 ];

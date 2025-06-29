@@ -1,0 +1,60 @@
+.lock{
+    margin: auto 10px auto -10px;
+    font-size: 1.3rem;
+    color:rgb(255, 94, 0);
+}
+
+.title{
+    display: flex;
+    margin: 0;
+    padding-right: 0px;
+    width: 90%;
+}
+
+.closeButton{
+    margin-right: 10px;
+}
+
+.title-wrip{
+    font-size: .8em;
+    width: 100%;
+}
+
+.options{
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    width: 100%;
+}
+
+.option_child{
+    flex: 1;
+}
+
+.option_child:first-child{
+    margin-right: 10px;
+}
+
+.borrar{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.borrar_child{
+    flex: 1;
+}
+
+.borrar_child:first-child{
+    margin-left: 20px;
+    
+}
+
+.borrar_child:last-child{
+    ion-icon {
+        float: right;
+        justify-content: flex-end;
+    }
+    
+}
