@@ -9,11 +9,7 @@ import { IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonLabel,
   IonCard, IonRefresherContent
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
-import { addIcons } from 'ionicons';
-import { ellipsisVerticalOutline,chevronUpOutline, chevronDownOutline,
-add,personOutline, lockClosedOutline,personAddOutline,personCircleOutline,
-toggleOutline
- } from 'ionicons/icons';
+
 import { UsersPage } from "../modals/users/users.page";
 import { VisitorListPage } from '../modals/visitor-list/visitor-list.page';
 import { FamilyPage } from '../modals/family/family.page';
@@ -32,7 +28,12 @@ import {
 } from '@capacitor/push-notifications';
 import { FCM } from "@capacitor-community/fcm"
 import { ScreenOrientation } from "@ionic-native/screen-orientation/ngx";
- import {NetworkService} from "../services/network.service"
+import {NetworkService} from "../services/network.service"
+import { addIcons } from 'ionicons';
+import { ellipsisVerticalOutline,chevronUpOutline, chevronDownOutline,
+add,personOutline, lockClosedOutline,personAddOutline,personCircleOutline,
+toggleOutline,documentOutline,shareSocialOutline,mailOutline
+ } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tab1',
@@ -48,6 +49,7 @@ import { ScreenOrientation } from "@ionic-native/screen-orientation/ngx";
 })
 
 export class Tab1Page implements OnInit{
+ //#region  variables-------------------------
   public localInfo : any = [];
   public codes: [] = [];
   @Input() msg: string = '';
@@ -73,8 +75,7 @@ export class Tab1Page implements OnInit{
   iosOrAndroid: boolean = false;
   demoMode:boolean = false;
   remote:boolean = false;
-
-
+// #endregion -----
   constructor(
     private sms: SMS,
     public modalController: ModalController,
@@ -86,9 +87,10 @@ export class Tab1Page implements OnInit{
     private screenOrientation: ScreenOrientation,
     public networkService:NetworkService
   ) {
-    addIcons({ ellipsisVerticalOutline,chevronUpOutline,chevronDownOutline,
-      add,personOutline, lockClosedOutline,personAddOutline,
-      personCircleOutline,toggleOutline
+    addIcons({ ellipsisVerticalOutline,chevronUpOutline,
+      chevronDownOutline,add,personOutline,documentOutline,
+      lockClosedOutline,personAddOutline,personCircleOutline,
+      toggleOutline,shareSocialOutline,mailOutline
     });
   }
 
