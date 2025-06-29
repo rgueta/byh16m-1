@@ -11,7 +11,9 @@ import { DatabaseService  } from "../../services/database.service";
 import { ToolsService } from "../../services/tools.service";
 import { SMS, SmsOptions } from '@ionic-native/sms/ngx';
 import {  addIcons } from "ionicons";
-import {  } from "ionicons/icons";
+import { arrowBackCircleOutline,lockClosedOutline,chevronForwardOutline,
+  chevronDownOutline,createOutline,saveOutline,trashOutline
+ } from "ionicons/icons";
 
 @Component({
   selector: 'app-users',
@@ -49,7 +51,8 @@ export class UsersPage implements OnInit {
     public navCtrl : NavController,
     private loadingController : LoadingController
   ) {
-    addIcons({});
+    addIcons({arrowBackCircleOutline,lockClosedOutline,chevronForwardOutline,
+  chevronDownOutline,createOutline,saveOutline,trashOutline});
    }
 
   async ionViewWillEnter(){

@@ -114,21 +114,29 @@ export class LoginPage implements OnInit {
       pwd: new FormControl('', [Validators.required, Validators.minLength(4)]),
     });
 
-    await Device.getInfo().then(async (DeviceInfo: any) => {
-
-      console.log('DeviceInfo:', DeviceInfo);
-
+    await Device.getInfo()
+    .then(async (DeviceInfo: any) => {
       this.device_info = await JSON.parse(JSON.stringify(DeviceInfo));
 
-      // get device uuid
-      await Device.getId().then(async (deviceId:any) =>{
-        await localStorage.setItem(DEVICE_UUID, await (deviceId['identifier']));
-        this.device_uuid = await (deviceId['identifier']);
+      console.log('1.- device_info: ', this.device_info);
+      //#region get device uuid  --------------------------------
+      await Device.getId()
+        .then(async (deviceId:any) =>{
+          await localStorage.setItem(DEVICE_UUID, await (deviceId['identifier']));
+          this.device_uuid = await (deviceId['identifier']);
+          console.log('2.- device_uuid: ', this.device_uuid);
+       })
+       .catch( err =>{
+          console.log('Error Device.getId inside Device.getInfo: ', err.message)
        });
 
+       //#endregion  -------------
+
        this.device_info.uuid = await this.device_uuid;
+       console.log('3.- device_info.uuid: ', this.device_info.uuid);
        await localStorage.setItem(DEVICE_PKG, await JSON.stringify(this.device_info));
        localStorage.setItem('devicePlatform',this.device_info.platform)
+       //#region soy android ---------------------------------
        if (this.device_info.platform === 'android') {
          try {
             delete this.device_info.memUsed
@@ -136,21 +144,31 @@ export class LoginPage implements OnInit {
             delete this.device_info.diskTotal
             delete this.device_info.realDiskFree
             delete this.device_info.realDiskTotal
-         } catch (e) {
-           console.log('soy android con Error: ', e);
-       }
-     }else{
-       console.log('no soy android');
-     }
+             console.log('4.- device_info after deletion: ', this.device_info);
+          } catch (e) {
+           console.log('Soy android, error al borrar algunos campos de device_info : ', e);
+          }
+       //#endregion  ---------------------------------------
+        }else{
+          console.log('No soy android');
+        }
 
      localStorage.setItem('device_info',JSON.stringify(this.device_info));
 
-    });
-      
+
+      console.log('5.- DeviceInfo:', DeviceInfo);
+
       if (this.admin_device.includes(this.device_uuid)){
         this.credentials.get('email')!.setValue('ricardogueta@gmail.com');
         this.credentials.get('pwd')!.setValue('1234567');
       }
+
+    })
+    .catch( err =>{
+      console.log('Error Device.getInfo: ', err.message)
+    });
+
+     
   }
 
 

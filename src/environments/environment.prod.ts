@@ -14,13 +14,13 @@ export const environment = {
     // server_url : "http://100.24.58.74/"
 
     // Local
-    // server_url : "http://192.168.1.185:5000/"
+    server_url : "http://192.168.1.185:5000/"
 
     // Eth
     // server_url : "http://192.168.1.184:5500/"
 
     // Wifi-1E44
-    server_url : "http://192.168.0.198:5000/"
+    // server_url : "http://192.168.0.198:5000/"
 
     // Wifi
     // socket_url : "ws://192.168.1.154:5500/",
