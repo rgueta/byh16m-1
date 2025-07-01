@@ -3,22 +3,24 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: 'false',
-  app : {
+  production: "false",
+  app: {
     version: "1.0.4",
     Description: "Main tab data information feed",
     debugging: false,
-    debugging_send_sms: true
+    debugging_send_sms: true,
   },
-  cloud : {
+  cloud: {
     // status 1 = Active; 2 = Inactive, 3 = New register
-    register_status : 3,
+    register_status: 3,
 
     // Web
     // server_url : "http://100.24.58.74/"
 
     // Local
-    server_url : "http://192.168.1.185:5000/"
+    server_url: "http://192.168.1.185:5000/",
+    admin: "ricardogueta@gmail.com",
+    padmin: "P@55w0rd$$",
 
     // Wifi-1E44
     // server_url : "http://192.168.0.198:5000/"
@@ -34,7 +36,7 @@ export const environment = {
 
     // Carlitos
     // server_url : "http://192.168.43.144:5500/"
-  }
+  },
 };
 
 /*

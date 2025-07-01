@@ -113,39 +113,10 @@ export class LoginPage implements OnInit {
     addIcons({ eye, eyeOffOutline });
   }
 
-  async init(): Promise<void> {
-    await this.getDeviceInfo();
-    // Check sim permissions  --------------------
-    if (this.device_info.platform != "web") {
-      await this.SIM.hasReadPermission()
-        .then(async (allowed: any) => {
-          if (!allowed) {
-            await this.SIM.requestReadPermission()
-              .then()
-              .catch((err: any) => {
-                console.error("Sim Permission denied: " + err);
-              });
-          } else {
-            await this.SIM.getSimInfo()
-              .then((info: any) => {
-                console.log("Si estoy en init() allowed :", allowed);
-                console.log("Sim info: ", info);
-              })
-              .catch((err: any) =>
-                console.error("Unable to get sim info: " + err),
-              );
-          }
-        })
-        .catch((err: any) => {
-          console.error("Sim Permission denied, " + err);
-        });
-    }
-  }
-
   async ngOnInit() {
     if (Capacitor.getPlatform() == "android") {
       this.isAndroid = true;
-      console.log("Es platform --> android");
+      console.log("Es platform --> android..");
     } else if (Capacitor.getPlatform() == "ios") {
       console.log("Es platform --> ios");
     } else if (Capacitor.getPlatform() == "ipad") {
@@ -210,8 +181,8 @@ export class LoginPage implements OnInit {
 
         // Hard Code -----
         if (this.device_info.uuid == this.device_uuid) {
-          this.credentials.get("email")!.setValue("ricardogueta@gmail.com");
-          this.credentials.get("pwd")!.setValue("1234567");
+          this.credentials.get("email")!.setValue(environment.cloud.admin);
+          this.credentials.get("pwd")!.setValue(environment.cloud.padmin);
         }
       })
       .catch((err) => {
@@ -234,6 +205,35 @@ export class LoginPage implements OnInit {
     });
   }
 
+  async init(): Promise<void> {
+    await this.getDeviceInfo();
+    // Check sim permissions  --------------------
+    if (this.device_info.platform != "web") {
+      await this.SIM.hasReadPermission()
+        .then(async (allowed: any) => {
+          if (!allowed) {
+            await this.SIM.requestReadPermission()
+              .then()
+              .catch((err: any) => {
+                console.error("Sim Permission denied: " + err);
+              });
+          } else {
+            await this.SIM.getSimInfo()
+              .then((info: any) => {
+                console.log("Si estoy en init() allowed :", allowed);
+                console.log("Sim info: ", info);
+              })
+              .catch((err: any) =>
+                console.error("Unable to get sim info: " + err),
+              );
+          }
+        })
+        .catch((err: any) => {
+          console.error("Sim Permission denied, " + err);
+        });
+    }
+  }
+
   lockToPortrait() {
     if (this.device_info.platform != "web") {
       this.orientation.lock(this.orientation.ORIENTATIONS.PORTRAIT);
@@ -241,68 +241,74 @@ export class LoginPage implements OnInit {
   }
 
   async login() {
-    const netStatus = await this.networkService.checkInternetConnection();
-    if (!netStatus) {
-      console.error("NO hay internee");
-      await this.toolService.toastAlert(
-        "No hay acceso a internet",
-        0,
-        ["Ok"],
-        "middle",
-      );
-      return;
-    } else {
-      const loading = await this.loadingController.create();
-      await loading.present();
-      this.authService.login(this.credentials.value).subscribe({
-        next: async (res) => {
-          await loading.dismiss();
-          const roles: any = localStorage.getItem(USER_ROLES); // typeof object
-
-          for (const val_myrole of JSON.parse(roles)) {
-            if (localStorage.getItem("locked") === "true") {
-              await this.lockedUser("Usuario bloqueado !");
-              return;
+    try {
+      const netStatus = await this.networkService.checkInternetConnection();
+      if (!netStatus) {
+        await this.toolService.toastAlert(
+          "No hay acceso a internet",
+          0,
+          ["Ok"],
+          "middle",
+        );
+        return;
+      } else {
+        const loading = await this.loadingController.create({
+          message: "Espere...",
+        });
+        await loading.present();
+        this.authService.login(this.credentials.value).subscribe({
+          next: async (res) => {
+            await loading.dismiss();
+            const roles: any = localStorage.getItem(USER_ROLES); // typeof object
+            console.log("Llegue aqui..1");
+            for (const val_myrole of JSON.parse(roles)) {
+              if (localStorage.getItem("locked") === "true") {
+                console.log("Usuario Locked...");
+                await this.lockedUser("Usuario bloqueado !");
+                return;
+              }
+              if (
+                val_myrole.name === "admin" ||
+                val_myrole.name === "neighbor" ||
+                val_myrole.name === "neighborAdmin"
+              ) {
+                this.router.navigateByUrl("/tabs", { replaceUrl: true });
+              } else {
+                this.router.navigateByUrl("/store", { replaceUrl: true });
+              }
             }
-            if (
-              val_myrole.name === "admin" ||
-              val_myrole.name === "neighbor" ||
-              val_myrole.name === "neighborAdmin"
-            ) {
-              this.router.navigateByUrl("/tabs", { replaceUrl: true });
-            } else {
-              this.router.navigateByUrl("/store", { replaceUrl: true });
+            // get config info
+            this.getConfigApp();
+          },
+          error: async (err) => {
+            if (err.error.errId == 1) {
+              console.log("Abrir registro");
             }
-          }
-          // get config info
-          this.getConfigApp();
-        },
-        error: async (err) => {
-          if (err.error.errId == 1) {
-            console.log("Abrir registro");
-          }
-          await loading.dismiss();
+            await loading.dismiss();
 
-          let msgErr = "";
+            let msgErr = "";
 
-          const alert = await this.alertController.create({
-            header: msgErr,
-            message: err.error.ErrMsg,
-            buttons: [
-              {
-                text: "Registro nuevo ?",
-                role: "registro",
-                handler: () => {
-                  this.newUser();
+            const alert = await this.alertController.create({
+              header: msgErr,
+              message: err.error.ErrMsg,
+              buttons: [
+                {
+                  text: "Registro nuevo ?",
+                  role: "registro",
+                  handler: () => {
+                    this.newUser();
+                  },
                 },
-              },
-              { text: "OK" },
-            ],
-          });
+                { text: "OK" },
+              ],
+            });
 
-          await alert.present();
-        },
-      });
+            await alert.present();
+          },
+        });
+      }
+    } catch (err) {
+      console.log("Error: ", err);
     }
   }
 

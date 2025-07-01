@@ -1,115 +1,109 @@
-
 ion-content {
-    --padding-top: 40%;
-    --padding-start: 10%;
-    --padding-end: 10%;
-    // --background: url('https://images.unsplash.com/photo-1536431311719-398b6704d4cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1234&q=80') 0 0/100% 100% no-repeat;
-    // --background: url('../../../assets/logo_v2.png') 0 0/100% 100% no-repeat;
+  --padding-top: 40%;
+  --padding-start: 10%;
+  --padding-end: 10%;
+  // --background: url('https://images.unsplash.com/photo-1536431311719-398b6704d4cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1234&q=80') 0 0/100% 100% no-repeat;
+  // --background: url('../../../assets/logo_v2.png') 0 0/100% 100% no-repeat;
 }
 
-.formInput{
-    margin-top: -90px;
+.formInput {
+  margin-top: -90px;
 }
 
-.mainTitle{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 28px;
+.mainTitle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28px;
 }
 
-.version{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 12px;
+.version {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
 }
-
 
 .loginButton {
-    --background:#64AA95;
+  --background: #64aa95;
 }
 
-.registerButton{
-    --background:#6599CE;
-    // color:#6599CE;
+.registerButton {
+  --background: #6599ce;
+  // color:#6599CE;
 }
- 
+
 .input-group {
-    background: #fff;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 15px;
-    // margin-top: -40px;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 15px;
+  // margin-top: -40px;
 }
- 
+
 .errors {
-    font-size: small;
-    color: #fff;
-    background: var(--ion-color-danger);
-    padding-left: 15px;
-    padding-top: 5px;
-    padding-bottom: 5px;
+  font-size: small;
+  color: #fff;
+  background: var(--ion-color-danger);
+  padding-left: 15px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 .login_logo {
-    position:relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content:center ;
-    height: 200px;
-    top:-100px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  top: -100px;
 
-    img{
-        border-radius: 50%;
-        border: 2px solid #fff;
-        position: absolute;
-    }
+  img {
+    border-radius: 50%;
+    border: 2px solid #fff;
+    position: absolute;
+  }
 }
 
-.resetPwd-Link{
-    margin-top: 15px;
-    text-align: center!important;
+.resetPwd-Link {
+  margin-top: 15px;
+  text-align: center !important;
 
-    a{
-    color: #6599CE;
-    }
+  a {
+    color: #6599ce;
+  }
 }
-
 
 // Small phones
-    @media only screen and (min-width: 200px) {
-        .login_logo {      
-            img{
-                margin-bottom: 20px;
-                width: 170px;
-                height: 170px;
-            }
-     }
+@media only screen and (min-width: 200px) {
+  .login_logo {
+    img {
+      margin-bottom: 20px;
+      width: 170px;
+      height: 170px;
     }
+  }
+}
 
-    // Large phones
-    @media only screen and (min-width: 400px) {
-        .login_logo {      
-            img{
-                margin-bottom: 40px;
-                width: 190px;
-                height: 190px;
-            }
-     }
+// Large phones
+@media only screen and (min-width: 400px) {
+  .login_logo {
+    img {
+      margin-bottom: 40px;
+      width: 190px;
+      height: 190px;
     }
+  }
+}
 
-    // Tablets
-     @media only screen and (min-width: 768px) {
-        .login_logo {      
-            img{
-                margin-bottom: 180px;
-                width: 300px;
-                height: 300px;
-                
-            }
-     }
-    
-
+// Tablets
+@media only screen and (min-width: 768px) {
+  .login_logo {
+    img {
+      margin-bottom: 180px;
+      width: 300px;
+      height: 300px;
     }
+  }
+}
