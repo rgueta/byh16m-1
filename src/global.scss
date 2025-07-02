@@ -36,8 +36,12 @@
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
 
+.topHeader {
+  padding-top: 2rem;
+}
+
 // Accordion -------------------------------
-ion-accordion.accordion-expanding ion-item[slot="header"],
+ion-accordion.accordion-expandSng ion-item[slot="header"],
 ion-accordion.accordion-expanded ion-item[slot="header"] {
   --background: #0c0254;
   --color: #fff;

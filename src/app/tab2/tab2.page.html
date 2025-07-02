@@ -1,79 +1,85 @@
-<ion-header [translucent]="true">
+<ion-header class="topHeader">
   <ion-toolbar slot="start">
     <ion-title class="ion-text-center">Registro de entradas</ion-title>
   </ion-toolbar>
-
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content>
+  <div slot="fixed" class="aperturas">
+    <ion-item [ngStyle]="{ '--background': '#6599CE', 'color':'white' }">
+      <div id="open-modal1" class="FilterFrom">
+        <div>
+          <ion-label>Desde:</ion-label>
+        </div>
+        <div id="open-modal1" class="itemFilter">
+          <ion-note class="filterDate" slot="end">{{start | date}}</ion-note>
+          <ion-icon slot="end" name="calendar"></ion-icon>
+        </div>
+      </div>
+
+      <div id="open-modal2" class="FilterTo">
+        <div>
+          <ion-label>Hasta:</ion-label>
+        </div>
+        <div id="open-modal2" class="itemFilter">
+          <ion-note class="filterDate" slot="end">{{end | date}}</ion-note>
+          <ion-icon slot="end" name="calendar"></ion-icon>
+        </div>
+      </div>
+
+      <div class="search" (click)="getEvents()">
+        <div>
+          <ion-label>Buscar:</ion-label>
+        </div>
+        <div id="open-modal2" class="itemFilter">
+          <ion-icon slot="end" name="search"></ion-icon>
+        </div>
+      </div>
+    </ion-item>
+  </div>
 
   <ion-list class="wrapper-filter">
-      <ion-item
-        [ngStyle]="{ '--background': '#6599CE', 'color':'white' }">
-        <div id="open-modal1" class="FilterFrom">
-          <div>
-            <ion-label>Desde:</ion-label>
-          </div>
-          <div id="open-modal1" class="itemFilter">
-            <ion-note class="filterDate" slot="end">{{start | date}}</ion-note>
-            <ion-icon slot="end" name="calendar" ></ion-icon>
-          </div>
-        </div>
-  
-        <div id="open-modal2" class="FilterTo">
-          <div>
-            <ion-label>Hasta:</ion-label>
-          </div>
-          <div id="open-modal2" class="itemFilter">
-            <ion-note class="filterDate" slot="end">{{end | date}}</ion-note>
-            <ion-icon slot="end" name="calendar"></ion-icon>
-          </div>
-        </div>
-
-        <div class="search" (click)="getEvents()">
-          <div>
-            <ion-label>Buscar:</ion-label>
-          </div>
-          <div id="open-modal2" class="itemFilter">
-            <ion-icon slot="end" name="search"></ion-icon>
-          </div>
-        </div>
-
-      </ion-item>
-    
     <ion-modal id="open-modal1" trigger="open-modal1" [cssClass]="'bottom-end'">
       <ng-template>
-        <ion-datetime  class="dateFilter"
+        <ion-datetime
+          class="dateFilter"
           locale="es-ES"
           presentation="date"
           size="cover"
-          display-format="D MMM YYYY" min="2024-11-01T00:00:00" 
-          max="2064-11-01T00:00:00" value={{Initial}} 
+          display-format="D MMM YYYY"
+          min="2024-11-01T00:00:00"
+          max="2064-11-01T00:00:00"
+          value="{{Initial}}"
           [showDefaultButtons]="true"
           cancelText="Cancelar"
           doneText="Aceptar"
           (ionChange)="getEventsInitial($event)"
-          [showDefaultTitle]="true" >
-        <span slot="title">Selecciona la fecha</span>
-      </ion-datetime>
+          [showDefaultTitle]="true"
+        >
+          <span slot="title">Selecciona la fecha</span>
+        </ion-datetime>
       </ng-template>
     </ion-modal>
 
     <ion-modal id="open-modal2" trigger="open-modal2" [cssClass]="'bottom-end'">
       <ng-template>
-        <ion-datetime  class="dateFilter" 
+        <ion-datetime
+          class="dateFilter"
           locale="es-ES"
           presentation="date"
           size="cover"
-          display-format="D MMM YYYY" min="2024-11-01T00:00:00" 
-          max="2064-11-01T00:00:00" value={{Final}} 
+          display-format="D MMM YYYY"
+          min="2024-11-01T00:00:00"
+          max="2064-11-01T00:00:00"
+          value="{{Final}}"
           [showDefaultButtons]="true"
           cancelText="Cancelar"
           doneText="Aceptar"
           (ionChange)="getEventsFinal($event)"
-          [showDefaultTitle]="true">
-        <span slot="title">Selecciona la fecha</span>
-      </ion-datetime>
+          [showDefaultTitle]="true"
+        >
+          <span slot="title">Selecciona la fecha</span>
+        </ion-datetime>
       </ng-template>
     </ion-modal>
   </ion-list>
@@ -81,33 +87,51 @@
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-  
-  <ion-list *ngFor="let item of EventsList; let i = index;" 
-    class="accordion-list" lines="none" detail="false" no-padding>
-    <ion-item tappable class='section' (click)="toggleSection(i)">
-       <ion-icon color="white" slot="end" name="chevron-forward-outline" *ngIf="!item.open"></ion-icon>
-       <ion-icon color="white" slot="end" name="chevron-down-outline" *ngIf="item.open"></ion-icon>
-       <ion-label class="ion-text-wrap">
-        Nombre: <strong>{{item.visitorName}}</strong><b></b></ion-label>
-   </ion-item>
 
-   <form tappable *ngIf="item.open" class="detail">
-       <ion-item class='detail-events-item'>
-         <ion-label> Ocurrio: <b>{{item.createdAt | date:'dd MMM yyyy hh:mm a'}}</b></ion-label>
-       </ion-item>
-       <ion-item class='detail-item'>
+  <ion-list
+    *ngFor="let item of EventsList; let i = index;"
+    class="accordion-list"
+    lines="none"
+    detail="false"
+    no-padding
+  >
+    <ion-item tappable class="section" (click)="toggleSection(i)">
+      <ion-icon
+        color="white"
+        slot="end"
+        name="chevron-forward-outline"
+        *ngIf="!item.open"
+      ></ion-icon>
+      <ion-icon
+        color="white"
+        slot="end"
+        name="chevron-down-outline"
+        *ngIf="item.open"
+      ></ion-icon>
+      <ion-label class="ion-text-wrap">
+        Nombre: <strong>{{item.visitorName}}</strong><b></b
+      ></ion-label>
+    </ion-item>
+
+    <form tappable *ngIf="item.open" class="detail">
+      <ion-item class="detail-events-item">
+        <ion-label>
+          Ocurrio:
+          <b>{{item.createdAt | date:'dd MMM yyyy hh:mm a'}}</b></ion-label
+        >
+      </ion-item>
+      <ion-item class="detail-item">
         <ion-label> Casa: <b>{{item.house}}</b></ion-label>
       </ion-item>
-        <ion-item class='detail-item'>
-          <ion-label> Codigo: <b>{{item.code}}</b></ion-label>
+      <ion-item class="detail-item">
+        <ion-label> Codigo: <b>{{item.code}}</b></ion-label>
       </ion-item>
-        <ion-item  *ngIf="myEventsList?.length > 0" >
-         <ion-label class='labelInput' floating>Users:</ion-label>
-         <!-- <ion-select ok-text="Seleccionar" cancel-text="Cancelar" (ionChange)="setupCode(visitorId)" >
+      <ion-item *ngIf="myEventsList?.length > 0">
+        <ion-label class="labelInput" floating>Users:</ion-label>
+        <!-- <ion-select ok-text="Seleccionar" cancel-text="Cancelar" (ionChange)="setupCode(visitorId)" >
            <ion-select-option *ngFor="let user of myEventsList; let i = index;" value={{user._id}}  >{{user.name}}</ion-select-option>
          </ion-select> -->
-     </ion-item>
-   </form>
- </ion-list>
-
+      </ion-item>
+    </form>
+  </ion-list>
 </ion-content>
