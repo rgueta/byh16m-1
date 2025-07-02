@@ -1,3 +1,7 @@
+.top_header {
+  padding-top: var(--ion-safe-area-top, 0);
+}
+
 ion-content {
   --padding-top: 40%;
   --padding-start: 10%;

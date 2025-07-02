@@ -1,12 +1,12 @@
-import type { CapacitorConfig } from '@capacitor/cli';
+import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'byh16m',
-  webDir: 'www',
-  server:{
-    cleartext:true
-  }
+  appId: "com.bytheg.byh16m",
+  appName: "byh16m",
+  webDir: "www",
+  server: {
+    cleartext: true,
+  },
 };
 
 export default config;

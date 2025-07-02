@@ -1,47 +1,73 @@
-<ion-header>
+<ion-header class="top_header">
   <ion-toolbar>
     <div class="mainTitle">BYH16M</div>
     <div class="version">version {{version}}</div>
   </ion-toolbar>
 </ion-header>
- 
-<ion-content>
- <div class="login_logo">
-  <img src="../../../assets/logo_v2.png"/>
-  <div class="version">version {{version}}</div>
- </div> 
 
- <form class="formInput" (ngSubmit)="login()" [formGroup]="credentials">
-   <div class="input-group">
+<ion-content>
+  <div class="login_logo">
+    <img src="../../../assets/logo_v2.png" />
+    <div class="version">version {{version}}</div>
+  </div>
+
+  <form class="formInput" (ngSubmit)="login()" [formGroup]="credentials">
+    <div class="input-group">
       <ion-item>
-        <ion-input type="email" placeholder="Email"  (keyup.enter)="login()"
-        formControlName="email"></ion-input>
+        <ion-input
+          type="email"
+          placeholder="Email"
+          (keyup.enter)="login()"
+          formControlName="email"
+        ></ion-input>
       </ion-item>
-      <div *ngIf="(email.dirty || email.touched) && email.errors" class="errors">
+      <div
+        *ngIf="(email.dirty || email.touched) && email.errors"
+        class="errors"
+      >
         <span *ngIf="email.errors?.['required']">Email is required</span>
         <span *ngIf="email.errors?.['email']">Email is invalid</span>
       </div>
       <ion-item>
-        <ion-input type="password" placeholder="Password" (keyup.enter)="login()" 
-        [type]="showPassword ? 'text' : 'password'" formControlName="pwd"></ion-input>
-        <ion-icon slot="end" [name]="passwordToggleIcon" (click)="togglePassword()"></ion-icon>
-
-        </ion-item>
-      <div *ngIf="(password.dirty || password.touched) && password.errors" class="errors">
+        <ion-input
+          type="password"
+          placeholder="Password"
+          (keyup.enter)="login()"
+          [type]="showPassword ? 'text' : 'password'"
+          formControlName="pwd"
+        ></ion-input>
+        <ion-icon
+          slot="end"
+          [name]="passwordToggleIcon"
+          (click)="togglePassword()"
+        ></ion-icon>
+      </ion-item>
+      <div
+        *ngIf="(password.dirty || password.touched) && password.errors"
+        class="errors"
+      >
         <span *ngIf="password.errors?.['required']">Password is required</span>
-        <span *ngIf="password.errors?.['minlength']">Password needs to be 6 characters</span>
+        <span *ngIf="password.errors?.['minlength']"
+          >Password needs to be 6 characters</span
+        >
       </div>
     </div>
- 
-    <ion-button class="loginButton" type="submit" expand="block" 
-      [disabled]="!credentials.valid">Iniciar sesion</ion-button>
-      <hr>
 
-      <ion-button class="loginButton" expand="block" (click)="newUser()"
-      >Usuario nuevo</ion-button>
+    <ion-button
+      class="loginButton"
+      type="submit"
+      expand="block"
+      [disabled]="!credentials.valid"
+      >Iniciar sesion</ion-button
+    >
+    <hr />
 
-      <hr>
-      <!-- <ion-button class="loginButton" expand="block" (click)='openStore()'>
+    <ion-button class="loginButton" expand="block" (click)="newUser()"
+      >Usuario nuevo</ion-button
+    >
+
+    <hr />
+    <!-- <ion-button class="loginButton" expand="block" (click)='openStore()'>
         Soy visitante</ion-button> -->
 
     <div class="resetPwd-Link">

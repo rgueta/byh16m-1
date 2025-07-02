@@ -116,12 +116,16 @@ export class LoginPage implements OnInit {
   async ngOnInit() {
     if (Capacitor.getPlatform() == "android") {
       this.isAndroid = true;
+      this.lockToPortrait();
       console.log("Es platform --> android..");
     } else if (Capacitor.getPlatform() == "ios") {
+      this.lockToPortrait();
       console.log("Es platform --> ios");
     } else if (Capacitor.getPlatform() == "ipad") {
+      this.lockToPortrait();
       console.log("Es platform --> ipad");
     } else if (Capacitor.getPlatform() == "iphone") {
+      this.lockToPortrait();
       console.log("Es platform --> iphone");
     } else if (Capacitor.getPlatform() == "web") {
       console.log("Es platform --> web");
@@ -235,9 +239,7 @@ export class LoginPage implements OnInit {
   }
 
   lockToPortrait() {
-    if (this.device_info.platform != "web") {
-      this.orientation.lock(this.orientation.ORIENTATIONS.PORTRAIT);
-    }
+    this.orientation.lock(this.orientation.ORIENTATIONS.PORTRAIT);
   }
 
   async login() {
