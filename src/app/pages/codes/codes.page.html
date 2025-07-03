@@ -1,11 +1,10 @@
-<ion-header [translucent]="true">
+<ion-header class="topHeader" [translucent]="true">
   <ion-toolbar slot="start">
-      <ion-title class="ion-text-center">Codigos</ion-title>
+    <ion-title class="ion-text-center">Codigos</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
@@ -14,106 +13,142 @@
     <ion-icon color="white" slot="end" name="add" style="zoom:1.5" ></ion-icon>Nuevo codigo
   </ion-button> -->
 
-     <!-- fab placed to the bottom end -->
-     <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-      <ion-fab-button class="button-blue" (click)="addCode()">
-        <ion-icon name="add-outline"></ion-icon>
-      </ion-fab-button>
-    </ion-fab>
+  <!-- fab placed to the bottom end -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button class="button-blue" (click)="addCode()">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 
-    <ion-list *ngFor="let item of CodeList; let i = index;" class="accordion-list" 
-      lines="none" detail="false" no-padding >
+  <ion-list
+    *ngFor="let item of CodeList; let i = index;"
+    class="accordion-list"
+    lines="none"
+    detail="false"
+    no-padding
+  >
+    <ion-item
+      tappable
+      (click)="toggleSection(i)"
+      [ngClass]="{'section-expired' : item.expired || !item.enable, 'section' : !item.expired}"
+    >
+      <ion-icon
+        slot="end"
+        name="chevron-forward-outline"
+        *ngIf="!item.open"
+      ></ion-icon>
+      <ion-icon
+        slot="end"
+        name="chevron-down-outline"
+        *ngIf="item.open"
+      ></ion-icon>
+      <ion-label class="ion-text-wrap" *ngIf="item.expired">
+        {{item.code}}, codigo expirado
+      </ion-label>
+      <ion-label class="ion-text-wrap" *ngIf="!item.expired">
+        {{item.code}} [ activo ] Expira en {{item.range}} horas
+      </ion-label>
+    </ion-item>
 
-      <ion-item tappable (click)="toggleSection(i)" 
-        [ngClass]="{'section-expired' : item.expired || !item.enable, 'section' : !item.expired}">
-        <ion-icon slot="end" name="chevron-forward-outline" *ngIf="!item.open"></ion-icon>
-        <ion-icon slot="end" name="chevron-down-outline" *ngIf="item.open"></ion-icon>
-        <ion-label class="ion-text-wrap" *ngIf="item.expired">
-          {{item.code}}, codigo expirado </ion-label>
-        <ion-label class="ion-text-wrap" *ngIf="!item.expired" >
-          {{item.code}} [ activo ] Expira en {{item.range}} horas </ion-label>
+    <form tappable *ngIf="item.open" class="detail">
+      <ion-item class="detail-item">
+        <ion-label> Codigo: {{item.code}}</ion-label>
+      </ion-item>
+      <ion-item class="detail-item" *ngIf="MyRole == 'admin'">
+        <div class="reenviar">
+          <ion-range
+            id="expiryRange"
+            class="range"
+            aria-label="Tiempo activo: "
+            min="1"
+            max="8"
+            [value]="code_expiry"
+            [pin]="true"
+            [ticks]="true"
+            [snaps]="true"
+            (ionChange)="onRangeChange($event)"
+          >
+            <ion-label class="limits" slot="start">1</ion-label>
+            <ion-label class="limits" slot="end">8</ion-label>
+          </ion-range>
+
+          <input
+            class="button-17"
+            type="button"
+            (click)="ResendCode(item.code,item._id,item.initial,item.expiry)"
+            value="Reenviar a modulo"
+          />
+        </div>
       </ion-item>
 
-      <form tappable *ngIf="item.open" class="detail">
-          <ion-item class='detail-item'>
-            <ion-label> Codigo: {{item.code}}</ion-label>
-          </ion-item>
-          <ion-item  class='detail-item' *ngIf="MyRole == 'admin'" >
-            <div class="reenviar">
-              <ion-range id="expiryRange" class="range"
-              aria-label="Tiempo activo: "
-              min="1"
-              max="8"
-              [value]="code_expiry"
-              [pin]="true"
-              [ticks]="true"
-              [snaps]="true"
-              (ionChange)="onRangeChange($event)">
-              <ion-label class="limits" slot="start">1</ion-label>
-              <ion-label class="limits" slot="end">8</ion-label>
-            </ion-range>
-
-              <input class="button-17" type="button" 
-                (click)="ResendCode(item.code,item._id,item.initial,item.expiry)"
-                value="Reenviar a modulo">
-            </div>
-          </ion-item>
-          
-          <!-- <ion-item class='detail-item'>
+      <!-- <ion-item class='detail-item'>
             <ion-label> Tel. visitante:  {{item.visitorSim}}</ion-label>
           </ion-item> -->
 
-
       <!-- Initial   ----------------------------------------------------------------------- -->
-          <!-- <ion-list class="lstInitial"> -->
-            <ion-item id="open-modalInitial" class="itemFilter">
-              <ion-label class='lblFilterDate'>Inicio :</ion-label>
-              <ion-note class="filterDate" slot="end">{{item.initial | date:'dd MMM YYYY hh:mm a'}}</ion-note>
-              <ion-icon color="white" slot="end" name="calendar-outline" ></ion-icon>
-            </ion-item>
-            <ion-modal trigger="open-modalInitialToAvoid" [cssClass]="'bottom-end'">
-              <ng-template>
-                <ion-datetime  class="dateFilter" 
-                  locale="es-ES"
-                  presentation="date"
-                  size="cover"
-                  #myInitial displayFormat="D MMM YYYY hh:mm a" min="2022" 
-                  max="2060" minuteValues="0,15,30,45"
-                  [showDefaultButtons]="true"
-                  (ionChange)="onChangeInitial(myInitial.value,item.expiry)"
-                  >
-              </ion-datetime>
-              </ng-template>
-            </ion-modal>
-          <!-- </ion-list> -->
+      <!-- <ion-list class="lstInitial"> -->
+      <ion-item id="open-modalInitial" class="itemFilter">
+        <ion-label class="lblFilterDate">Inicio :</ion-label>
+        <ion-note class="filterDate" slot="end"
+          >{{item.initial | date:'dd MMM YYYY hh:mm a'}}</ion-note
+        >
+        <ion-icon color="white" slot="end" name="calendar-outline"></ion-icon>
+      </ion-item>
+      <ion-modal trigger="open-modalInitialToAvoid" [cssClass]="'bottom-end'">
+        <ng-template>
+          <ion-datetime
+            class="dateFilter"
+            locale="es-ES"
+            presentation="date"
+            size="cover"
+            #myInitial
+            displayFormat="D MMM YYYY hh:mm a"
+            min="2022"
+            max="2060"
+            minuteValues="0,15,30,45"
+            [showDefaultButtons]="true"
+            (ionChange)="onChangeInitial(myInitial.value,item.expiry)"
+          >
+          </ion-datetime>
+        </ng-template>
+      </ion-modal>
+      <!-- </ion-list> -->
 
-          <!--  Expiry -------------------------------------------------------------------------------- -->
+      <!--  Expiry -------------------------------------------------------------------------------- -->
 
-            <ion-item id="open-modalExpiry" class="itemFilter">
-              <ion-label class='lblFilterDate'>Fin :</ion-label>
-              <ion-note class="filterDate" slot="end">{{item.expiry | date:'dd MMM YYYY hh:mm a'}}</ion-note>
-              <ion-icon color="white" slot="end" name="calendar-outline" ></ion-icon>
-            </ion-item>
-            <ion-modal trigger="open-modalExpiryToAvoid" [cssClass]="'bottom-end'">
-              <ng-template>
-                <ion-datetime  class="dateFilter" 
-                  locale="es-ES"
-                  presentation="date"
-                  size="cover"
-                  #myExpiry display-format="D MMM YYYY" min="2022" 
-                  max="2060" 
-                  [showDefaultButtons]="true"
-                  (ionChange)="onChangeExpiry(item._id,myExpiry.value,myExpiry.value)"
-                  >
-              </ion-datetime>
-              </ng-template>
-            </ion-modal>
+      <ion-item id="open-modalExpiry" class="itemFilter">
+        <ion-label class="lblFilterDate">Fin :</ion-label>
+        <ion-note class="filterDate" slot="end"
+          >{{item.expiry | date:'dd MMM YYYY hh:mm a'}}</ion-note
+        >
+        <ion-icon color="white" slot="end" name="calendar-outline"></ion-icon>
+      </ion-item>
+      <ion-modal trigger="open-modalExpiryToAvoid" [cssClass]="'bottom-end'">
+        <ng-template>
+          <ion-datetime
+            class="dateFilter"
+            locale="es-ES"
+            presentation="date"
+            size="cover"
+            #myExpiry
+            display-format="D MMM YYYY"
+            min="2022"
+            max="2060"
+            [showDefaultButtons]="true"
+            (ionChange)="onChangeExpiry(item._id,myExpiry.value,myExpiry.value)"
+          >
+          </ion-datetime>
+        </ng-template>
+      </ion-modal>
 
-          <ion-item class='detail-item'>
-            <ion-label *ngIf="item.range <= 0"> Ya expiro en dias: ({{((item.range/24) * -1).toFixed(1)}})</ion-label>
-            <ion-label *ngIf="item.range > 0"> Expira en {{item.range}} horas </ion-label>
-          </ion-item>
-      </form>
-
-    </ion-list>
+      <ion-item class="detail-item">
+        <ion-label *ngIf="item.range <= 0">
+          Ya expiro en dias: ({{((item.range/24) * -1).toFixed(1)}})</ion-label
+        >
+        <ion-label *ngIf="item.range > 0">
+          Expira en {{item.range}} horas
+        </ion-label>
+      </ion-item>
+    </form>
+  </ion-list>
 </ion-content>

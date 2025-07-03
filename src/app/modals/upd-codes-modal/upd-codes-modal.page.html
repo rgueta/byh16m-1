@@ -1,13 +1,118 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>upd-codes-modal</ion-title>
+    <div class="column left">
+      <div>
+        <ion-buttons slot="start">
+          <ion-icon
+            class="icon_exit"
+            (click)="closeModal()"
+            name="arrow-back-circle-outline"
+            >Cerrar</ion-icon
+          >
+        </ion-buttons>
+      </div>
+    </div>
+
+    <div class="column middle">
+      <ion-title>Mandar codigo</ion-title>
+    </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">upd-codes-modal</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+  <ion-item id="qrWrap" class="qrWrap">
+    <!-- <div>
+      <ion-button class="custom-fab-code" shape="round" (click)="captureQRscreen()">
+        <ion-icon name="share-social-outline" size="large"></ion-icon>
+      </ion-button>
+    </div> -->
+
+    <div id="qrImage">
+      <div class="qrIn">
+        <qr-code value="{{code}}" size="180" errorCorrectionLevel="M" />
+      </div>
+      <label class="qrLabel">{{code}}</label>
+      <label class="qrLabel">valido por: {{diff}} hrs.</label>
+      <label class="qrLabel" style="color: white"> ______ </label>
+    </div>
+
+    <!-- <div class="code">
+      <ion-input class='newCode' type="text" name='code' required placeholder="codigo"
+      value={{code}} [(ngModel)]="code" ></ion-input>
+    </div> -->
+
+    <!-- <div class="refreshCode">
+      <ion-button class="custom-fab-code" shape="round" (click)="newCode()">
+        <ion-icon name="refresh-outline" size="large"></ion-icon>
+      </ion-button>
+    </div> -->
+  </ion-item>
+
+  <form [formGroup]="RegisterForm">
+    <!-- <ion-item class="visitor-item-select"  color="primary">
+        <ion-input class="visitorOption" href="#" placeholder="Selecciona Visitante"
+        formControlName="ValidVisitorName" (click)="openVisitorModal()"
+        [(ngModel)]="visitorCode"
+        [value]="visitorCode"></ion-input>
+        <ion-icon name="person-add-outline" slot="start" (click)="openVisitorModal()"></ion-icon>
+      </ion-item>
+
+    <ion-item>
+      <ion-label>Telefono:</ion-label>
+      <ion-input class='phoneNumber' type="text"
+          [value]="visitorSim" formControlName="ValidVisitorSim"
+          [(ngModel)]="visitorSim">
+        </ion-input>
+    </ion-item> -->
+
+    <!-- Expiry range -->
+    <ion-item>
+      <ion-range
+        aria-label="Tiempo activo: "
+        min="1"
+        max="8"
+        [value]="code_expiry"
+        [pin]="true"
+        [ticks]="true"
+        [snaps]="true"
+        (ionChange)="onRangeChange($event)"
+      >
+        <ion-label class="limits" slot="start">1</ion-label>
+        <ion-label class="limits" slot="end">8</ion-label>
+      </ion-range>
+    </ion-item>
+
+    <!-- ----------------------------------- -->
+
+    <ion-item class="horas">
+      <ion-label style="min-width: 150px">Expira en horas: </ion-label>
+      <ion-label id="diff">{{diff}}</ion-label>
+    </ion-item>
+
+    <ion-item class="motivo">
+      <ion-label class="labelInput">Motivo: </ion-label>
+      <ion-textarea
+        #mycomment
+        class="input"
+        (ionChange)="onChangeComment(mycomment.value)"
+        name="comment"
+        value="{{comment}}"
+      ></ion-textarea>
+    </ion-item>
+
+    <ion-item class="wrap-input">
+      <!-- <ion-button type="submit" class="submit titleButtonBlue" mode="ios"
+         expand="full"
+        (click)="captureQRscreen()" >Enviar</ion-button> -->
+
+      <div class="item-wripper">
+        <input
+          class="button-17 submit"
+          type="button"
+          (click)="sendQR()"
+          value="Mandar"
+        />
+      </div>
+    </ion-item>
+  </form>
 </ion-content>

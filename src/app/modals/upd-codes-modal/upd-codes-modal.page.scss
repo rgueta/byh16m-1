@@ -1,0 +1,211 @@
+ion-modal {
+  &.bottom-end {
+    align-items: flex-end;
+    --height: auto;
+    .ion-page {
+      position: relative;
+      display: block;
+      contain: content;
+    }
+  }
+}
+
+.wrap-input {
+  padding: 1px 0 10px 0;
+}
+
+.closeButton {
+  margin-right: 0px;
+}
+
+.title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+
+.column {
+  float: left;
+  padding: 0.3rem 0 0.3rem 0.2rem;
+}
+
+.left {
+  width: 25%;
+  padding: 0.3rem 0 0.3rem 0.4rem;
+  // background-color: beige;
+}
+
+.middle {
+  padding: 1rem 0 0.5rem 0;
+
+  // width: 50%;
+  ion-title {
+    font-size: 5vw;
+    text-align: center;
+  }
+}
+
+.item-wripper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+}
+
+.submit {
+  align-items: center;
+  height: 60px;
+  margin-top: 10px;
+  width: 90%;
+}
+
+.itemFilter {
+  // display: flex;
+  align-content: space-between;
+}
+
+.filterDate {
+  // display: flex;
+  color: #777;
+  font-size: 1em;
+  vertical-align: middle;
+  margin: 0 20px 0 5px;
+  text-align: center;
+  // width: 60%;
+  padding-left: 0px;
+}
+
+.horas {
+  #diff {
+    color: #777 !important;
+    font-size: 1em;
+  }
+}
+
+.newCode {
+  font-size: 1.5rem;
+  color: #ffbb00;
+}
+
+.visitorImg {
+  display: inline-block;
+  width: 100%;
+  height: 30%;
+}
+
+.phoneNumber {
+  display: contents;
+  text-align: center;
+}
+
+.newCodeButton {
+  box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.3);
+  height: 40px;
+  margin: 10px;
+
+  border-radius: 25px;
+  --background: #6599ce;
+  font-size: 15px;
+  width: 180px;
+}
+
+.custom-fab-code {
+  height: 40px;
+  margin-top: 10px;
+  width: 40px;
+}
+
+.labelVisitor {
+  display: contents;
+}
+
+.visitor-item-select {
+  display: contents;
+  // align-content: space-between;
+  // flex-wrap: wrap;
+  // width: 100%;
+}
+
+.visitorOption {
+  display: contents;
+  float: right;
+  text-align: center;
+
+  max-width: 100% !important;
+  width: 100%;
+}
+
+.refreshCode {
+  margin-right: 10px;
+  width: 30%;
+  ion-button {
+    width: 50px;
+    height: 50px;
+    float: right;
+  }
+}
+
+.qrWrap {
+  display: grid;
+  justify-content: space-around;
+  background-color: white;
+}
+
+.qrIn {
+  z-index: 98;
+}
+
+.qrLabel {
+  top: -20px;
+  border-top: 0;
+  color: #777;
+  // margin-bottom: 3px;
+  font-size: 12px;
+  text-align: center;
+  width: 100%;
+  z-index: 99;
+}
+
+#qrImage {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.motivo {
+  display: flex;
+  justify-items: center;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 0px;
+}
+
+.input {
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+// ---- Lines used to fix ion-select-option width (
+.alert-tappable.alert-radio {
+  height: auto;
+  contain: content;
+  // --min-height: auto;
+}
+
+.alert-radio-label.sc-ion-alert-md,
+.alert-radio-label.sc-ion-alert-ios {
+  white-space: normal;
+}
+
+.alert-checkbox-label.sc-ion-alert-md,
+.alert-checkbox-label.sc-ion-alert-ios {
+  white-space: normal;
+}
+.alert-tappable.alert-checkbox {
+  height: auto;
+  contain: content;
+}

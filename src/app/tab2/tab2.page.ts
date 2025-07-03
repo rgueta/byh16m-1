@@ -50,7 +50,6 @@ const netStatus = "netStatus";
     IonDatetime,
     IonNote,
     IonIcon,
-    NgStyle,
     DatePipe,
     IonRefresher,
     IonRefresherContent,
