@@ -1,108 +1,163 @@
-<ion-header>
+<ion-header class="topHeader">
   <ion-toolbar>
     <ion-item class="wrap-input">
       <ion-buttons class="closeButton" slot="start">
-        <ion-icon class="icon_exit" (click)='closeModal()' 
-          name='arrow-back-circle-outline' ></ion-icon>
+        <ion-icon
+          class="icon_exit"
+          (click)="closeModal()"
+          name="arrow-back-circle-outline"
+        ></ion-icon>
       </ion-buttons>
       <div class="title-wrip">
         <ion-title class="title">Usuarios:</ion-title>
         <ion-title class="title">{{coreName}}</ion-title>
-      </div>      
-    
+      </div>
     </ion-item>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <ion-list *ngFor="let item of users; let i = index;" class="accordion-list"
-    lines="none" detail="false" no-padding >
-    <ion-item tappable (click)="toggleSection(i)" [ngClass]="{'section-expired' : 
-      item.expired || !item.enable, 'section' : !item.expired}">
-      <ion-icon class="lock" slot="start"  name="lock-closed-outline" 
-        *ngIf="item.locked"></ion-icon>
-      <ion-icon slot="end" name="chevron-forward-outline" *ngIf="!item.open"></ion-icon>
-      <ion-icon slot="end" name="chevron-down-outline" *ngIf="item.open"></ion-icon>
-      <ion-label class="ion-text-wrap">{{item.name}},  house: {{item.house}}</ion-label>
+  <ion-list
+    *ngFor="let item of users; let i = index;"
+    class="accordion-list"
+    lines="none"
+    detail="false"
+    no-padding
+  >
+    <ion-item
+      tappable
+      (click)="toggleSection(i)"
+      [ngClass]="{'section-expired' :
+      item.expired || !item.enable, 'section' : !item.expired}"
+    >
+      <ion-icon
+        class="lock"
+        slot="start"
+        name="lock-closed-outline"
+        *ngIf="item.locked"
+      ></ion-icon>
+      <ion-icon
+        slot="end"
+        name="chevron-forward-outline"
+        *ngIf="!item.open"
+      ></ion-icon>
+      <ion-icon
+        slot="end"
+        name="chevron-down-outline"
+        *ngIf="item.open"
+      ></ion-icon>
+      <ion-label class="ion-text-wrap"
+        >{{item.name}}, house: {{item.house}}</ion-label
+      >
     </ion-item>
 
     <form tappable *ngIf="item.open" class="detail">
-        <ion-item class='detail-item'>
-          <ion-label> User name: {{item.username}}</ion-label>
+      <ion-item class="detail-item">
+        <ion-label> User name: {{item.username}}</ion-label>
+      </ion-item>
+      <ion-item class="detail-item">
+        <ion-label> Email: {{item.email}}</ion-label>
+      </ion-item>
+
+      <ion-item class="detail-item">
+        <ion-label> Sim: {{item.sim}}</ion-label>
+        <ion-icon
+          *ngIf="soyAdmin || soyNeighborAdmin"
+          slot="end"
+          name="create-outline"
+          (click)="onEditSim()"
+        >
+        </ion-icon>
+      </ion-item>
+
+      <form
+        tappable
+        *ngIf="editSim && (soyAdmin || soyNeighborAdmin)"
+        class="detailRoutines"
+      >
+        <ion-item class="detail-item">
+          <ion-input
+            name="code"
+            required
+            placeholder="new Sim"
+            value="{{item.Sim}}"
+            [(ngModel)]="sim"
+          ></ion-input>
+          <ion-icon
+            name="save-outline"
+            size="large"
+            *ngIf="sim"
+            (click)="simChange(item._id,item.sim)"
+          ></ion-icon>
         </ion-item>
-        <ion-item class='detail-item'>
-          <ion-label> Email: {{item.email}}</ion-label>
-        </ion-item>
+      </form>
 
+      <ion-item class="detail-item"
+        >Roles:
+        <ul *ngFor="let role of item.roles">
+          <li>{{role}}</li>
+        </ul>
+        <ion-icon
+          *ngIf="soyAdmin"
+          slot="end"
+          name="create-outline"
+          (click)="onEditRole()"
+        >
+        </ion-icon>
+      </ion-item>
 
-        <ion-item class='detail-item'>
-          <ion-label> Sim: {{item.sim}}</ion-label>
-          <ion-icon *ngIf="soyAdmin || soyNeighborAdmin" slot="end"
-               name="create-outline" (click)="onEditSim()">
-            </ion-icon>
-        </ion-item>
-
-        <form tappable *ngIf="editSim && (soyAdmin || soyNeighborAdmin)" class="detailRoutines">
-          <ion-item class="detail-item">
-            <ion-input name='code' required placeholder="new Sim" 
-              value={{item.Sim}} [(ngModel)]="sim"></ion-input>
-              <ion-icon name="save-outline" size="large" *ngIf="sim"
-              (click)="simChange(item._id,item.sim)"></ion-icon>
-          </ion-item>
-        </form>
-
-        <ion-item class='detail-item'>Roles:
-            <ul *ngFor= "let role of item.roles">
-              <li>{{role}}</li>
-            </ul> 
-            <ion-icon *ngIf="soyAdmin" slot="end"
-               name="create-outline" (click)="onEditRole()">
-            </ion-icon>
-        </ion-item>
-
-        <ion-item *ngIf="editRole && soyAdmin" mode="ios">
-          <ion-select ok-text="Seleccionar" 
+      <ion-item *ngIf="editRole && soyAdmin" mode="ios">
+        <ion-select
+          ok-text="Seleccionar"
           placeholder="Select Event"
-            (ionChange)="changeRoles($event,item._id,item.name)"
-            label="Roles:" cancel-text="Cancelar" [multiple]="true">
-            <ion-select-option *ngFor="let item of RoleList" 
-              value={{item._id}}>{{item.name}}
-            </ion-select-option>
-          </ion-select>
-        </ion-item>
+          (ionChange)="changeRoles($event,item._id,item.name)"
+          label="Roles:"
+          cancel-text="Cancelar"
+          [multiple]="true"
+        >
+          <ion-select-option *ngFor="let item of RoleList" value="{{item._id}}"
+            >{{item.name}}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
 
-        <ion-item class='detail-item'>
-          <ion-label> Location:  {{item.location}}</ion-label>
-        </ion-item>
+      <ion-item class="detail-item">
+        <ion-label> Location: {{item.location}}</ion-label>
+      </ion-item>
 
-      <ion-item class="options" >
+      <ion-item class="options">
         <div class="option_child">
-            <ion-toggle id="disableToggle" 
-            labelPlacement="start" [ngModel] = "item.locked"
+          <ion-toggle
+            id="disableToggle"
+            labelPlacement="start"
+            [ngModel]="item.locked"
             (ionChange)="chgLockStatus($event,item.locked,item._id, item.sim,
-              item.name, item.house, item.coreSim)">
-            <ion-label id="lblUnlock" *ngIf="item.locked">Desbloquear : </ion-label>
+              item.name, item.house, item.coreSim)"
+          >
+            <ion-label id="lblUnlock" *ngIf="item.locked"
+              >Desbloquear :
+            </ion-label>
             <ion-label id="lblLock" *ngIf="!item.locked">Bloquear : </ion-label>
           </ion-toggle>
         </div>
-        <div class="option_child borrar " style="border-left: 2px solid white;">
+        <div class="option_child borrar" style="border-left: 2px solid white">
           <div class="borrar_child">
             <ion-label slot="start">Borrar</ion-label>
           </div>
           <div class="borrar_child">
-            <ion-icon name="trash-outline" size="large" slot="end"
-              (click)="delUser(item._id, item.name, item.coreSim)"></ion-icon>
+            <ion-icon
+              name="trash-outline"
+              size="large"
+              slot="end"
+              (click)="delUser(item._id, item.name, item.coreSim)"
+            ></ion-icon>
           </div>
         </div>
       </ion-item>
-
     </form>
-
   </ion-list>
-
 </ion-content>

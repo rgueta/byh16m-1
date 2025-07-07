@@ -1,0 +1,100 @@
+.title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+
+.column {
+  float: left;
+  padding: 0.3rem 1.5rem 0.3rem 0;
+}
+
+.left {
+  width: 60px;
+  padding: 0.3rem 0 0.3rem 0.4rem;
+  // background-color: beige;
+}
+
+.menu {
+  border-left: 0px;
+  padding-left: 30px;
+}
+
+.middle {
+  padding: 1rem 0 0.5rem 0;
+
+  width: 50%;
+  ion-title {
+    font-size: 1.1rem;
+    text-align: center;
+  }
+}
+
+.item-wripper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+}
+
+.submit {
+  align-items: center;
+  height: 60px;
+  margin-top: 10px;
+  width: 90%;
+}
+
+.centralize_Title {
+  margin-left: 0px;
+  width: 100%;
+}
+
+.titleCore {
+  background: none !important;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  border: 1px solid;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.divlblCoreName {
+  background: none !important;
+  display: flex;
+  justify-items: center;
+  padding-left: 40px;
+  width: 100%;
+  flex-direction: row;
+  padding: 0px;
+  text-align: center;
+}
+
+.divToggleDemo {
+  background: none !important;
+  height: 33px;
+  margin-top: -5px;
+  padding-top: 0px;
+  border-top: 0px;
+}
+
+.ToggleDemo {
+  background: none !important;
+  margin-top: -6px;
+  padding-top: 0px;
+  border-top: 0px;
+}
+
+.itemToggleDemo {
+  background: transparent;
+  height: 33px;
+}
+
+.basic-alert {
+  --background: #161e2c !important;
+  --color: #ff0000 !important;
+  --border-radius: 5px !important;
+}

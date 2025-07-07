@@ -105,36 +105,46 @@ export const Utils = {
 
   cleanLocalStorage: async () => {
     let myVisitors: string | null = "";
+    console.log("myVisitors at tools.cleanLocalStorage: ", myVisitors);
+    console.log(
+      "myVisitors at tools.cleanLocalStorage(stringify): ",
+      myVisitors,
+    );
     let myToken_px: string = "";
     let mycore_id: string = "";
     let my_refresh_token: string = "";
     let netStatus: string | null = "";
 
-    if (localStorage.getItem("netStatus") != null) {
+    if (localStorage.getItem("netStatus") !== null) {
       // netStatus = await JSON.parse(localStorage.getItem('netStatus'));
       netStatus = localStorage.getItem("netStatus");
     }
 
-    if (localStorage.getItem("visitors") != null) {
+    // if (localStorage.getItem("visitors") !== null) {
+    if (localStorage.getItem("visitors")) {
       // myVisitors = await JSON.parse(localStorage.getItem('visitors'));
-      myVisitors = localStorage.getItem("visitors");
+      console.log(
+        "Vaciado local to myVisitors: ",
+        localStorage.getItem("visitors"),
+      );
+      myVisitors = localStorage.getItem("visitors")!;
     }
 
-    if (localStorage.getItem("token_px") != null) {
+    if (localStorage.getItem("token_px") !== null) {
       let myToken_px = localStorage.getItem("token_px");
     }
 
-    if (localStorage.getItem("my-refresh-token") != null) {
+    if (localStorage.getItem("my-refresh-token") !== null) {
       let my_refresh_token = localStorage.getItem("my-refresh-token");
     }
 
-    if (localStorage.getItem("core-id") != null) {
+    if (localStorage.getItem("core-id") !== null) {
       let mycore_id = localStorage.getItem("core-id");
     }
 
     localStorage.clear();
-    localStorage.setItem("netStatus", JSON.stringify(netStatus));
-    localStorage.setItem("visitors", JSON.stringify(myVisitors));
+    localStorage.setItem("netStatus", netStatus!);
+    localStorage.setItem("visitors", myVisitors);
     localStorage.setItem("token_px", myToken_px);
     localStorage.setItem("my-refresh-token", my_refresh_token);
     localStorage.setItem("core-id", mycore_id);

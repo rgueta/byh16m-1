@@ -76,7 +76,8 @@
 }
 
 .wrapper-list {
-  padding-top: 62px;
+  /* padding-top: 62px; */
+  padding-top: calc(52px + env(safe-area-inset-top));
 }
 
 .accordion-list {
@@ -168,5 +169,6 @@ ion-modal {
       display: block;
       contain: content;
     }
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
   }
 }

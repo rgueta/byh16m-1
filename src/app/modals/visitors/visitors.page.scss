@@ -1,0 +1,47 @@
+.header {
+  display: flex;
+  // flex-wrap: wrap;
+}
+
+.header img {
+  margin: 10px;
+  width: 100px;
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  margin-left: -20px;
+  width: 100%;
+}
+
+.column {
+  float: left;
+  padding: 0.3rem 0 0.3rem 0.2rem;
+}
+
+.left {
+  width: 15%;
+  padding: 0.3rem 0 0.3rem 0.4rem;
+  // background-color: beige;
+}
+
+.middle {
+  padding: 1rem 0 0.5rem 0;
+  width: 70%;
+
+  ion-title {
+    font-size: 5vw;
+    text-align: center;
+  }
+}
+
+.closeButton {
+  font-size: 3em;
+  // position:relative;
+}
+
+.icon_exit {
+  font-size: 38px;
+  padding-left: 10px;
+}

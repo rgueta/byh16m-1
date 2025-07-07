@@ -1,42 +1,58 @@
-<ion-header>
+<ion-header class="topHeader">
   <ion-toolbar>
     <div class="column left">
       <ion-buttons class="closeButton" slot="start">
-        <ion-icon class="icon_exit" (click)='closeModal()' 
-        name='arrow-back-circle-outline' >Cerrar</ion-icon>
+        <ion-icon
+          class="icon_exit"
+          (click)="closeModal()"
+          name="arrow-back-circle-outline"
+          >Cerrar</ion-icon
+        >
       </ion-buttons>
-  </div>
-  <div class="column middle">    
-    <ion-title>Agregar visitante</ion-title>
-  </div>
+    </div>
+    <div class="column middle">
+      <ion-title>Agregar visitante</ion-title>
+    </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <!-- <form [formGroup] = "RegisterForm" (submit)="onSubmit()" > -->
-  <form [formGroup] = "RegisterForm" >
+  <!-- <form [formGroup]="RegisterForm" (submit)="onSubmit()"> -->
+  <form [formGroup]="RegisterForm">
     <ion-card>
-     
-      
       <ion-card-content>
-      <ion-button class="titleButtonBlue" expand="full" (click)="modalContacts()" 
-         >Mis Contactos</ion-button>
-      <!-- <ion-button class="titleButtonBlue" expand="full" color="light" 
+        <ion-button
+          class="titleButtonBlue"
+          expand="full"
+          (click)="modalContacts()"
+          >Mis Contactos</ion-button
+        >
+        <!-- <ion-button class="titleButtonBlue" expand="full" color="light"
         (click)="modalContacts()" >Mis Contactos</ion-button> -->
-      
-      <ion-item class="wrap-input">
-        <ion-input class='input' type="text" name='name' 
-        required placeholder="nombre" 
-        formControlName="LocalName" value={{name}} ></ion-input>
-        <br><br>
-      </ion-item>
-      
+
         <ion-item class="wrap-input">
-          <ion-input class='input' type="text" 
-          name='email' placeholder="email" 
-          value={{email}} ></ion-input>
+          <ion-input
+            class="input"
+            type="text"
+            name="name"
+            required
+            placeholder="nombre"
+            formControlName="LocalName"
+            value="{{name}}"
+          ></ion-input>
+          <br /><br />
         </ion-item>
-  
+
+        <ion-item class="wrap-input">
+          <ion-input
+            class="input"
+            type="text"
+            name="email"
+            placeholder="email"
+            value="{{email}}"
+          ></ion-input>
+        </ion-item>
+
         <ion-item class="wrap-input">
           <ion-label>Origen celular</ion-label>
           <ion-select value="MX" okText="Aceptar" cancelText="Cancelar">
@@ -46,37 +62,49 @@
         </ion-item>
 
         <ion-item>
-          <ion-input class='input' type="text" name='sim' 
-           required formControlName="LocalSim"
-            placeholder="Numero de celular" value={{sim}} >
+          <ion-input
+            class="input"
+            type="text"
+            name="sim"
+            required
+            formControlName="LocalSim"
+            placeholder="Numero de celular"
+            value="{{sim}}"
+          >
           </ion-input>
-          <br><br>
+          <br /><br />
         </ion-item>
-
 
         <ion-item class="wrap-input">
           <ion-label>Genero</ion-label>
-          <ion-select value="gender" [(ngModel)]="gender" [ngModelOptions]="{standalone: true}"
-          okText="Aceptar" cancelText="Cancelar" >
-            <ion-select-option value="H" >Hombre</ion-select-option>
-            <ion-select-option value="M" >Mujer</ion-select-option>
+          <ion-select
+            value="gender"
+            [(ngModel)]="gender"
+            [ngModelOptions]="{standalone: true}"
+            okText="Aceptar"
+            cancelText="Cancelar"
+          >
+            <ion-select-option value="H">Hombre</ion-select-option>
+            <ion-select-option value="M">Mujer</ion-select-option>
           </ion-select>
         </ion-item>
 
-          <!-- <ion-item>
+        <!-- <ion-item>
             <ion-input class='input' type="text" name='avatar' required placeholder="Image" value={{sim}} [(ngModel)]="sim" ></ion-input>
             <br><br>
           </ion-item> -->
-  
-          <ion-item class="wrap-input">
-            <ion-button type="submit" [disabled]="RegisterForm.invalid" 
-            class="submit titleButtonBlue" expand="full"  
-            (click)="onSubmit()" >Grabar</ion-button>
-          </ion-item>
 
-          
-        </ion-card-content>
+        <ion-item class="wrap-input">
+          <ion-button
+            type="submit"
+            [disabled]="RegisterForm.invalid"
+            class="submit titleButtonBlue"
+            expand="full"
+            (click)="onSubmit()"
+            >Grabar</ion-button
+          >
+        </ion-item>
+      </ion-card-content>
     </ion-card>
-
   </form>
 </ion-content>

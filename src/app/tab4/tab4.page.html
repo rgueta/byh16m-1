@@ -1,54 +1,73 @@
-<ion-header [translucent]="true">
+<ion-header class="topHeader">
   <ion-toolbar slot="start">
     <ion-title class="ion-text-center">Visitas</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-   <!-- fab placed to the bottom end -->
-   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <!-- fab placed to the bottom end -->
+  <ion-fab vertical="center" horizontal="end" slot="fixed">
     <ion-fab-button class="button-green" (click)="modalVisitors()">
       <ion-icon name="people"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 
-  <ion-list  *ngFor="let item of VisitorsList; let i = index;" class="accordion-list" 
-    lines="none" detail="false" no-padding>
-    
-    <ion-item tappable class='section'>
-      <ion-icon name="trash-outline" class="removeIteem" color="white" slot="start" 
-        (click)="removeVisitor(i,item.name)"></ion-icon>
+  <ion-list
+    *ngFor="let item of VisitorsList; let i = index;"
+    class="accordion-list"
+    lines="none"
+    detail="false"
+    no-padding
+  >
+    <ion-item tappable class="section">
+      <ion-icon
+        name="trash-outline"
+        class="removeIteem"
+        color="white"
+        slot="start"
+        (click)="removeVisitor(i,item.name)"
+      ></ion-icon>
 
-       <ion-icon color="white" slot="end" name="chevron-forward-outline"  
-        (click)="toggleSection(i)" *ngIf="!item.open"></ion-icon>
-       <ion-icon color="white" slot="end" name="chevron-down-outline" 
-        (click)="toggleSection(i)" *ngIf="item.open"></ion-icon>
-       <ion-label class="ion-text-wrap"><strong>{{item.name}}</strong><b></b></ion-label>
-   </ion-item>
+      <ion-icon
+        color="white"
+        slot="end"
+        name="chevron-forward-outline"
+        (click)="toggleSection(i)"
+        *ngIf="!item.open"
+      ></ion-icon>
+      <ion-icon
+        color="white"
+        slot="end"
+        name="chevron-down-outline"
+        (click)="toggleSection(i)"
+        *ngIf="item.open"
+      ></ion-icon>
+      <ion-label class="ion-text-wrap"
+        ><strong>{{item.name}}</strong><b></b
+      ></ion-label>
+    </ion-item>
 
-   <form tappable *ngIf="item.open" class="detail">
-       <ion-item class='detail-item'>
-         <ion-label class='lblVisitInput'> Dir.: {{item.address}}</ion-label>
+    <form tappable *ngIf="item.open" class="detail">
+      <ion-item class="detail-item">
+        <ion-label class="lblVisitInput"> Dir.: {{item.address}}</ion-label>
         <!-- <ion-icon name="pencil-outline" (click)="update('direccion',item._id,item.name,item.address)"></ion-icon> -->
-       </ion-item>
-       <ion-item class='detail-item'>
-         <ion-label class='lblVisitInput'> Tel:  {{item.sim}}</ion-label>
+      </ion-item>
+      <ion-item class="detail-item">
+        <ion-label class="lblVisitInput"> Tel: {{item.sim}}</ion-label>
         <!-- <ion-icon name="pencil-outline" (click)="update('telefono',item._id, item.name,item.sim)"></ion-icon> -->
-       </ion-item>
-       <ion-item class='detail-item'>
-         <ion-label class='lblVisitInput'> Email: {{item.email}}</ion-label>
+      </ion-item>
+      <ion-item class="detail-item">
+        <ion-label class="lblVisitInput"> Email: {{item.email}}</ion-label>
         <!-- <ion-icon name="pencil-outline" (click)="update('email',item._id,item.name,item.email)"></ion-icon> -->
-       </ion-item>
-       <ion-item class='detail-item'>
-         <ion-label class='lblVisitInput'>Genero : {{item.gender}}</ion-label>
+      </ion-item>
+      <ion-item class="detail-item">
+        <ion-label class="lblVisitInput">Genero : {{item.gender}}</ion-label>
         <!-- <ion-icon name="pencil-outline" (click)="updateGender(item._id, item.name,item.gender)"></ion-icon> -->
-       </ion-item>
-
-   </form>
- </ion-list>
+      </ion-item>
+    </form>
+  </ion-list>
 </ion-content>

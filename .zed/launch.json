@@ -1,0 +1,20 @@
+// .zed/launch.json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node", // Usamos el depurador de Node.js
+      "request": "launch",
+      "name": "Ionic Serve (Debugging)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "ionic:serve-debug" // Usaremos un script npm custom para esto
+      ],
+      "port": 9229, // Puerto de inspección de Node.js (por defecto)
+      "cwd": "${workspaceFolder}",
+      "outputCapture": "std",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}

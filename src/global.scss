@@ -37,7 +37,11 @@
 @import "@ionic/angular/css/palettes/dark.system.css";
 
 .topHeader {
-  padding-top: 2rem;
+  padding-top: calc(2rem + env(safe-area-inset-top));
+}
+
+.bottomFooter {
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom));
 }
 
 // Accordion -------------------------------

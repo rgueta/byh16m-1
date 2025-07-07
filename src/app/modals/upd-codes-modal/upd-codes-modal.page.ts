@@ -25,8 +25,6 @@ import {
   IonButtons,
 } from "@ionic/angular/standalone";
 import { CommonModule } from "@angular/common";
-// import { IonContent, IonHeader, IonTitle, IonToolbar,
-// } from '@ionic/angular/standalone';
 
 import { DatabaseService } from "../../services/database.service";
 import { Utils } from "../../tools/tools";
@@ -184,14 +182,18 @@ export class UpdCodesModalPage implements OnInit {
   }
 
   async getVisitors() {
-    this.myVisitors = await JSON.parse(localStorage.getItem("visitors")!);
+    const visitors = localStorage.getItem("visitors");
+    const lenVisitors = visitors !== null ? visitors.length : 0;
+    if (lenVisitors > 0) {
+      this.myVisitors = await JSON.parse(localStorage.getItem("visitors")!);
 
-    //Sort Visitors by name
-    this.myVisitors = await Utils.sortJsonVisitors(
-      this.myVisitors,
-      "name",
-      true,
-    );
+      //Sort Visitors by name
+      this.myVisitors = await Utils.sortJsonVisitors(
+        this.myVisitors,
+        "name",
+        true,
+      );
+    }
   }
 
   async setupCode(event: any) {

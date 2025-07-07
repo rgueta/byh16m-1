@@ -1,24 +1,27 @@
-
-<ion-header [translucent]="true">
-  <ion-toolbar  class="header" slot="start">
+<ion-header class="topHeader">
+  <ion-toolbar class="header" slot="start">
     <div class="column left">
-      <ion-buttons slot="start">  
-        <ion-menu-button auto-hide="false" color="dark" menu="adminMenu"></ion-menu-button>   
+      <ion-buttons slot="start">
+        <ion-menu-button
+          auto-hide="false"
+          color="dark"
+          menu="adminMenu"
+        ></ion-menu-button>
       </ion-buttons>
     </div>
     <div class="column middle">
-      <ion-title >Administration</ion-title>
+      <ion-title>Administration</ion-title>
     </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-<!-- Menu -->
+  <!-- Menu -->
 
   <ion-menu class="main-manu" side="start" menuId="adminMenu" contentId="menu">
     <ion-header>
       <ion-toolbar class="titleGreen">
-        <ion-title class="title" >Admin options</ion-title>
+        <ion-title class="title">Admin options</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content>
@@ -31,29 +34,54 @@
         <ion-item (click)="modalBackstage()">Backstage</ion-item>
 
         <ion-item class="wrap-input">
-          <ion-toggle id="twilioToggle" class="ion-toggle-red" labelPlacement="start" 
-            [ngModel]="localenable" [checked]="false"  
-            [ngModelOptions]="{standalone: true}" (ionChange)="TwilioToggleEven($event)">
+          <ion-toggle
+            id="twilioToggle"
+            class="ion-toggle-red"
+            labelPlacement="start"
+            [ngModel]="localenable"
+            [checked]="false"
+            [ngModelOptions]="{standalone: true}"
+            (ionChange)="TwilioToggleEven($event)"
+          >
             Use twilio :
           </ion-toggle>
         </ion-item>
         <ion-item class="wrap-input">
-          <ion-toggle id="visitorEmail" class="ion-toggle-red" labelPlacement="start" 
-            [ngModel]="emailToVisitor" [checked]="emailToVisitor"  
-            [ngModelOptions]="{standalone: true}" (ionChange)="EmailVisitorToggleEven($event)">
+          <ion-toggle
+            id="visitorEmail"
+            class="ion-toggle-red"
+            labelPlacement="start"
+            [ngModel]="emailToVisitor"
+            [checked]="emailToVisitor"
+            [ngModelOptions]="{standalone: true}"
+            (ionChange)="EmailVisitorToggleEven($event)"
+          >
             Send email to visitor :
           </ion-toggle>
         </ion-item>
         <ion-item class="wrap-input">
-          <ion-toggle id="visitorEmail" class="ion-toggle-red" labelPlacement="start" 
-            [ngModel]="emailToVisitor" [checked]="emailToVisitor"  
-            [ngModelOptions]="{standalone: true}" (ionChange)="EmailCoreToggleEven($event)">
-            Send email to Core :</ion-toggle>
+          <ion-toggle
+            id="visitorEmail"
+            class="ion-toggle-red"
+            labelPlacement="start"
+            [ngModel]="emailToVisitor"
+            [checked]="emailToVisitor"
+            [ngModelOptions]="{standalone: true}"
+            (ionChange)="EmailCoreToggleEven($event)"
+          >
+            Send email to Core :</ion-toggle
+          >
         </ion-item>
         <ion-item class="wrap-input">
-          <ion-toggle id="twilioToggle" class="ion-toggle-red" labelPlacement="start" 
-            [ngModel]="demoMode" [checked]="false"  
-            [ngModelOptions]="{standalone: true}" (ionChange)="DemoMode()">
+          <ion-toggle
+            id="twilioToggle"
+            class="ion-toggle-red"
+            labelPlacement="start"
+            [ngModel]="demoMode"
+            [checked]="false"
+            [ngModelOptions]="{standalone: true}"
+            (ionChange)="DemoMode()"
+          >
             Demo mode
           </ion-toggle>
         </ion-item>
@@ -62,13 +90,13 @@
   </ion-menu>
   <ion-router-outlet Id="menu"></ion-router-outlet>
 
-<!-- --------------------------------------------  -->
+  <!-- --------------------------------------------  -->
 
-    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
-      <ion-refresher-content></ion-refresher-content>
-    </ion-refresher>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
 
-    <!-- <ion-button class="titleButtonBlue" shape="round" (click)="modalUpdCores()">
+  <!-- <ion-button class="titleButtonBlue" shape="round" (click)="modalUpdCores()">
       <ion-icon color="white" slot="end" name="add" style="zoom:1.5" ></ion-icon>Add core
     </ion-button> -->
 
@@ -78,140 +106,292 @@
       </ion-button>
   </ion-item> -->
 
-  <ion-list  *ngFor="let item of CoresList; let i = index;" class="accordion-list" 
-    lines="none" detail="false" no-padding>
-     <ion-item tappable class='section' (click)="toggleSection(i)">
-        <ion-icon color="white" slot="end" name="chevron-forward-outline" *ngIf="!item.open"></ion-icon>
-        <ion-icon color="white" slot="end" name="chevron-down-outline" *ngIf="item.open"></ion-icon>
-        <ion-icon color="white" slot="start" name="grid-outline"></ion-icon>
-        <ion-label class="ion-text-wrap">
-        <strong>{{item.name}}</strong> Houses: <b>{{item.Houses.qty}}</b></ion-label>
+  <ion-list
+    *ngFor="let item of CoresList; let i = index;"
+    class="accordion-list"
+    lines="none"
+    detail="false"
+    no-padding
+  >
+    <ion-item tappable class="section" (click)="toggleSection(i)">
+      <ion-icon
+        color="white"
+        slot="end"
+        name="chevron-forward-outline"
+        *ngIf="!item.open"
+      ></ion-icon>
+      <ion-icon
+        color="white"
+        slot="end"
+        name="chevron-down-outline"
+        *ngIf="item.open"
+      ></ion-icon>
+      <ion-icon color="white" slot="start" name="grid-outline"></ion-icon>
+      <ion-label class="ion-text-wrap">
+        <strong>{{item.name}}</strong> Houses:
+        <b>{{item.Houses.qty}}</b></ion-label
+      >
     </ion-item>
 
     <form tappable *ngIf="item.open" class="detail">
-        <ion-item class='detail-item'>
-          <ion-label> Address: <b>{{item.Address}}</b></ion-label>
-        </ion-item>
-        <ion-item class='detail-item'>
-          <ion-icon color="white" slot="start" size="large" name="location"></ion-icon>
-          <ion-label> Coordinates: <b>{{item.coord[0] | number:'.2-2'}}, {{item.coord[1] | number:'.2-2'}}</b></ion-label>
+      <ion-item class="detail-item">
+        <ion-label> Address: <b>{{item.Address}}</b></ion-label>
+      </ion-item>
+      <ion-item class="detail-item">
+        <ion-icon
+          color="white"
+          slot="start"
+          size="large"
+          name="location"
+        ></ion-icon>
+        <ion-label>
+          Coordinates:
+          <b
+            >{{item.coord[0] | number:'.2-2'}}, {{item.coord[1] |
+            number:'.2-2'}}</b
+          ></ion-label
+        >
+      </ion-item>
+
+      <ion-list
+        class="accordion-list"
+        lines="none"
+        detail="false"
+        no-padding
+        mode="ios"
+      >
+        <ion-item tappable class="sectionRoutines" (click)="toggleSectionSim()">
+          <ion-icon
+            color="white"
+            slot="end"
+            name="chevron-forward-outline"
+            *ngIf="!simSectionOpen"
+          ></ion-icon>
+          <ion-icon
+            color="white"
+            slot="end"
+            name="chevron-down-outline"
+            *ngIf="simSectionOpen"
+          ></ion-icon>
+          <ion-icon color="white" slot="start" name="call-outline"></ion-icon>
+          <ion-label> Sim: <b>{{item.Sim}}</b></ion-label>
         </ion-item>
 
-        <ion-list class="accordion-list"  lines="none" detail="false" no-padding mode="ios">
-          <ion-item tappable class="sectionRoutines"  (click)="toggleSectionSim()">
-            <ion-icon color="white" slot="end" name="chevron-forward-outline" *ngIf="!simSectionOpen"></ion-icon>
-            <ion-icon color="white" slot="end" name="chevron-down-outline" *ngIf="simSectionOpen"></ion-icon>
-            <ion-icon color="white" slot="start" name="call-outline"></ion-icon>
-            <ion-label> Sim:  <b>{{item.Sim}}</b></ion-label>
+        <form tappable *ngIf="simSectionOpen" class="detailRoutines">
+          <ion-item class="detail-item">
+            <ion-input
+              type="text"
+              name="code"
+              required
+              placeholder="new Sim"
+              value="{{item.Sim}}"
+              [(ngModel)]="sim"
+            ></ion-input>
+            <ion-icon
+              name="save-outline"
+              size="large"
+              *ngIf="sim"
+              (click)="simChange($event,item)"
+            ></ion-icon>
+          </ion-item>
+        </form>
+      </ion-list>
+
+      <ion-item class="detail-item">
+        <ion-label class="labelInput"
+          >Gate : <b>{{item.detail.Gate_type}}</b>, Motor:
+          <b>{{item.detail.Motor}}</b></ion-label
+        >
+      </ion-item>
+
+      <ion-list class="accordion-list" lines="none" detail="false" no-padding>
+        <ion-item
+          tappable
+          class="sectionRoutines"
+          (click)="toggleSectionRoutines()"
+        >
+          <ion-icon
+            color="white"
+            slot="start"
+            name="cog-outline"
+            size="large"
+          ></ion-icon>
+          <ion-icon
+            color="white"
+            slot="end"
+            name="chevron-forward-outline"
+            *ngIf="!routineOpen"
+          ></ion-icon>
+          <ion-icon
+            color="white"
+            slot="end"
+            name="chevron-down-outline"
+            *ngIf="routineOpen"
+          ></ion-icon>
+          <ion-label class="ion-text-wrap">
+            <strong>Settings</strong></ion-label
+          >
+        </ion-item>
+        <form tappable *ngIf="routineOpen" class="detailRoutines">
+          <ion-item
+            class="detail-item"
+            (click)="collectUsers(item._id,item.name)"
+          >
+            <ion-icon
+              color="white"
+              slot="start"
+              name="people-outline"
+            ></ion-icon>
+            <ion-label>View users</ion-label>
+          </ion-item>
+          <ion-item
+            class="detail-item"
+            (click)="addNewUser(item._id,item.name,item.location)"
+          >
+            <ion-icon
+              color="white"
+              slot="start"
+              name="person-add-outline"
+            ></ion-icon>
+            <ion-label>New user</ion-label>
+          </ion-item>
+          <ion-item
+            class="detail-item"
+            (click)="newExtrange(item._id,item.name,item.location)"
+          >
+            <ion-icon
+              color="white"
+              slot="start"
+              name="person-add-outline"
+            ></ion-icon>
+            <ion-label>New extrange</ion-label>
           </ion-item>
 
-          <form tappable *ngIf="simSectionOpen" class="detailRoutines">
-            <ion-item class="detail-item">
-              <ion-input type="text" name='code' required placeholder="new Sim" 
-              value={{item.Sim}} [(ngModel)]="sim" ></ion-input>
-                <ion-icon name="save-outline" size="large" *ngIf="sim"
-                (click)="simChange($event,item)"></ion-icon>
-            </ion-item>
+          <ion-item class="detail-item">
+            <ion-accordion-group style="width: 100%">
+              <ion-accordion>
+                <ion-item slot="header">
+                  <ion-icon
+                    color="white"
+                    slot="start"
+                    name="calculator"
+                  ></ion-icon>
+                  <ion-label>Remote device</ion-label>
+                </ion-item>
+                <div slot="content">
+                  <ion-accordion-group>
+                    <ion-accordion>
+                      <ion-item slot="header">
+                        <ion-icon
+                          color="white"
+                          slot="start"
+                          name="reader-outline"
+                        ></ion-icon>
+                        <ion-label>Information</ion-label>
+                      </ion-item>
+                      <ion-list
+                        slot="content"
+                        style="padding-top: 0px; padding-bottom: 0px"
+                        *ngFor="let routine of routineOptions.slice(0,12); let i=index;"
+                      >
+                        <ion-item
+                          button
+                          (click)="routineSelected($event, i, item)"
+                          style="
+                            color: white;
+                            --background: #3e5165;
+                            margin-top: 2px;
+                          "
+                        >
+                          <ion-icon
+                            color="white"
+                            slot="start"
+                            name="arrow-forward-circle-outline"
+                          ></ion-icon>
+                          <ion-label>{{routine.name}}</ion-label>
+                        </ion-item>
+                      </ion-list>
+                    </ion-accordion>
+                  </ion-accordion-group>
+                </div>
 
-          </form>
-        </ion-list>
-        
-        <ion-item class='detail-item'>
-          <ion-label class='labelInput'>Gate : <b>{{item.detail.Gate_type}}</b>, Motor: 
-            <b>{{item.detail.Motor}}</b></ion-label>
-        </ion-item>
-
-        <ion-list  class="accordion-list"  lines="none" detail="false" no-padding>
-          <ion-item tappable class="sectionRoutines"  (click)="toggleSectionRoutines()">
-            <ion-icon color="white" slot="start" name="cog-outline" size="large"></ion-icon>
-            <ion-icon color="white" slot="end" name="chevron-forward-outline" *ngIf="!routineOpen"></ion-icon>
-            <ion-icon color="white" slot="end" name="chevron-down-outline" *ngIf="routineOpen"></ion-icon>
-            <ion-label class="ion-text-wrap"> <strong>Settings</strong></ion-label>
+                <div slot="content">
+                  <ion-accordion-group>
+                    <ion-accordion>
+                      <ion-item slot="header">
+                        <ion-icon
+                          color="white"
+                          slot="start"
+                          name="options-outline"
+                        ></ion-icon>
+                        <ion-label>configuration</ion-label>
+                      </ion-item>
+                      <ion-list
+                        slot="content"
+                        style="padding-top: 0px; padding-bottom: 0px"
+                        *ngFor="let routine of routineOptions.slice(12); let i=index;"
+                      >
+                        <ion-item
+                          button
+                          (click)="routineSelected($event, i+12, item)"
+                          style="
+                            color: white;
+                            --background: #3e5165;
+                            margin-top: 2px;
+                          "
+                        >
+                          <ion-icon
+                            color="white"
+                            slot="start"
+                            name="arrow-forward-circle-outline"
+                          ></ion-icon>
+                          <ion-label>{{routine.name}}</ion-label>
+                        </ion-item>
+                      </ion-list>
+                    </ion-accordion>
+                  </ion-accordion-group>
+                </div>
+              </ion-accordion>
+            </ion-accordion-group>
           </ion-item>
-          <form tappable *ngIf="routineOpen" class="detailRoutines">
-            <ion-item class="detail-item" (click)="collectUsers(item._id,item.name)">
-              <ion-icon color="white" slot="start" name="people-outline"></ion-icon>
-              <ion-label>View users</ion-label>
-            </ion-item>
-            <ion-item class="detail-item" (click)="addNewUser(item._id,item.name,item.location)">
-              <ion-icon color="white" slot="start" name="person-add-outline"></ion-icon>
-              <ion-label>New user</ion-label>
-            </ion-item>
-            <ion-item class="detail-item" (click)="newExtrange(item._id,item.name,item.location)">
-              <ion-icon color="white" slot="start" name="person-add-outline"></ion-icon>
-              <ion-label>New extrange</ion-label>
-            </ion-item>
+        </form>
+      </ion-list>
 
-            <ion-item class="detail-item">
-              <ion-accordion-group style="width: 100%;">
-                <ion-accordion>
-                  <ion-item slot="header">
-                    <ion-icon color="white" slot="start" name="calculator"></ion-icon>
-                    <ion-label>Remote device</ion-label>
-                  </ion-item>
-                  <div slot="content">
-                    <ion-accordion-group>
-                      <ion-accordion>
-                        <ion-item slot="header">
-                          <ion-icon color="white" slot="start" name="reader-outline"></ion-icon>
-                          <ion-label>Information</ion-label>
-                        </ion-item>
-                        <ion-list slot="content" style="padding-top: 0px; padding-bottom: 0px;"
-                        *ngFor="let routine of routineOptions.slice(0,12); let i=index;">
-                          <ion-item button (click)="routineSelected($event, i, item)"
-                            style="color:white;--background:#3e5165; margin-top: 2px;">
-                            <ion-icon color="white" slot="start" name="arrow-forward-circle-outline"></ion-icon>
-                            <ion-label>{{routine.name}}</ion-label>
-                          </ion-item>
-                        </ion-list>
-                      </ion-accordion>
-                    </ion-accordion-group>
-                  </div>
-    
-                  <div slot="content">
-                    <ion-accordion-group>
-                      <ion-accordion>
-                        <ion-item slot="header">
-                          <ion-icon color="white" slot="start" name="options-outline"></ion-icon>
-                          <ion-label>configuration</ion-label>
-                        </ion-item>
-                        <ion-list slot="content" style="padding-top: 0px; padding-bottom: 0px;" 
-                        *ngFor="let routine of routineOptions.slice(12); let i=index;">
-                          <ion-item button (click)="routineSelected($event, i+12, item)"
-                            style="color:white;--background:#3e5165; margin-top: 2px;">
-                            <ion-icon color="white" slot="start" name="arrow-forward-circle-outline"></ion-icon>
-                            <ion-label>{{routine.name}}</ion-label>
-                          </ion-item>
-                        </ion-list>
-                      </ion-accordion>
-                    </ion-accordion-group>
-                  </div>
-                    
-                </ion-accordion>
-              </ion-accordion-group>
+      <ion-item class="wrap-input" mode="ios">
+        <ion-toggle
+          id="remoteToggle"
+          labelPlacement="start"
+          checked="{{item.remote}}"
+          (ionChange)="chgRemoteButton($event,item)"
+          >Remote buttons :
+        </ion-toggle>
+      </ion-item>
 
-            </ion-item>
-          </form>
-        </ion-list>
+      <ion-item class="wrap-input" mode="ios">
+        <ion-toggle
+          id="disableToggle"
+          labelPlacement="start"
+          checked="{{item.enable}}"
+          (ionChange)="chgStatusCore($event,item)"
+          >Enabled core :
+        </ion-toggle>
+      </ion-item>
 
-        <ion-item class="wrap-input" mode="ios">
-          <ion-toggle id="remoteToggle" labelPlacement="start" checked="{{item.remote}}" 
-          (ionChange)="chgRemoteButton($event,item)">Remote buttons : </ion-toggle>
-        </ion-item>
-
-        <ion-item class="wrap-input" mode="ios">
-          <ion-toggle id="disableToggle" labelPlacement="start" checked="{{item.enable}}" 
-          (ionChange)="chgStatusCore($event,item)">Enabled core : </ion-toggle>
-        </ion-item>
-
-         <ion-item  *ngIf="myUserList?.length > 0" >
-          <ion-label class='labelInput' floating>Users:</ion-label>
-          <ion-select ok-text="Seleccionar" cancel-text="Cancelar" (ionChange)="setupCode(visitorId)" >
-            <ion-select-option *ngFor="let user of myUserList; let i = index;" value={{user._id}} >
-              {{user.name}}</ion-select-option>
-          </ion-select>
+      <ion-item *ngIf="myUserList?.length > 0">
+        <ion-label class="labelInput" floating>Users:</ion-label>
+        <ion-select
+          ok-text="Seleccionar"
+          cancel-text="Cancelar"
+          (ionChange)="setupCode(visitorId)"
+        >
+          <ion-select-option
+            *ngFor="let user of myUserList; let i = index;"
+            value="{{user._id}}"
+          >
+            {{user.name}}</ion-select-option
+          >
+        </ion-select>
       </ion-item>
     </form>
   </ion-list>
-
 </ion-content>

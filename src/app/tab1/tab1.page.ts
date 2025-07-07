@@ -377,7 +377,7 @@ export class Tab1Page implements OnInit {
       if (!localStorage.getItem("lastInfo_updated")) {
         timestamp = Utils.convDate(new Date());
       } else {
-        timestamp = (await localStorage.getItem("lastInfo_updated")) ?? "";
+        timestamp = localStorage.getItem("lastInfo_updated") ?? "";
         // timestamp = '2024-01-29T00:49:49.857Z'
       }
 
@@ -599,7 +599,7 @@ export class Tab1Page implements OnInit {
         {
           text: txtConfirm,
           handler: async () => {
-            await this.api.logout();
+            this.api.logout();
             this.router.navigateByUrl("/", { replaceUrl: true });
             Utils.cleanLocalStorage();
           },

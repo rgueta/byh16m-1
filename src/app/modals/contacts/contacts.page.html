@@ -1,35 +1,47 @@
-<ion-header>
+<ion-header class="topHeader">
   <ion-toolbar>
-      <div class='column left'>
-          <ion-buttons slot="start">
-            <ion-icon class="icon_exit"  (click)='closeModal()' 
-              name='arrow-back-circle-outline' >Cerrar</ion-icon>
-          </ion-buttons>
-      </div>
-      <div class="column middle">
-        <ion-title>Contactos</ion-title>
-      </div>
+    <div class="column left">
+      <ion-buttons slot="start">
+        <ion-icon
+          class="icon_exit"
+          (click)="closeModal()"
+          name="arrow-back-circle-outline"
+          >Cerrar</ion-icon
+        >
+      </ion-buttons>
+    </div>
+    <div class="column middle">
+      <ion-title>Contactos</ion-title>
+    </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
- <ion-list *ngFor="let contact of contacts">
-      <ion-item button *ngIf="contact.name?.display && contact?.phones" (click)="onClickContact(contact)">
-        <ion-icon  *ngIf="!contact?.image" slot="start" name="person-circle-outline"></ion-icon>
-        <ion-avatar *ngIf="contact?.image" slot="start">
-          <ion-img [src]="contact.image.base64String"></ion-img>
-        </ion-avatar>
-        <ion-label class="ion-text-wrap">
-          <ion-text color="dark">
-            <h3>{{contact.name.display}}</h3>
-          </ion-text>
-          <ion-text color="medium" *ngFor="let number of contact.phones">
-            <p>{{number.type}}:{{number.number}}</p>
-          </ion-text>
-          <ion-text color="medium" *ngFor="let mails of contact.emails">
-            <p>{{mails.type}}:{{mails.address}}</p>
-          </ion-text>
-        </ion-label>
-      </ion-item>
+  <ion-list *ngFor="let contact of contacts">
+    <ion-item
+      button
+      *ngIf="contact.name?.display && contact?.phones"
+      (click)="onClickContact(contact)"
+    >
+      <ion-icon
+        *ngIf="!contact?.image"
+        slot="start"
+        name="person-circle-outline"
+      ></ion-icon>
+      <ion-avatar *ngIf="contact?.image" slot="start">
+        <ion-img [src]="contact.image.base64String"></ion-img>
+      </ion-avatar>
+      <ion-label class="ion-text-wrap">
+        <ion-text color="dark">
+          <h3>{{contact.name.display}}</h3>
+        </ion-text>
+        <ion-text color="medium" *ngFor="let number of contact.phones">
+          <p>{{number.type}}:{{number.number}}</p>
+        </ion-text>
+        <ion-text color="medium" *ngFor="let mails of contact.emails">
+          <p>{{mails.type}}:{{mails.address}}</p>
+        </ion-text>
+      </ion-label>
+    </ion-item>
   </ion-list>
 </ion-content>
