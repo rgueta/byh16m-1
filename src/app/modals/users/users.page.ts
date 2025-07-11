@@ -141,7 +141,7 @@ export class UsersPage implements OnInit {
       .subscribe(async (result: any) => {
         if (result) this.users = result;
         this.users[0].open = true;
-        console.log("users:", await result);
+        console.log("users:", result);
       });
   }
 

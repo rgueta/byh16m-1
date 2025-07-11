@@ -54,6 +54,7 @@ import {
   readerOutline,
   arrowForwardCircleOutline,
   optionsOutline,
+  location,
 } from "ionicons/icons";
 
 const TWILIO = "twilio";
@@ -326,6 +327,7 @@ export class AdminPage implements OnInit {
       readerOutline,
       arrowForwardCircleOutline,
       optionsOutline,
+      location,
     });
   }
 
