@@ -209,7 +209,7 @@ export class Tab1Page implements OnInit {
       });
 
       //  Subscribe to a specific topic
-      FCM.subscribeTo({ topic: localStorage.getItem("core-id") })
+      FCM.subscribeTo({ topic: localStorage.getItem("core-id")! })
         .then()
         .catch((err) => console.log(err));
 
