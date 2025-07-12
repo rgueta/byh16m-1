@@ -1,6 +1,6 @@
 <ion-header class="ion-padding-top ion-safe-area-top" [translucent]="true">
   <ion-toolbar>
-    <ion-item class="wrap-input">
+    <div class="wrap-input">
       <ion-buttons class="closeButton" slot="start">
         <ion-icon
           class="icon_exit"
@@ -9,10 +9,9 @@
         ></ion-icon>
       </ion-buttons>
       <div class="title-wrip">
-        <ion-title class="title">Usuarios:</ion-title>
-        <ion-title class="title">{{coreName}}</ion-title>
+        <ion-title class="title">Usuarios: {{coreName}}</ion-title>
       </div>
-    </ion-item>
+    </div>
   </ion-toolbar>
 </ion-header>
 
@@ -81,10 +80,10 @@
       >
         <ion-item class="detail-item">
           <ion-input
-            name="code"
+            name="sim"
             required
             placeholder="new Sim"
-            value="{{item.Sim}}"
+            value="{{item.sim}}"
             [(ngModel)]="sim"
           ></ion-input>
           <ion-icon
@@ -135,6 +134,8 @@
             id="disableToggle"
             labelPlacement="start"
             [ngModel]="item.locked"
+            [ngModelOptions]="{standalone: true}"
+            checked="item.locked ? true : false"
             (ionChange)="chgLockStatus($event,item.locked,item._id, item.sim,
               item.name, item.house, item.coreSim)"
           >

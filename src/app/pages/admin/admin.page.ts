@@ -508,7 +508,7 @@ export class AdminPage implements OnInit {
     const modal = await this.modalController.create({
       component: UsersPage,
       backdropDismiss: true,
-      componentProps: { CoreId: coreId, coreName: core },
+      componentProps: { coreId: coreId, coreName: core },
     });
 
     modal.onDidDismiss();

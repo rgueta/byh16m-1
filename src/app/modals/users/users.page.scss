@@ -1,60 +1,67 @@
-.lock{
-    margin: auto 10px auto -10px;
-    font-size: 1.3rem;
-    color:rgb(255, 94, 0);
+.lock {
+  margin: auto 10px auto -10px;
+  font-size: 1.3rem;
+  color: rgb(255, 94, 0);
 }
 
-.title{
-    display: flex;
-    margin: 0;
-    padding-right: 0px;
-    width: 90%;
+.wrap-input {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-top: auto;
+  width: 100%;
 }
 
-.closeButton{
-    margin-right: 10px;
+.title {
+  display: flex;
+  margin: 0;
+  padding-right: 0px;
+  width: 100%;
 }
 
-.title-wrip{
-    font-size: .8em;
-    width: 100%;
+.closeButton {
+  margin-right: 10px;
+  width: 25%;
 }
 
-.options{
-    display: flex;
-    justify-content: space-between;
-    flex-direction: column;
-    width: 100%;
+.title-wrip {
+  font-size: 0.8em;
+  width: 100%;
 }
 
-.option_child{
-    flex: 1;
+.options {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  width: 100%;
 }
 
-.option_child:first-child{
-    margin-right: 10px;
+.option_child {
+  flex: 1;
 }
 
-.borrar{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
+.option_child:first-child {
+  margin-right: 10px;
 }
 
-.borrar_child{
-    flex: 1;
+.borrar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
-.borrar_child:first-child{
-    margin-left: 20px;
-    
+.borrar_child {
+  flex: 1;
 }
 
-.borrar_child:last-child{
-    ion-icon {
-        float: right;
-        justify-content: flex-end;
-    }
-    
+.borrar_child:first-child {
+  margin-left: 20px;
+}
+
+.borrar_child:last-child {
+  ion-icon {
+    float: right;
+    justify-content: flex-end;
+  }
 }

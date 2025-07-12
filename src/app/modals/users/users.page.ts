@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Input } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import {
@@ -8,7 +8,6 @@ import {
   IonToolbar,
   ModalController,
   AlertController,
-  NavParams,
   IonLabel,
   LoadingController,
   NavController,
@@ -21,6 +20,7 @@ import {
   IonRefresherContent,
   IonRefresher,
   IonButtons,
+  IonToggle,
 } from "@ionic/angular/standalone";
 import { DatabaseService } from "../../services/database.service";
 import { ToolsService } from "../../services/tools.service";
@@ -58,14 +58,18 @@ import {
     IonRefresherContent,
     IonRefresher,
     IonButtons,
+    IonToggle,
   ],
 })
 export class UsersPage implements OnInit {
+  @Input() coreId: string = "";
+  @Input() coreName: string = "";
+  public locked: boolean = false;
+
   users: any;
   automaticClose = false;
-  coreId: string = "";
-  coreName: string = "";
   RoleList: any = [];
+
   editRole: boolean = false;
   soyAdmin: boolean = false;
   soyNeighborAdmin: boolean = false;
@@ -78,7 +82,6 @@ export class UsersPage implements OnInit {
     private modalController: ModalController,
     private alertCtrl: AlertController,
     private api: DatabaseService,
-    private navParams: NavParams,
     private toolService: ToolsService,
     private sms: SMS,
     public navCtrl: NavController,
@@ -96,7 +99,6 @@ export class UsersPage implements OnInit {
   }
 
   async ionViewWillEnter() {
-    this.coreId = this.navParams.data["CoreId"];
     this.soyAdmin = localStorage.getItem("my-role") == "admin" ? true : false;
     this.soyNeighborAdmin =
       localStorage.getItem("my-role") == "neighborAdmin" ? true : false;
@@ -105,18 +107,17 @@ export class UsersPage implements OnInit {
   }
 
   async ngOnInit() {
-    this.coreId = this.navParams.data["CoreId"];
     this.userId = localStorage.getItem("my-userId")!;
   }
 
   async getRoles() {
     this.api
       .getData("api/roles/" + localStorage.getItem("my-userId"))
-      .subscribe(
-        async (result: any) => {
+      .subscribe({
+        next: async (result: any) => {
           this.RoleList = await result;
         },
-        (error: any) => {
+        error: (error: any) => {
           this.toolService.showAlertBasic(
             "Alerta",
             "Error, getRoles: ",
@@ -124,7 +125,7 @@ export class UsersPage implements OnInit {
             ["Ok"],
           );
         },
-      );
+      });
   }
 
   async getUsers() {
@@ -136,12 +137,21 @@ export class UsersPage implements OnInit {
       url = "api/users/coreNeighbor/";
     }
 
+    console.log(
+      "url user: ",
+      url + this.coreId + "/" + localStorage.getItem("my-userId"),
+    );
     this.api
       .getData(url + this.coreId + "/" + localStorage.getItem("my-userId"))
-      .subscribe(async (result: any) => {
-        if (result) this.users = result;
-        this.users[0].open = true;
-        console.log("users:", result);
+      .subscribe({
+        next: async (result: any) => {
+          if (result) this.users = result;
+          this.users[0].open = true;
+          console.log("users:", result);
+        },
+        error: (error: any) => {
+          console.log("Error call api: ", error);
+        },
       });
   }
 

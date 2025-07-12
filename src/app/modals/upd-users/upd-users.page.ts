@@ -119,6 +119,12 @@ export class UpdUsersPage implements OnInit {
     console.log(`Entre upd-users, sourcePage: ${this.sourcePage},
       CoreName: ${this.coreName}, CoreId: ${this.coreId},
       pathLocation: ${this.pathLocation}`);
+  }
+
+  ngOnInit_() {
+    console.log(`Entre upd-users, sourcePage: ${this.sourcePage},
+      CoreName: ${this.coreName}, CoreId: ${this.coreId},
+      pathLocation: ${this.pathLocation}`);
 
     this.MyRole = localStorage.getItem("my-role")!;
     if (localStorage.getItem("demoMode")) {
@@ -223,11 +229,11 @@ export class UpdUsersPage implements OnInit {
   }
 
   async getCores(cpu: string) {
-    this.api.getData("api/cores/" + cpu).subscribe(
-      async (result: any) => {
+    this.api.getData("api/cores/" + cpu).subscribe({
+      next: async (result: any) => {
         this.CoreList = await result;
       },
-      (error: any) => {
+      error: (error: any) => {
         this.toolService.showAlertBasic(
           "Alerta",
           "Error, getCores: ",
@@ -235,7 +241,7 @@ export class UpdUsersPage implements OnInit {
           ["Ok"],
         );
       },
-    );
+    });
   }
 
   async getRoles() {
