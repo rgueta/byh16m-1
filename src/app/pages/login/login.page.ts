@@ -262,7 +262,6 @@ export class LoginPage implements OnInit {
           next: async (res) => {
             await loading.dismiss();
             const roles: any = localStorage.getItem(USER_ROLES); // typeof object
-            console.log("Llegue aqui..1");
             for (const val_myrole of JSON.parse(roles)) {
               if (localStorage.getItem("locked") === "true") {
                 console.log("Usuario Locked...");

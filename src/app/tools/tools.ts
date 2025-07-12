@@ -105,11 +105,7 @@ export const Utils = {
 
   cleanLocalStorage: async () => {
     let myVisitors: string | null = "";
-    console.log("myVisitors at tools.cleanLocalStorage: ", myVisitors);
-    console.log(
-      "myVisitors at tools.cleanLocalStorage(stringify): ",
-      myVisitors,
-    );
+
     let myToken_px: string = "";
     let mycore_id: string = "";
     let my_refresh_token: string = "";
@@ -123,10 +119,7 @@ export const Utils = {
     // if (localStorage.getItem("visitors") !== null) {
     if (localStorage.getItem("visitors")) {
       // myVisitors = await JSON.parse(localStorage.getItem('visitors'));
-      console.log(
-        "Vaciado local to myVisitors: ",
-        localStorage.getItem("visitors"),
-      );
+
       myVisitors = localStorage.getItem("visitors")!;
     }
 
