@@ -36,52 +36,61 @@
     </div>
   </div>
 
-  <ion-list class="wrapper-filter">
-    <ion-modal id="open-modal1" trigger="open-modal1" [cssClass]="'bottom-end'">
-      <ng-template>
-        <ion-datetime
-          class="dateFilter"
-          locale="es-ES"
-          presentation="date"
-          size="cover"
-          display-format="D MMM YYYY"
-          min="2024-11-01T00:00:00"
-          max="2064-11-01T00:00:00"
-          value="{{Initial}}"
-          [showDefaultButtons]="true"
-          cancelText="Cancelar"
-          doneText="Aceptar"
-          (ionChange)="getEventsInitial($event)"
-          [showDefaultTitle]="true"
-        >
-          <span slot="title">Selecciona la fecha</span>
-        </ion-datetime>
-      </ng-template>
-    </ion-modal>
+  <div class="wrapper-filter">
+    <ion-list>
+      <ion-modal
+        id="open-modal1"
+        trigger="open-modal1"
+        [cssClass]="'bottom-end'"
+      >
+        <ng-template>
+          <ion-datetime
+            class="dateFilter"
+            locale="es-ES"
+            presentation="date"
+            size="cover"
+            display-format="D MMM YYYY"
+            min="2024-11-01T00:00:00"
+            max="2064-11-01T00:00:00"
+            value="{{Initial}}"
+            [showDefaultButtons]="true"
+            cancelText="Cancelar"
+            doneText="Aceptar"
+            (ionChange)="getEventsInitial($event)"
+            [showDefaultTitle]="true"
+          >
+            <span slot="title">Selecciona la fecha</span>
+          </ion-datetime>
+        </ng-template>
+      </ion-modal>
 
-    <ion-modal id="open-modal2" trigger="open-modal2" [cssClass]="'bottom-end'">
-      <ng-template>
-        <ion-datetime
-          class="dateFilter"
-          locale="es-ES"
-          presentation="date"
-          size="cover"
-          display-format="D MMM YYYY"
-          min="2024-11-01T00:00:00"
-          max="2064-11-01T00:00:00"
-          value="{{Final}}"
-          [showDefaultButtons]="true"
-          cancelText="Cancelar"
-          doneText="Aceptar"
-          (ionChange)="getEventsFinal($event)"
-          [showDefaultTitle]="true"
-        >
-          <span slot="title">Selecciona la fecha</span>
-        </ion-datetime>
-      </ng-template>
-    </ion-modal>
-  </ion-list>
-
+      <ion-modal
+        id="open-modal2"
+        trigger="open-modal2"
+        [cssClass]="'bottom-end'"
+      >
+        <ng-template>
+          <ion-datetime
+            class="dateFilter"
+            locale="es-ES"
+            presentation="date"
+            size="cover"
+            display-format="D MMM YYYY"
+            min="2024-11-01T00:00:00"
+            max="2064-11-01T00:00:00"
+            value="{{Final}}"
+            [showDefaultButtons]="true"
+            cancelText="Cancelar"
+            doneText="Aceptar"
+            (ionChange)="getEventsFinal($event)"
+            [showDefaultTitle]="true"
+          >
+            <span slot="title">Selecciona la fecha</span>
+          </ion-datetime>
+        </ng-template>
+      </ion-modal>
+    </ion-list>
+  </div>
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
