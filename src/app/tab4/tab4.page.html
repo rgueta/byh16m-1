@@ -1,10 +1,10 @@
-<ion-header class="ion-padding-top ion-safe-area-top topHeader">
+<ion-header class="topHeader">
   <ion-toolbar slot="start">
     <ion-title class="ion-text-center">Visitas</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content>
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
