@@ -78,4 +78,8 @@ export const routes: Routes = [
     path: 'users',
     loadComponent: () => import('./modals/users/users.page').then( m => m.UsersPage)
   },
+  {
+    path: 'tab3',
+    loadComponent: () => import('./tab3/tab3.page').then( m => m.Tab3Page)
+  },
 ];

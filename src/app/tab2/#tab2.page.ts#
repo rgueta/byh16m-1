@@ -9,7 +9,7 @@ import {
   IonLabel,
   IonItem,
   IonModal,
-  IonDatetime,
+OB  IonDatetime,
   IonNote,
   IonRefresher,
   IonRefresherContent,
@@ -75,7 +75,7 @@ export class Tab2Page implements OnInit {
   constructor(
     public api: DatabaseService,
     private toolsService: ToolsService,
-    public networkService: NetworkService
+    public networkService: NetworkService,
   ) {
     addIcons({
       chevronUpOutline,
@@ -123,11 +123,11 @@ export class Tab2Page implements OnInit {
     await this.end.setHours(23, 59, 59).toLocaleString();
 
     this.Initial = new Date(
-      this.start.getTime() - this.start.getTimezoneOffset() * 60000
+      this.start.getTime() - this.start.getTimezoneOffset() * 60000,
     ).toISOString();
 
     this.Final = new Date(
-      this.end.getTime() - this.end.getTimezoneOffset() * 60000
+      this.end.getTime() - this.end.getTimezoneOffset() * 60000,
     ).toISOString();
   }
 
@@ -137,32 +137,29 @@ export class Tab2Page implements OnInit {
         "No hay Acceso a internet",
         0,
         ["Ok"],
-        "middle"
+        "middle",
       );
       return;
     }
 
     try {
-      this.api
+      await this.api
         .getData(
           "api/codeEvent/" +
             this.myUserId +
             "/" +
             this.Initial +
             "/" +
-            this.Final
+            this.Final,
         )
         .subscribe(async (result) => {
-          this.EventsList = result;
+          this.EventsList = await result;
 
           if (this.EventsList.length > 0) {
-            console.log("Initial: ", this.Initial);
-            console.log("Final: ", this.Final);
-            console.log("codeEvents: ", result);
             this.EventsList.forEach(async (item: any) => {
               let d = new Date(item.createdAt.replace("Z", ""));
-              item.createdAt = new Date(
-                d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+              item.createdAt = await new Date(
+                d.setMinutes(d.getMinutes() - d.getTimezoneOffset()),
               );
             });
 
@@ -172,7 +169,7 @@ export class Tab2Page implements OnInit {
               "No hay eventos para esta fecha",
               0,
               ["Ok"],
-              "middle"
+              "middle",
             );
           }
         });
@@ -181,7 +178,7 @@ export class Tab2Page implements OnInit {
         "Aviso",
         "Ocurrio una excepción revisar:",
         `1. Acceso a la red<br>` + `2. Permiso para envio de sms`,
-        ["Cerrar"]
+        ["Cerrar"],
       );
     }
   }
@@ -198,7 +195,7 @@ export class Tab2Page implements OnInit {
     this.EventsList[index].open = !this.EventsList[index].open;
     if (this.automaticClose && this.EventsList[index].open) {
       this.EventsList.filter(
-        (item: {}, itemIndex: number) => itemIndex != index
+        (item: {}, itemIndex: number) => itemIndex != index,
       ).map((item: any) => (item.open = false));
     }
   }

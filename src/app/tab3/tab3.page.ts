@@ -13,6 +13,10 @@ import {
   IonNote,
   IonRefresher,
   IonRefresherContent,
+  IonAccordionGroup,
+  IonAccordion,
+  IonButtons,
+  IonButton,
 } from "@ionic/angular/standalone";
 import { DatabaseService } from "../services/database.service";
 import { ToolsService } from "../services/tools.service";
@@ -24,7 +28,7 @@ import {
   search,
   chevronForwardOutline,
 } from "ionicons/icons";
-import { NgStyle, DatePipe, NgFor, NgIf } from "@angular/common";
+import { CommonModule, NgStyle, DatePipe, NgFor, NgIf } from "@angular/common";
 import { NetworkService } from "../services/network.service";
 
 const USERID = "my-userId";
@@ -34,9 +38,9 @@ const CORE_SIM = "my-core-sim";
 const netStatus = "netStatus";
 
 @Component({
-  selector: "app-tab2",
-  templateUrl: "tab2.page.html",
-  styleUrls: ["tab2.page.scss"],
+  selector: "app-tab3",
+  templateUrl: "tab3.page.html",
+  styleUrls: ["tab3.page.scss"],
   standalone: true,
   imports: [
     IonHeader,
@@ -55,9 +59,13 @@ const netStatus = "netStatus";
     IonRefresherContent,
     NgFor,
     NgIf,
+    IonAccordionGroup,
+    IonAccordion,
+    IonButtons,
+    IonButton,
   ],
 })
-export class Tab2Page implements OnInit {
+export class Tab3Page implements OnInit {
   start: any;
   end: any;
 
@@ -88,6 +96,7 @@ export class Tab2Page implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.convertDate("Oninit", new Date(Date.now()));
+    this.getEvents();
   }
 
   async ionViewWillEnter() {
@@ -147,17 +156,12 @@ export class Tab2Page implements OnInit {
         .getData(
           "api/codeEvent/" +
             this.myUserId +
-            "/" +
-            this.Initial +
-            "/" +
-            this.Final
+            "/2024-11-01T00:00:00.000/2024-11-02T23:59:59.000Z"
         )
         .subscribe(async (result) => {
           this.EventsList = result;
 
           if (this.EventsList.length > 0) {
-            console.log("Initial: ", this.Initial);
-            console.log("Final: ", this.Final);
             console.log("codeEvents: ", result);
             this.EventsList.forEach(async (item: any) => {
               let d = new Date(item.createdAt.replace("Z", ""));
