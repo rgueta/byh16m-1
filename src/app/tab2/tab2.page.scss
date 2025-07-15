@@ -76,9 +76,9 @@
 }
 
 .wrapper-list {
+  padding-top: 4.5rem;
   &.md {
-    background-color: pink;
-    padding-top: 17rem;
+    padding-top: 0.3rem;
   }
 
   &.ios {
@@ -87,17 +87,14 @@
 }
 
 .accordion-list {
-  /* --ion-item-background: #fff; */
-  min-height: 62px;
   margin-top: 2px;
 
   .section,
   .section-active,
   .section-expired {
-    border-radius: 5px;
+    border-radius: 3px;
     max-width: 95% !important;
-    margin-left: auto;
-    margin-right: auto;
+    margin: auto;
   }
 
   ion-icon {
@@ -139,7 +136,6 @@
 }
 
 .detail {
-  margin-top: 5px;
   padding-left: 12px;
   max-width: 97% !important;
   --ion-item-background: #efeeee;
