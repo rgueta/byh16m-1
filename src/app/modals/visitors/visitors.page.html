@@ -17,8 +17,8 @@
 </ion-header>
 
 <ion-content>
-  <!-- <form [formGroup]="RegisterForm" (submit)="onSubmit()"> -->
-  <form [formGroup]="RegisterForm">
+  <!-- <form [formGroup]="registerForm" (submit)="onSubmit()"> -->
+  <form [formGroup]="registerForm">
     <ion-card>
       <ion-card-content>
         <ion-button
@@ -35,10 +35,9 @@
             class="input"
             type="text"
             name="name"
-            required
+            [(ngModel)]="name"
             placeholder="nombre"
             formControlName="LocalName"
-            value="{{name}}"
           ></ion-input>
           <br /><br />
         </ion-item>
@@ -49,7 +48,6 @@
             type="text"
             name="email"
             placeholder="email"
-            value="{{email}}"
           ></ion-input>
         </ion-item>
 
@@ -66,7 +64,7 @@
             class="input"
             type="text"
             name="sim"
-            required
+            [(ngModel)]="sim"
             formControlName="LocalSim"
             placeholder="Numero de celular"
             value="{{sim}}"
@@ -89,15 +87,10 @@
           </ion-select>
         </ion-item>
 
-        <!-- <ion-item>
-            <ion-input class='input' type="text" name='avatar' required placeholder="Image" value={{sim}} [(ngModel)]="sim" ></ion-input>
-            <br><br>
-          </ion-item> -->
-
         <ion-item class="wrap-input">
           <ion-button
             type="submit"
-            [disabled]="RegisterForm.invalid"
+            [disabled]="registerForm.invalid"
             class="submit titleButtonBlue"
             expand="full"
             (click)="onSubmit()"

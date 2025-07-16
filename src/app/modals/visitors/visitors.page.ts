@@ -61,12 +61,11 @@ const VISITORS = "visitors";
   ],
 })
 export class VisitorsPage implements OnInit {
-  RegisterForm!: FormGroup;
+  registerForm!: FormGroup;
   @Input() name: string = "";
   @Input() email: string = "";
   @Input() sim: string = "";
   @Input() address: string = "";
-  // @Input() gender:String;
   @Input() avatar: string = "";
 
   myToast: any;
@@ -83,17 +82,17 @@ export class VisitorsPage implements OnInit {
     private modalController: ModalController,
     private toast: ToastController,
     public api: DatabaseService,
-    private animationController: AnimationController,
+    private animationController: AnimationController
   ) {
     addIcons({ arrowBackCircleOutline });
-
-    this.RegisterForm = this.fb.group({
-      LocalName: ["", Validators.required],
-      LocalSim: ["", Validators.required],
-    });
   }
 
   async ngOnInit() {
+    this.registerForm = this.fb.group({
+      LocalName: ["", [Validators.required]],
+      LocalSim: ["", [Validators.required]],
+    });
+
     this.userId = localStorage.getItem("my-userId")!;
 
     if (localStorage.getItem(VISITORS) !== null) {
@@ -138,7 +137,7 @@ export class VisitorsPage implements OnInit {
         },
         (err) => {
           alert("No se agrego el contacto");
-        },
+        }
       );
   }
 

@@ -77,12 +77,13 @@
 
 .wrapper-list {
   padding-top: 4.5rem;
-  &.md {
-    padding-top: 0.3rem;
+
+  .md {
+    padding-top: 0rem;
   }
 
-  &.ios {
-    padding-top: env(safe-area-inset-top);
+  .ios {
+    padding-top: 0.3rem;
   }
 }
 

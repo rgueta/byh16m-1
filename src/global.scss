@@ -37,12 +37,12 @@
 @import "@ionic/angular/css/palettes/dark.system.css";
 
 .topHeader {
-  &.md {
-    padding-top: 2rem;
+  .md {
+    padding-top: 1rem;
   }
 
   &.ios {
-    padding-top: env(safe-area-inset-top);
+    /*padding-top: env(safe-area-inset-top);*/
   }
 }
 

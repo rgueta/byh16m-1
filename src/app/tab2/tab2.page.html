@@ -96,11 +96,13 @@
     </ion-list>
   </div>
 
-  <div class="wrapper-list">
+  <div id="codeEvents" class="wrapper-list">
     <ion-list
       *ngFor="let item of EventsList; let i = index;"
       class="accordion-list"
+      lines="none"
       detail="false"
+      ion-no-padding="true"
     >
       <ion-item tappable class="section" (click)="toggleSection(i)">
         <ion-icon
