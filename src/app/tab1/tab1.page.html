@@ -8,7 +8,7 @@
     </div>
     <div class="column middle">
       <ion-title>{{coreName}}</ion-title>
-      <div class="doorsButton-toggle" *ngIf="remote">
+      <!-- <div class="doorsButton-toggle" *ngIf="remote">
         <ion-label (click)="toggleButtons()">
           {{btnVisible ? 'Ocultar' : 'Visualizar'}}</ion-label
         >
@@ -17,15 +17,13 @@
           (click)="toggleButtons()"
           style="padding-left: 5px"
         ></ion-icon>
-      </div>
+      </div> -->
     </div>
     <div class="column right">
       <!-- <span [hidden] = "MyRole != 'admin'" > -->
       <span>
-        <ion-buttons slot="end">
-          <ion-button id="popover-button">
-            <ion-icon name="ellipsis-vertical-outline"></ion-icon>
-          </ion-button>
+        <ion-buttons slot="end" id="popover-button">
+          <ion-menu-button autoHide="false"></ion-menu-button>
         </ion-buttons>
       </span>
     </div>

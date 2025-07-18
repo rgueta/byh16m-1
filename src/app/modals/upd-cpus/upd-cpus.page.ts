@@ -53,7 +53,6 @@ import {
     IonRefresher,
     IonButtons,
     IonButton,
-    IonSelect,
   ],
 })
 export class UpdCpusPage implements OnInit {

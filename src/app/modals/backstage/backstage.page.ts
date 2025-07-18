@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { ModalController, NavParams, AlertController } from "@ionic/angular";
 import {
   IonButtons,
@@ -53,6 +53,7 @@ import {
     IonRefresherContent,
     IonRefresher,
     IonFabButton,
+    ReactiveFormsModule,
   ],
 })
 export class BackstagePage implements OnInit {

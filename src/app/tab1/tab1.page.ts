@@ -4,6 +4,8 @@ import {
   AlertController,
   LoadingController,
   isPlatform,
+  IonMenu,
+  IonMenuButton,
 } from "@ionic/angular/standalone";
 import { environment } from "../../environments/environment";
 import {
@@ -69,6 +71,7 @@ import {
   documentOutline,
   shareSocialOutline,
   mailOutline,
+  menu,
 } from "ionicons/icons";
 
 @Component({
@@ -102,6 +105,7 @@ import {
     IonCardTitle,
     IonCardSubtitle,
     IonRefresherContent,
+    IonMenuButton,
   ],
 })
 export class Tab1Page implements OnInit {
@@ -141,7 +145,7 @@ export class Tab1Page implements OnInit {
     private toolService: ToolsService,
     private loadingController: LoadingController,
     private screenOrientation: ScreenOrientation,
-    public networkService: NetworkService,
+    public networkService: NetworkService
   ) {
     addIcons({
       ellipsisVerticalOutline,
@@ -199,7 +203,7 @@ export class Tab1Page implements OnInit {
             "Push notification not granted..!",
             0,
             ["Ok"],
-            "middle",
+            "middle"
           );
         }
       });
@@ -225,7 +229,7 @@ export class Tab1Page implements OnInit {
         "pushNotificationReceived",
         (notification: PushNotificationSchema) => {
           this.toolService.toastAlert(notification.body!, 0, ["Ok"], "middle");
-        },
+        }
       );
 
       // pushNotification clicked Action Performed event
@@ -233,7 +237,7 @@ export class Tab1Page implements OnInit {
         "pushNotificationActionPerformed",
         (notification: ActionPerformed) => {
           // alert('Push action performed: ' + JSON.stringify(notification));
-        },
+        }
       );
 
       // -----------------------------------------------------
@@ -246,7 +250,7 @@ export class Tab1Page implements OnInit {
         "collect Info jumped, because debugging!",
         0,
         ["Ok"],
-        "bottom",
+        "bottom"
       );
     } else {
       this.collectInfo();
@@ -335,7 +339,7 @@ export class Tab1Page implements OnInit {
   async fcmNotification() {
     this.api.postData(
       `api/alerts/${localStorage.getItem("core-id")}/peatonal open/`,
-      "",
+      ""
     );
   }
 
@@ -413,7 +417,7 @@ export class Tab1Page implements OnInit {
                 this.localInfo = await Utils.sortJsonVisitors(
                   this.localInfo,
                   "updatedAt",
-                  false,
+                  false
                 );
 
                 // cleanup info
@@ -423,7 +427,7 @@ export class Tab1Page implements OnInit {
 
                 localStorage.setItem(
                   "info",
-                  await JSON.stringify(this.localInfo),
+                  await JSON.stringify(this.localInfo)
                 );
               }
             },
@@ -434,7 +438,7 @@ export class Tab1Page implements OnInit {
 
         localStorage.setItem(
           "lastInfo_updated",
-          await Utils.convDate(new Date()),
+          await Utils.convDate(new Date())
         );
       } catch (e) {
         console.error("Error api call: ", e);
@@ -449,7 +453,7 @@ export class Tab1Page implements OnInit {
         "No hay acceso a internet",
         0,
         ["Ok"],
-        "middle",
+        "middle"
       );
     }
   }
@@ -537,7 +541,7 @@ export class Tab1Page implements OnInit {
                       "Alerta",
                       "Error",
                       "Falla conexion a red telefonica",
-                      ["Ok"],
+                      ["Ok"]
                     );
                   });
               },
@@ -549,7 +553,7 @@ export class Tab1Page implements OnInit {
                   "Usuario bloqueado",
                   "btns",
                   "Ok",
-                  "",
+                  ""
                 );
               },
             });
@@ -561,7 +565,7 @@ export class Tab1Page implements OnInit {
                 this.msg +
                 "/" +
                 this.sim,
-              "",
+              ""
             );
             this.loadingController.dismiss();
           }
@@ -571,7 +575,7 @@ export class Tab1Page implements OnInit {
         "Aviso",
         "Ocurrio una excepción revisar:",
         `Error: ${e}`,
-        ["Cerrar"],
+        ["Cerrar"]
       );
     }
   }
@@ -584,7 +588,7 @@ export class Tab1Page implements OnInit {
     msg: string,
     btns: any,
     txtConfirm: string,
-    txtCancel: string,
+    txtCancel: string
   ) {
     const alert = await this.alertCtrl.create({
       header: Header,

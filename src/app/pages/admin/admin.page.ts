@@ -439,6 +439,7 @@ export class AdminPage implements OnInit {
   }
 
   async modalBackstage() {
+    console.log("from admin calling backstage page !!");
     const modal = await this.modalController.create({
       component: BackstagePage,
     });
