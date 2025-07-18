@@ -1,13 +1,231 @@
 <ion-header class="topHeader">
   <ion-toolbar>
-    <ion-title>info</ion-title>
+    <ion-buttons slot="start">
+      <ion-icon
+        class="icon_exit"
+        (click)="closeModal()"
+        name="arrow-back-circle-outline"
+        >Cerrar</ion-icon
+      >
+    </ion-buttons>
+    <div class="centered-content-wrapper">
+      <ion-title> Information</ion-title>
+    </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">info</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content padding>
+  <form [formGroup]="RegisterForm">
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+    <ion-item>
+      <ion-label class="labelInput" floating>Country:</ion-label>
+      <ion-select
+        [(ngModel)]="localCountry"
+        ok-text="Seleccionar"
+        cancel-text="Cancelar"
+        (ionChange)="countrySelection(localCountry)"
+        formControlName="frmCtrl_country"
+      >
+        <ion-select-option
+          *ngFor="let item of countriesList"
+          value="{{item.shortName}}"
+          >{{item.name}}</ion-select-option
+        >
+      </ion-select>
+    </ion-item>
+
+    <ion-item [disabled]="!localCountry">
+      <ion-label class="labelInput" floating>State:</ion-label>
+      <ion-select
+        [(ngModel)]="localState"
+        ok-text="Seleccionar"
+        cancel-text="Cancelar"
+        (ionChange)="stateSelection(localState)"
+        formControlName="frmCtrl_state"
+      >
+        <ion-select-option
+          *ngFor="let item of statesList"
+          value="{{item.shortName}}"
+          >{{item.name}}</ion-select-option
+        >
+      </ion-select>
+    </ion-item>
+
+    <ion-item [disabled]="!localState">
+      <ion-label class="labelInput" floating>City:</ion-label>
+      <ion-select
+        multiple
+        [(ngModel)]="localCity"
+        ok-text="Seleccionar"
+        cancel-text="Cancelar"
+        (ionChange)="citySelection(localCity)"
+        formControlName="frmCtrl_city"
+      >
+        <ion-select-option
+          *ngFor="let item of citiesList"
+          value="{{item.shortName}}"
+          >{{item.name}}</ion-select-option
+        >
+      </ion-select>
+    </ion-item>
+
+    <ion-item [disabled]="!localCity">
+      <ion-label class="labelInput" floating>Division:</ion-label>
+      <ion-select
+        [(ngModel)]="localDivision"
+        ok-text="Seleccionar"
+        cancel-text="Cancelar"
+        (ionChange)="divisionSelection(localDivision);"
+        formControlName="frmCtrl_division"
+      >
+        <ion-select-option
+          *ngFor="let item of divisionsList"
+          value="{{item.id}}"
+          >{{item.name}}</ion-select-option
+        >
+      </ion-select>
+    </ion-item>
+
+    <ion-item [disabled]="!localDivision">
+      <ion-label class="labelInput" floating>Cpu:</ion-label>
+      <ion-select
+        [(ngModel)]="localCpu"
+        ok-text="Seleccionar"
+        cancel-text="Cancelar"
+        (ionChange)="cpuSelection(localCpu)"
+        formControlName="frmCtrl_cpu"
+      >
+        <ion-select-option
+          *ngFor="let item of cpusList"
+          value="{{item.shortName}}"
+          >{{item.name}}</ion-select-option
+        >
+      </ion-select>
+    </ion-item>
+
+    <ion-item [disabled]="!localCpu">
+      <ion-label class="labelInput" floating>Core:</ion-label>
+      <ion-select
+        [(ngModel)]="localCore"
+        ok-text="Seleccionar"
+        cancel-text="Cancelar"
+        (ionChange)="coreSelection(localCore)"
+        formControlName="frmCtrl_core"
+      >
+        <ion-select-option
+          *ngFor="let item of coresList"
+          value="{{item.shortName}}"
+          >{{item.name}}</ion-select-option
+        >
+      </ion-select>
+    </ion-item>
+
+    <!-- <ion-item>
+      <ion-button class="titleBlue" fill="clear" [disabled]="RegisterForm.invalid"
+      [(ngModel)]="showMoreControls" [ngModelOptions]="{standalone: true}" ngDefaultControl
+      (click)="getImage()">Get Image</ion-button>
+    </ion-item> -->
+
+    <ion-item class="">
+      <ion-label class="labelRange" floating>Image size:</ion-label>
+      <ion-range
+        class="range wrapper_range"
+        aria-label="Range with pin"
+        [pin]="true"
+        [snaps]="true"
+        min="0"
+        max="100"
+        step="10"
+        (ionChange)="rangeChange($event)"
+        [pinFormatter]="pinFormatter"
+        [value]="{ upper: 10 }"
+      >
+        <ion-icon slot="start" size="small" name="image-outline"></ion-icon>
+        <ion-icon slot="end" name="image-outline"></ion-icon>
+      </ion-range>
+      <!-- <ion-range aria-label="Range with ticks" [ticks]="true"
+        [snaps]="true" [min]="0" [max]="10"></ion-range> -->
+    </ion-item>
+
+    <ion-button
+      id="frmCtrl_image"
+      class="tamamataMargen titleBlue"
+      expand="block"
+      [disabled]="RegisterForm.invalid"
+      (click)="getImage()"
+      >Get Image</ion-button
+    >
+  </form>
+
+  <ion-item *ngIf="imageFileName">
+    <ion-input
+      type="text"
+      class="ion-text-wrap"
+      [ngModel]="localTitle"
+      placeholder="Title"
+    ></ion-input>
+  </ion-item>
+
+  <div *ngIf="imageFileName">
+    <ion-item>
+      <ion-thumbnail class="auxuwiMargen">
+        <!-- <ion-img  class="auxuwiMargin" [src]="imageFileName" alt="Ionic File"></ion-img> -->
+        <img class="auxuwiMargin" src="{{imageFileName}}" />
+      </ion-thumbnail>
+    </ion-item>
+
+    <ion-item class="auxuwiMargen">
+      <ion-textarea rows="4" placeholder="Url" value="{{localUrl}}">
+        <b>URL:</b></ion-textarea
+      >
+    </ion-item>
+
+    <ion-item>
+      <ion-textarea
+        rows="4"
+        placeholder="Description"
+        value="{{localDescription}}"
+        [(ngModel)]="localDescription"
+        ><b>Description:</b></ion-textarea
+      >
+    </ion-item>
+
+    <ion-button
+      class="tamamataMargen titleGreen"
+      expand="block"
+      (click)="uploadFile()"
+      >Upload</ion-button
+    >
+
+    <ion-button
+      class="tamamataMargen"
+      color="warning"
+      expand="block"
+      (click)="cancelUploadFile()"
+      >Cancel</ion-button
+    >
+  </div>
+
+  <ion-card
+    [ngClass]="!item.disable ?  'CardInfo' : 'HiddenCardInfo'"
+    *ngFor="let item of localInfo; let i = index;"
+  >
+    <ion-card-header>
+      <div class="VisibleCtrl">
+        <ion-card-subtitle *ngIf="item.disable">Mostrar</ion-card-subtitle>
+        <ion-card-subtitle *ngIf="!item.disable">Ocultar</ion-card-subtitle>
+        <ion-checkbox
+          (ionChange)="StatusInfo($event,item.disable,item._id)"
+        ></ion-checkbox>
+      </div>
+      <ion-card-title>{{item.title}}</ion-card-title>
+      <ion-card-subtitle>{{item.createdAt}}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content class="">
+      <img style="height: 100px" src="{{item.path}}{{item.image}}" />
+      <p>{{item.description}}</p>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

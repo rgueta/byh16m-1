@@ -1,0 +1,69 @@
+.title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+
+.column {
+  float: left;
+  padding: 0.3rem 0 0.3rem 0.2rem;
+}
+
+.left {
+  width: 25%;
+  padding: 0.3rem 0 0.3rem 0.4rem;
+  // background-color: beige;
+}
+
+.middle {
+  padding: 1rem 0 0.5rem 0;
+
+  width: 90%;
+  ion-title {
+    font-size: 1.2rem;
+    text-align: center;
+  }
+}
+
+.centralize {
+  margin-left: -60px;
+}
+
+.titleCore {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  border: 1px solid;
+  flex-direction: column;
+  padding-top: 8px;
+}
+
+.basic-alert {
+  --background: #161e2c !important;
+  --color: #ff0000 !important;
+  --border-radius: 5px !important;
+}
+
+.fabicon {
+  font-size: 2.3em;
+  color: white;
+}
+
+ion-fab-button[data-desc] {
+  position: relative;
+}
+
+ion-fab-button[data-desc]::after {
+  position: absolute;
+  content: attr(data-desc);
+  z-index: 1;
+  right: 55px;
+  bottom: 4px;
+  background-color: var(--ion-color-secondary);
+  padding: 9px;
+  border-radius: 15px;
+  color: white;
+  box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2),
+    0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12);
+}

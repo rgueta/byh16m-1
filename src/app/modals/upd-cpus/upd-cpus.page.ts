@@ -4,7 +4,7 @@ import { AlertController } from "@ionic/angular";
 import { DatabaseService } from "../../services/database.service";
 import { Subscription } from "rxjs";
 
-import { FormsModule } from "@angular/forms";
+import { FormsModule, FormGroup } from "@angular/forms";
 import {
   ModalController,
   IonContent,
@@ -20,6 +20,8 @@ import {
   IonRefresher,
   IonButtons,
   IonButton,
+  IonSearchbar,
+  IonSelect,
 } from "@ionic/angular/standalone";
 
 import { addIcons } from "ionicons";
@@ -51,6 +53,7 @@ import {
     IonRefresher,
     IonButtons,
     IonButton,
+    IonSelect,
   ],
 })
 export class UpdCpusPage implements OnInit {
