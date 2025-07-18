@@ -1,36 +1,20 @@
 <ion-header class="topHeader">
   <ion-toolbar>
-    <div class="title">
-      <div class="column left">
-        <ion-buttons slot="start">
-          <ion-icon
-            class="icon_exit"
-            (click)="closeModal()"
-            name="arrow-back-circle-outline"
-            >Cerrar</ion-icon
-          >
-        </ion-buttons>
-      </div>
+    <ion-buttons slot="start">
+      <ion-icon
+        (click)="closeModal()"
+        name="arrow-back-circle-outline"
+      ></ion-icon>
+    </ion-buttons>
 
-      <div class="column middle centralize_Title">
-        <ion-title *ngIf="sourcePage == 'adminNew'">Usuario Nuevo</ion-title>
-        <ion-title *ngIf="sourcePage == 'adminNewExtrange'"
-          >New extrange</ion-title
-        >
-        <ion-title *ngIf="sourcePage == 'commentApp'"
-          >Comentar de la aplicacion</ion-title
-        >
-      </div>
-
-      <div class="column right">
-        <!-- <span>
-          <ion-buttons class="menu" slot="end">
-            <ion-button id="popover-button">
-              <ion-icon  name="ellipsis-vertical-outline"></ion-icon>
-            </ion-button>
-          </ion-buttons>
-        </span> -->
-      </div>
+    <div class="centered-content-wrapper">
+      <ion-title *ngIf="sourcePage == 'adminNew'">Usuario Nuevo</ion-title>
+      <ion-title *ngIf="sourcePage == 'adminNewExtrange'"
+        >New extrange</ion-title
+      >
+      <ion-title *ngIf="sourcePage == 'commentApp'"
+        >Comentar de la aplicacion</ion-title
+      >
     </div>
   </ion-toolbar>
 </ion-header>

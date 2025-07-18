@@ -1,13 +1,269 @@
 <ion-header class="topHeader">
   <ion-toolbar>
-    <ion-title>upd-cores</ion-title>
+    <ion-buttons slot="start">
+      <ion-icon
+        (click)="closeModal(false)"
+        name="arrow-back-circle-outline"
+      ></ion-icon>
+    </ion-buttons>
+
+    <div class="centered-content-wrapper">
+      <ion-title class="ion-no-padding">Core register</ion-title>
+    </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">upd-cores</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <form [formGroup]="updCoreForm">
+    <ion-item class="wrap-input">
+      <ion-input
+        class="input"
+        type="text"
+        placeholder="Name"
+        formControlName="Name"
+        [(ngModel)]="localName"
+      ></ion-input>
+      <br /><br />
+    </ion-item>
+
+    <ion-item class="wrap-input">
+      <ion-input
+        class="input"
+        type="text"
+        placeholder="Address"
+        formControlName="Address"
+        [(ngModel)]="localAddress"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item class="wrap-input1">
+      <div class="Section1">
+        <ion-item class="wrap-input">
+          <ion-label>Web service</ion-label>
+          <ion-select
+            okText="Accept"
+            cancelText="Cancelar"
+            [(ngModel)]="localWebService"
+            formControlName="webService"
+          >
+            <ion-select-option value="Y">Yes</ion-select-option>
+            <ion-select-option value="N">No</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </div>
+
+      <div class="Section2">
+        <ion-item class="wrap-input">
+          <ion-input
+            class="input"
+            type="text"
+            *ngIf="localWebService == 'N'"
+            pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+            placeholder="Sim 123-456-7890"
+            formControlName="Sim"
+            [(ngModel)]="localSim"
+          ></ion-input>
+          <ion-input
+            class="input"
+            type="text"
+            *ngIf="localWebService == 'Y'"
+            placeholder="URL or static IP "
+            formControlName="Sim"
+            [(ngModel)]="localSim"
+          ></ion-input>
+        </ion-item>
+      </div>
+    </ion-item>
+
+    <ion-item class="wrap-input">
+      <ion-label>Coordinates: </ion-label>
+      <ion-input
+        class="input"
+        type="number"
+        placeholder="Latitud"
+        formControlName="Coord"
+        [(ngModel)]="localLat"
+      ></ion-input>
+      <ion-input
+        class="input"
+        type="number"
+        placeholder="Longitude"
+        formControlName="Coord"
+        [(ngModel)]="localLon"
+      ></ion-input>
+    </ion-item>
+
+    <div class="CoreWrapper">
+      <ion-item class="wrap-input">
+        <div class="Section1">
+          <ion-item>
+            <!-- <ion-label floating>{{SelectHousingUnitTitle}}</ion-label> -->
+            <ion-select
+              class="ion-select-Division"
+              okText="Aceptar"
+              cancelText="Cancelar"
+              placeholder="Cpu"
+              interface="popover"
+              (ionChange)="changeHousing_unit($event)"
+              formControlName="housing_unit"
+            >
+              <ion-select-option
+                *ngFor="let housing_unit of myHousingUnitList"
+                [value]="{id:housing_unit._id,name:housing_unit.Name}"
+                >{{housing_unit.name}}</ion-select-option
+              >
+            </ion-select>
+          </ion-item>
+        </div>
+        <div class="Section2">
+          <ion-item class="wrap-input">
+            <ion-label class="labelInput">Enable : </ion-label>
+            <ion-toggle
+              slot="end"
+              [ngModel]="localenable"
+              [checked]="true"
+              formControlName="enable"
+              (ionChange)="EnableCore($event)"
+            ></ion-toggle>
+          </ion-item>
+        </div>
+      </ion-item>
+
+      <!-- Contact -->
+
+      <ion-item class="wrap-input detailTitle">
+        <ion-input
+          class="input"
+          type="text"
+          placeholder="Contact name"
+          formControlName="contact_name"
+          [(ngModel)]="localContact_name"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item class="wrap-input">
+        <div class="Section1">
+          <ion-item class="wrap-input">
+            <ion-input
+              class="input"
+              type="text"
+              placeholder="Email"
+              formControlName="contact_email"
+              [(ngModel)]="localContact_email"
+            ></ion-input>
+          </ion-item>
+        </div>
+        <div class="Section2">
+          <ion-item class="wrap-input">
+            <ion-input
+              class="input"
+              type="text"
+              placeholder="Cell phone"
+              formControlName="contact_phone"
+              [(ngModel)]="localContact_phone"
+            ></ion-input>
+          </ion-item>
+        </div>
+      </ion-item>
+
+      <!-- Detail -->
+
+      <ion-item class="wrap-input">
+        <div class="Section1">
+          <ion-item class="wrap-input">
+            <ion-input
+              class="input"
+              type="number"
+              placeholder="House qty"
+              formControlName="House_qty"
+              [(ngModel)]="localHouse_qty"
+            ></ion-input>
+          </ion-item>
+          <ion-item class="wrap-input">
+            <ion-input
+              class="input"
+              type="text"
+              placeholder="Motor model"
+              formControlName="Motor"
+              [(ngModel)]="localMotor"
+            ></ion-input>
+          </ion-item>
+          <ion-item class="wrap-input">
+            <ion-input
+              class="input"
+              type="text"
+              placeholder="Gate type"
+              formControlName="Gate_type"
+              [(ngModel)]="localGate_type"
+            ></ion-input>
+          </ion-item>
+          <ion-item class="wrap-input">
+            <ion-input
+              class="input"
+              type="number"
+              placeholder="Gate long"
+              formControlName="Gate_long"
+              [(ngModel)]="localGate_long"
+            ></ion-input>
+          </ion-item>
+        </div>
+        <div class="Section2">
+          <ion-item class="wrap-input">
+            <ion-input
+              class="input"
+              type="number"
+              placeholder="Gate height mts"
+              formControlName="Gate_height"
+              [(ngModel)]="localGate_height"
+            ></ion-input>
+          </ion-item>
+
+          <ion-item class="wrap-input">
+            <ion-input
+              class="input"
+              type="text"
+              placeholder="Pedestrian type"
+              formControlName="Pedestrian_type"
+              [(ngModel)]="localPedestrian_type"
+            ></ion-input>
+          </ion-item>
+
+          <ion-item class="wrap-input">
+            <ion-input
+              class="input"
+              type="number"
+              placeholder="Pedestrian long"
+              formControlName="Pedestrian_long"
+              [(ngModel)]="localPedestrian_long"
+            ></ion-input>
+          </ion-item>
+
+          <ion-item class="wrap-input">
+            <ion-input
+              class="input"
+              type="number"
+              placeholder="Pedestrian height"
+              formControlName="Pedestrian_height"
+              [(ngModel)]="localPedestrian_height"
+            ></ion-input>
+          </ion-item>
+        </div>
+      </ion-item>
+    </div>
+
+    <!-- <ion-item>
+        <ion-button type="submit" class="submit titleButtonBlue" [disabled] = "updCoreForm.invalid"
+        expand="full" (click)="onSubmitUpdCoreForm()">Save</ion-button>
+      </ion-item> -->
+
+    <ion-item>
+      <ion-button
+        type="submit"
+        class="submit titleButtonBlue"
+        expand="full"
+        (click)="onSubmitUpdCoreForm()"
+        >Save</ion-button
+      >
+    </ion-item>
+  </form>
 </ion-content>

@@ -46,6 +46,36 @@
   }
 }
 
+ion-toolbar {
+  // By default, ion-toolbar is a flex container.
+  // We need to ensure the space between start/end slots and the center is flexible.
+  // This helps the .centered-content-wrapper take up available space.
+  --min-height: 56px; // Standard height, adjust if needed
+
+  ion-icon {
+    font-size: 2.5rem;
+    padding: 5px 5px 20px 15px;
+  }
+  .centered-content-wrapper {
+    // This div needs to fill the space for centering to work effectively
+    flex-grow: 1; // Allows the div to grow and take available space
+    display: flex; /* Make this div a flex container */
+    align-items: center; /* Align items vertically in the center */
+    justify-content: center; /* Align items horizontally in the center */
+    height: 100%; /* Ensure it takes full height of the toolbar for vertical centering */
+
+    ion-title {
+      // Remove default padding of ion-title to ensure true centering
+      padding-inline-start: 0;
+      padding-inline-end: 0;
+      padding-top: 0;
+      padding-bottom: 0px;
+      // Optional: enforce text alignment if it's still off
+      text-align: center;
+    }
+  }
+}
+
 .bottomFooter {
   padding-bottom: calc(2rem + env(safe-area-inset-bottom));
 }

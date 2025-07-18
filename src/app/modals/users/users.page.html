@@ -1,16 +1,13 @@
 <ion-header class="topHeader">
   <ion-toolbar>
-    <div class="wrap-input">
-      <ion-buttons class="closeButton" slot="start">
-        <ion-icon
-          class="icon_exit"
-          (click)="closeModal()"
-          name="arrow-back-circle-outline"
-        ></ion-icon>
-      </ion-buttons>
-      <div class="title-wrip">
-        <ion-title class="title">Usuarios: {{coreName}}</ion-title>
-      </div>
+    <ion-buttons slot="start">
+      <ion-icon
+        (click)="closeModal()"
+        name="arrow-back-circle-outline"
+      ></ion-icon>
+    </ion-buttons>
+    <div class="centered-content-wrapper">
+      <ion-title class="ion-no-padding">Usuarios: {{coreName}}</ion-title>
     </div>
   </ion-toolbar>
 </ion-header>

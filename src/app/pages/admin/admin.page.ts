@@ -83,7 +83,6 @@ const EMAIL_TO_CORE = "emailToCore";
     IonIcon,
     IonList,
     IonAccordion,
-    IonAccordionGroup,
     IonInput,
     IonRefresher,
     IonRefresherContent,
@@ -91,6 +90,7 @@ const EMAIL_TO_CORE = "emailToCore";
     IonMenu,
     IonMenuButton,
     IonButtons,
+    IonAccordionGroup,
   ],
 })
 export class AdminPage implements OnInit {
@@ -302,14 +302,14 @@ export class AdminPage implements OnInit {
 
   constructor(
     public animationController: AnimationController,
-    public modalController: ModalController,
+    private modalController: ModalController,
     public api: DatabaseService,
     private sms: SMS,
     // private toast: ToastController,
     public alertCtrl: AlertController,
     // public routerOutlet :IonRouterOutlet
     private toolService: ToolsService,
-    private loadingController: LoadingController,
+    private loadingController: LoadingController
   ) {
     addIcons({
       chevronUpOutline,
@@ -472,7 +472,7 @@ export class AdminPage implements OnInit {
       this.routineOptions[index]["cmd"],
       "Yes",
       "Cancel",
-      index,
+      index
     );
   }
 
@@ -484,7 +484,7 @@ export class AdminPage implements OnInit {
       "New sim: " + this.sim + " ?",
       "simChange",
       "Yes",
-      "Cancel",
+      "Cancel"
     );
   }
 
@@ -534,7 +534,7 @@ export class AdminPage implements OnInit {
         titleMsg + " " + item.name + " ?",
         "chgRemoteButtons",
         "Yes",
-        "Cancel",
+        "Cancel"
       );
     }
   }
@@ -554,7 +554,7 @@ export class AdminPage implements OnInit {
         titleMsg + " " + item.name + " ?",
         "chgStatusCore",
         "Yes",
-        "Cancel",
+        "Cancel"
       );
     }
   }
@@ -596,7 +596,7 @@ export class AdminPage implements OnInit {
     this.CoresList[index].open = !this.CoresList[index].open;
     if (this.automaticClose && this.CoresList[index].open) {
       this.CoresList.filter(
-        (item: {}, itemIndex: number) => itemIndex != index,
+        (item: {}, itemIndex: number) => itemIndex != index
       ).map((item: any) => (item.open = false));
     }
   }
@@ -642,7 +642,7 @@ export class AdminPage implements OnInit {
     option: string,
     txtConfirm: string,
     txtCancel: string,
-    index: number = 0,
+    index: number = 0
   ) {
     let element = <HTMLInputElement>(
       document.getElementById(event.srcElement.id)
@@ -710,7 +710,7 @@ export class AdminPage implements OnInit {
                         if (option == "chgRemoteButtons") {
                           localStorage.setItem(
                             "remote",
-                            event.target.checked.toString(),
+                            event.target.checked.toString()
                           );
                         }
 
@@ -722,16 +722,16 @@ export class AdminPage implements OnInit {
                             JSON.stringify(onReject),
                           0,
                           ["Ok"],
-                          "bottom",
+                          "bottom"
                         );
-                      },
+                      }
                     );
                 } else {
                   this.toolService.toastAlert(
                     "No hay Acceso a internet",
                     0,
                     ["Ok"],
-                    "middle",
+                    "middle"
                   );
                 }
                 break;
@@ -769,7 +769,7 @@ export class AdminPage implements OnInit {
                                     (await this.getTimestamp()) +
                                     ",sim,value," +
                                     this.sim,
-                                  options,
+                                  options
                                 )
                                 .then(() => {
                                   this.sim = "";
@@ -779,7 +779,7 @@ export class AdminPage implements OnInit {
                                     "Sim cambiado " + this.sim,
                                     0,
                                     ["Ok"],
-                                    "bottom",
+                                    "bottom"
                                   );
                                 })
                                 .catch((err) => {
@@ -788,7 +788,7 @@ export class AdminPage implements OnInit {
                                     "Falla conexion a red telefonica",
                                     0,
                                     ["Ok"],
-                                    "bottom",
+                                    "bottom"
                                   );
                                   return;
                                 });
@@ -800,7 +800,7 @@ export class AdminPage implements OnInit {
                                   JSON.stringify(error),
                                 0,
                                 ["Ok"],
-                                "bottom",
+                                "bottom"
                               );
                               return;
                             });
@@ -812,7 +812,7 @@ export class AdminPage implements OnInit {
                             "No hay Acceso a internet",
                             0,
                             ["Ok"],
-                            "middle",
+                            "middle"
                           );
                         }
                       } else {
@@ -821,7 +821,7 @@ export class AdminPage implements OnInit {
                           "Formato Invalido",
                           0,
                           ["Ok"],
-                          "bottom",
+                          "bottom"
                         );
                       }
                     } catch (e) {
@@ -830,7 +830,7 @@ export class AdminPage implements OnInit {
                         "Sim no cambiado, error:<br>" + JSON.stringify(e),
                         0,
                         ["Ok"],
-                        "bottom",
+                        "bottom"
                       );
                     }
                   });
@@ -838,14 +838,14 @@ export class AdminPage implements OnInit {
               case "getSIMstatus":
                 this.sendSms(
                   item.Sim,
-                  "status," + (await this.getTimestamp()) + ",gral",
+                  "status," + (await this.getTimestamp()) + ",gral"
                 );
                 break;
 
               case "getConfig":
                 this.sendSms(
                   item.Sim,
-                  "status," + (await this.getTimestamp()) + ",getConfig",
+                  "status," + (await this.getTimestamp()) + ",getConfig"
                 );
                 break;
               case "getHouseNFC":
@@ -854,7 +854,7 @@ export class AdminPage implements OnInit {
                     "Alerta",
                     "Error, " + option,
                     "informacion incompleta",
-                    ["Ok"],
+                    ["Ok"]
                   );
                 } else {
                   this.sendSms(
@@ -863,14 +863,14 @@ export class AdminPage implements OnInit {
                       "," +
                       (await this.getTimestamp()) +
                       "," +
-                      data.inputValue,
+                      data.inputValue
                   );
                 }
                 break;
               case "RestraintStatus":
                 await this.sendSms(
                   item.Sim,
-                  "status," + (await this.getTimestamp()) + ",restraint",
+                  "status," + (await this.getTimestamp()) + ",restraint"
                 );
                 break;
 
@@ -881,13 +881,13 @@ export class AdminPage implements OnInit {
               case "ModuleRST":
                 await this.sendSms(
                   item.Sim,
-                  "rst," + (await this.getTimestamp()),
+                  "rst," + (await this.getTimestamp())
                 );
                 break;
               case "getActiveCodes":
                 await this.sendSms(
                   item.Sim,
-                  "active_codes," + (await this.getTimestamp()),
+                  "active_codes," + (await this.getTimestamp())
                 );
                 break;
 
@@ -898,7 +898,7 @@ export class AdminPage implements OnInit {
               case "uploadNFC":
                 await this.sendSms(
                   item.Sim,
-                  option + "," + (await this.getTimestamp()),
+                  option + "," + (await this.getTimestamp())
                 );
                 break;
 
@@ -908,7 +908,7 @@ export class AdminPage implements OnInit {
                   "setOpenCode," +
                     (await this.getTimestamp()) +
                     "," +
-                    item.option1,
+                    item.option1
                 );
                 break;
               case "setKeypad":
@@ -917,7 +917,7 @@ export class AdminPage implements OnInit {
                   "setKeypad," +
                     (await this.getTimestamp()) +
                     "," +
-                    item.option1,
+                    item.option1
                 );
                 break;
               case "cfgCHG":
@@ -928,7 +928,7 @@ export class AdminPage implements OnInit {
                         "Alerta",
                         "Error, " + option,
                         "informacion incompleta",
-                        ["Ok"],
+                        ["Ok"]
                       );
                     } else {
                       await this.sendSms(
@@ -940,7 +940,7 @@ export class AdminPage implements OnInit {
                           "," +
                           item.option2 +
                           "," +
-                          data.inputValue,
+                          data.inputValue
                       );
                     }
                   } else {
@@ -954,7 +954,7 @@ export class AdminPage implements OnInit {
                           "," +
                           item.option2 +
                           "," +
-                          item._id,
+                          item._id
                       );
                     } else {
                       await this.sendSms(
@@ -966,7 +966,7 @@ export class AdminPage implements OnInit {
                           "," +
                           item.option2 +
                           "," +
-                          item.option3,
+                          item.option3
                       );
                     }
                   }
@@ -975,7 +975,7 @@ export class AdminPage implements OnInit {
                     "No enviado, error:<br>" + JSON.stringify(e),
                     0,
                     ["Ok"],
-                    "bottom",
+                    "bottom"
                   );
                 }
                 break;
@@ -1014,14 +1014,14 @@ export class AdminPage implements OnInit {
                 "Alerta",
                 "Falla conexion a red telefonica",
                 "",
-                ["Ok"],
+                ["Ok"]
               );
             });
           this.toolService.toastAlert(
             "Msg. enviado a " + sim,
             0,
             ["Ok"],
-            "bottom",
+            "bottom"
           );
         } catch (e) {
           this.loadingController.dismiss();
@@ -1029,7 +1029,7 @@ export class AdminPage implements OnInit {
             "No se envio, error: <br>" + JSON.stringify(e),
             0,
             ["Ok"],
-            "bottom",
+            "bottom"
           );
         }
       });

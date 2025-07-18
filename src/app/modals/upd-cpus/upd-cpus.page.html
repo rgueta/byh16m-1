@@ -1,13 +1,129 @@
 <ion-header class="topHeader">
   <ion-toolbar>
-    <ion-title>upd-cpus</ion-title>
+    <ion-buttons slot="start">
+      <ion-icon
+        (click)="closeModal()"
+        name="arrow-back-circle-outline"
+      ></ion-icon>
+    </ion-buttons>
+    <div class="centered-content-wrapper">
+      <ion-title class="ion-no-padding">Cpu register</ion-title>
+    </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">upd-cpus</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-list
+    *ngFor="let item of CpuList; let i = index "
+    class="accordion-list"
+    lines="none"
+    detail="false"
+    no-padding
+  >
+    <!-- <ion-list  *ngFor="let item of CpuList let i = index" class="accordion-list" lines="none" detail="false" no-padding> -->
+    <ion-item tappable class="section_blue" (click)="toggleSection(i)">
+      <ion-icon
+        color="white"
+        slot="end"
+        name="chevron-forward-outline"
+        *ngIf="!item.open"
+      ></ion-icon>
+      <ion-icon
+        color="white"
+        slot="end"
+        name="chevron-down-outline"
+        *ngIf="item.open"
+      ></ion-icon>
+      <ion-label class="ion-text-wrap">
+        <strong>{{item.name}}</strong></ion-label
+      >
+    </ion-item>
+
+    <form tappable *ngIf="item.open" class="detail">
+      <ion-item>
+        <ion-button
+          class="dual_field buttons_Section"
+          expand="block"
+          (click)="updCpu($event,false,i,item)"
+          >{{isReadOnly ? 'Edit' : 'Save'}}</ion-button
+        >
+
+        <ion-button
+          class="dual_field buttons_Section"
+          expand="block"
+          (click)="CancelUpd(i)"
+          *ngIf="!isReadOnly"
+          >Cancel</ion-button
+        >
+      </ion-item>
+
+      <ion-item class="detail-item">
+        <ion-input
+          label="Cores:"
+          labelPlacement="floating"
+          disabled="{{isReadOnly}}"
+          value="{{item.cores}}"
+          name="item.cores"
+          [(ngModel)]="item.cores"
+        ></ion-input>
+
+        <ion-input
+          type="number"
+          label="Entry:"
+          labelPlacement="floating"
+          disabled="{{isReadOnly}}"
+          value="{{item.entry}}"
+          name="{{item.entry}}"
+          [(ngModel)]="item.entry"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item class="detail-item">
+        <ion-input
+          label="Coordinates:"
+          labelPlacement="floating"
+          disabled="{{isReadOnly}}"
+          value="{{item.coord}}"
+          name="{{item.coord}}"
+          [(ngModel)]="item.coord"
+        ></ion-input>
+
+        <ion-input
+          style="width: 33%"
+          class="dual_field"
+          label="Houses:"
+          labelPlacement="floating"
+          disabled="{{isReadOnly}}"
+          value="{{item.houses}}"
+          name="{{item.houses}}"
+          [(ngModel)]="item.houses"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item class="detail-item">
+        <ion-input
+          class="dual_field"
+          label="Sim:"
+          labelPlacement="floating"
+          disabled="{{isReadOnly}}"
+          value="{{item.sim}}"
+          name="{{item.sim}}"
+          [(ngModel)]="item.sim"
+        ></ion-input>
+
+        <ion-checkbox
+          class="dual_field"
+          justify="space-between"
+          disabled="{{isReadOnly}}"
+          checked="item.school"
+          [(ngModel)]="item.school"
+          >School</ion-checkbox
+        >
+      </ion-item>
+    </form>
+  </ion-list>
 </ion-content>
