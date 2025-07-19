@@ -54,11 +54,17 @@
 .doorsButton-toggle {
   display: flex;
   align-items: center;
-  font-size: 0.7em;
   justify-content: center;
   width: 100%;
-  .ios {
-    margin-top: 40px;
+
+  font-size: 1.2rem;
+
+  .md {
+    font-size: 2.5rem;
+  }
+
+  &.ios {
+    font-size: 1.2rem;
   }
 }
 

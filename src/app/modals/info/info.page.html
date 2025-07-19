@@ -19,12 +19,13 @@
     <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
       <ion-refresher-content></ion-refresher-content>
     </ion-refresher>
+
     <ion-item>
-      <ion-label class="labelInput" floating>Country:</ion-label>
       <ion-select
-        [(ngModel)]="localCountry"
+        label="Country"
         ok-text="Seleccionar"
         cancel-text="Cancelar"
+        [(ngModel)]="localCountry"
         (ionChange)="countrySelection(localCountry)"
         formControlName="frmCtrl_country"
       >
@@ -37,8 +38,9 @@
     </ion-item>
 
     <ion-item [disabled]="!localCountry">
-      <ion-label class="labelInput" floating>State:</ion-label>
+      <!-- <ion-label class="labelInput" floating>State:</ion-label> -->
       <ion-select
+        label="State"
         [(ngModel)]="localState"
         ok-text="Seleccionar"
         cancel-text="Cancelar"
@@ -54,8 +56,9 @@
     </ion-item>
 
     <ion-item [disabled]="!localState">
-      <ion-label class="labelInput" floating>City:</ion-label>
+      <!-- <ion-label class="labelInput" floating>City:</ion-label> -->
       <ion-select
+        label="City"
         multiple
         [(ngModel)]="localCity"
         ok-text="Seleccionar"
@@ -72,8 +75,9 @@
     </ion-item>
 
     <ion-item [disabled]="!localCity">
-      <ion-label class="labelInput" floating>Division:</ion-label>
+      <!-- <ion-label class="labelInput" floating>Division:</ion-label> -->
       <ion-select
+        label="Division"
         [(ngModel)]="localDivision"
         ok-text="Seleccionar"
         cancel-text="Cancelar"
@@ -89,8 +93,9 @@
     </ion-item>
 
     <ion-item [disabled]="!localDivision">
-      <ion-label class="labelInput" floating>Cpu:</ion-label>
+      <!-- <ion-label class="labelInput" floating>Cpu:</ion-label> -->
       <ion-select
+        label="Cpu"
         [(ngModel)]="localCpu"
         ok-text="Seleccionar"
         cancel-text="Cancelar"
@@ -106,8 +111,9 @@
     </ion-item>
 
     <ion-item [disabled]="!localCpu">
-      <ion-label class="labelInput" floating>Core:</ion-label>
+      <!-- <ion-label class="labelInput" floating>Core:</ion-label> -->
       <ion-select
+        label="Core"
         [(ngModel)]="localCore"
         ok-text="Seleccionar"
         cancel-text="Cancelar"
@@ -153,7 +159,7 @@
       id="frmCtrl_image"
       class="tamamataMargen titleBlue"
       expand="block"
-      [disabled]="RegisterForm.valid"
+      [disabled]="RegisterForm.invalid"
       (click)="getImage()"
       >Get Image</ion-button
     >

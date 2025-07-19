@@ -1,5 +1,5 @@
-import { Component, OnInit } from "@angular/core";
-import { CommonModule } from "@angular/common";
+import { Component, OnInit, Input, NgModule } from "@angular/core";
+import { CommonModule, NgFor, NgIf } from "@angular/common";
 import { Capacitor } from "@capacitor/core";
 import {
   FormsModule,
@@ -41,6 +41,7 @@ import {
   IonLabel,
   IonSelectOption,
   IonRefresherContent,
+  IonSelect,
 } from "@ionic/angular/standalone";
 
 @Component({
@@ -73,23 +74,26 @@ import {
     IonRefresherContent,
     ReactiveFormsModule,
     IonRefresher,
+    NgFor,
+    NgIf,
+    IonSelect,
   ],
 })
 export class InfoPage implements OnInit {
-  RegisterForm: FormGroup;
+  RegisterForm!: FormGroup;
   imageURI: any;
   imageFileName: any;
   myToast: any;
   userId: string = "";
-  localTitle: String = "";
-  localDescription: String = "";
-  localUrl: String = "";
-  localCountry: String = "";
-  public localState: String = "";
-  public localCity: String = "";
-  public localDivision: String = "";
-  public localCpu: String = "";
-  public localCore: String = "";
+  @Input() localTitle: string = "";
+  @Input() localDescription: string = "";
+  @Input() localUrl: string = "";
+  @Input() localCountry: string = "";
+  @Input() localState: string = "";
+  @Input() localCity: string = "";
+  @Input() localDivision: string = "";
+  @Input() localCpu: string = "";
+  @Input() localCore: string = "";
 
   public countriesList: any;
   public statesList: any;
@@ -109,42 +113,45 @@ export class InfoPage implements OnInit {
   REST_API_SERVER = environment.cloud.server_url;
 
   constructor(
+    private fb: FormBuilder,
     private modalController: ModalController,
     public loadingCtrl: LoadingController,
     private api: DatabaseService,
-    // public formBuilder : FormBuilder
     private http: HttpClient,
     private toolService: ToolsService
   ) {
     addIcons({ arrowBackCircleOutline, imageOutline });
-    this.RegisterForm = new FormGroup({
-      frmCtrl_country: new FormControl("", [Validators.required]),
-      frmCtrl_state: new FormControl("", [Validators.required]),
-      frmCtrl_city: new FormControl("", [Validators.required]),
-      frmCtrl_division: new FormControl("", [Validators.required]),
-      frmCtrl_cpu: new FormControl("", [Validators.required]),
-      frmCtrl_core: new FormControl("", [Validators.required]),
+    this.validateControls();
+  }
+
+  async validateControls() {
+    this.RegisterForm = this.fb.group({
+      frmCtrl_country: ["", [Validators.required]],
+      frmCtrl_state: ["", [Validators.required]],
+      frmCtrl_city: ["", [Validators.required]],
+      frmCtrl_division: ["", [Validators.required]],
+      frmCtrl_cpu: ["", [Validators.required]],
+      frmCtrl_core: ["", [Validators.required]],
     });
   }
 
   async ngOnInit() {
     this.localTitle = "Aqui va el titulo..";
     this.userId = localStorage.getItem("my-userId")!;
-    // await localStorage.getItem('my-userId').then((val_userId:any) => {
-    //   this.userId = val_userId.value;
-    // });
-
     this.collectCountries();
     this.collectInfo();
   }
 
   //#region select location  -------------------------------------------
   async collectCountries() {
-    this.api
-      .getData("api/countries/" + this.userId)
-      .subscribe(async (countriesResult) => {
-        this.countriesList = countriesResult;
-      });
+    this.api.getData("api/countries/" + this.userId).subscribe({
+      next: async (result) => {
+        this.countriesList = result;
+      },
+      error: (error) => {
+        this.toolService.toastAlert("Error: " + error, 0, ["Ok"], "middle");
+      },
+    });
   }
 
   async collectStates(country: any) {
@@ -383,13 +390,19 @@ export class InfoPage implements OnInit {
   }
 
   //#endregion Image section ------------------------------------------------
+
   async collectInfo() {
     if (await this.toolService.verifyNetStatus()) {
-      this.api
-        .getData("api/info/all/" + this.userId)
-        .subscribe(async (result) => {
+      this.api.getData("api/info/all/" + this.userId).subscribe({
+        next: async (result) => {
+          console.log("info --> ", result);
           this.localInfo = result;
-        });
+        },
+        error: (err) => {
+          console.log("Error collectInfo --> ", err);
+          this.toolService.toastAlert("Error: " + err, 0, ["Ok"], "middle");
+        },
+      });
     } else {
       this.toolService.toastAlert(
         "No hay Acceso a internet",

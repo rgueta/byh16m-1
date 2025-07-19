@@ -85,7 +85,6 @@ import {
     IonToolbar,
     IonTitle,
     IonContent,
-    IonLabel,
     CommonModule,
     IonIcon,
     IonButton,
