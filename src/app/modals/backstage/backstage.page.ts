@@ -79,7 +79,7 @@ export class BackstagePage implements OnInit {
   }
 
   async ionViewWillEnter() {
-    this.MyRole = localStorage.getItem("my-role")!;
+    this.MyRole = localStorage.getItem("myRole")!;
   }
 
   ngOnInit() {
@@ -89,9 +89,9 @@ export class BackstagePage implements OnInit {
 
   async getBackstage() {
     this.api
-      .getData("api/backstage/" + localStorage.getItem("my-userId"))
-      .subscribe(
-        async (result: any) => {
+      .getData("api/backstage/" + localStorage.getItem("userId"))
+      .subscribe({
+        next: async (result: any) => {
           this.backstageList = await result;
           if (this.backstageList.length > 0) {
             this.backstageList[0].open = true;
@@ -105,15 +105,15 @@ export class BackstagePage implements OnInit {
             this.modalController.dismiss("no refresh");
           }
         },
-        (err: any) => {
+        error: (err: any) => {
           this.toolService.showAlertBasic(
             "Alerta",
-            "Error, get backstage: ",
+            "Fallo obteniendo backstage: ",
             JSON.stringify(err),
             ["Ok"]
           );
-        }
-      );
+        },
+      });
   }
 
   async getRoles() {
@@ -121,19 +121,19 @@ export class BackstagePage implements OnInit {
     if (this.sourcePage == "tab1NewNeighbor") {
       url = "api/roles/neiAdmin/";
     }
-    this.api.getData(url + localStorage.getItem("my-userId")).subscribe(
-      async (result: any) => {
+    this.api.getData(url + localStorage.getItem("userId")).subscribe({
+      next: async (result: any) => {
         this.RoleList = await result;
       },
-      (error: any) => {
+      error: (error: any) => {
         this.toolService.showAlertBasic(
           "Alerta",
-          "Error, getRoles: ",
+          "Fallo, getRoles: ",
           JSON.stringify(error),
           ["Ok"]
         );
-      }
-    );
+      },
+    });
   }
 
   toggleSection(index: number) {

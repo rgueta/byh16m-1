@@ -170,9 +170,9 @@ export class Tab1Page implements OnInit {
       this.isAndroid = true;
     }
 
-    this.MyRole = localStorage.getItem("my-role");
-    this.myEmail = localStorage.getItem("my-email");
-    this.myName = localStorage.getItem("my-name");
+    this.MyRole = localStorage.getItem("myRole");
+    this.myEmail = localStorage.getItem("email");
+    this.myName = localStorage.getItem("name");
     this.remote = localStorage.getItem("remote") === "true";
 
     if (localStorage.getItem("demoMode")) {
@@ -187,13 +187,14 @@ export class Tab1Page implements OnInit {
   }
 
   async ngOnInit() {
-    const sim = localStorage.getItem("my-core-sim");
-    this.userId = localStorage.getItem("my-userId");
-    this.coreName = localStorage.getItem("core-name");
-    this.coreId = localStorage.getItem("core-id");
+    const sim = localStorage.getItem("coreSim");
+    this.userId = localStorage.getItem("userId");
+    this.coreName = localStorage.getItem("coreName");
+    this.coreId = localStorage.getItem("coreId");
 
     // -----------------firebase Push notification
-    if (["android", "ios"].indexOf(localStorage.getItem("devicePlatform")!)) {
+
+    if (["android", "ios"].includes(localStorage.getItem("devicePlatform")!)) {
       PushNotifications.requestPermissions().then((resul) => {
         if (resul.receive === "granted") {
           PushNotifications.register();
@@ -343,7 +344,7 @@ export class Tab1Page implements OnInit {
   }
 
   lockToPortrait() {
-    if (["android", "ios"].indexOf(localStorage.getItem("devicePlatform")!))
+    if (["android", "ios"].includes(localStorage.getItem("devicePlatform")!))
       this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.PORTRAIT);
   }
 
@@ -400,14 +401,15 @@ export class Tab1Page implements OnInit {
         this.api
           .getData("api/info/" + this.userId + "/" + timestamp)
           .subscribe({
-            next: async (result) => {
+            next: async (result: any) => {
               if (Object.keys(result).length > 0) {
                 // get last api call variable
                 if (this.localInfo.length > 0) {
                   // this.localInfo = JSON.parse(localStorage.getItem('info'));
 
                   Object.entries(result).forEach(async ([key, item]) => {
-                    this.localInfo.push(item);
+                    // this.localInfo.push(item);
+                    this.localInfo = [...this.localInfo, item];
                   });
                 } else {
                   this.localInfo = result;
@@ -424,21 +426,15 @@ export class Tab1Page implements OnInit {
                   this.localInfo.splice(1000);
                 }
 
-                localStorage.setItem(
-                  "info",
-                  await JSON.stringify(this.localInfo)
-                );
+                localStorage.setItem("info", JSON.stringify(this.localInfo));
               }
             },
-            error: (error) => {
+            error: (error: any) => {
               console.error("collect info error : ", error);
             },
           });
 
-        localStorage.setItem(
-          "lastInfo_updated",
-          await Utils.convDate(new Date())
-        );
+        localStorage.setItem("lastInfo_updated", Utils.convDate(new Date()));
       } catch (e) {
         console.error("Error api call: ", e);
       }
@@ -497,10 +493,10 @@ export class Tab1Page implements OnInit {
       },
     };
 
-    const local_sim = await localStorage.getItem("my-core-sim");
-    const use_twilio = await localStorage.getItem("twilio");
-    const uuid = await localStorage.getItem("device-uuid");
-    // const local_sim =  await this.storage.get('my-core-sim');
+    const local_sim = localStorage.getItem("coreSim");
+    const use_twilio = localStorage.getItem("twilio");
+    const uuid = localStorage.getItem("device-uuid");
+    // const local_sim =  await this.storage.get('coreSim');
 
     // create milliseconds block  for local timestamp -------
 

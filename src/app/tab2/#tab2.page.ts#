@@ -27,10 +27,10 @@ import {
 import { NgStyle, DatePipe, NgFor, NgIf } from "@angular/common";
 import { NetworkService } from "../services/network.service";
 
-const USERID = "my-userId";
-const REFRESH_TOKEN_KEY = "my-refresh-token";
-const TOKEN_KEY = "my-token";
-const CORE_SIM = "my-core-sim";
+const USERID = "userId";
+const REFRESH_TOKEN_KEY = "refreshToken";
+const TOKEN_KEY = "authToken";
+const CORE_SIM = "coreSim";
 const netStatus = "netStatus";
 
 @Component({

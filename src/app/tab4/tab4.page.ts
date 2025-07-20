@@ -66,7 +66,7 @@ export class Tab4Page implements OnInit {
     public api: DatabaseService,
     private sms: SMS,
     private toolService: ToolsService,
-    private alertCtrl: AlertController,
+    private alertCtrl: AlertController
   ) {
     addIcons({
       chevronDownOutline,
@@ -77,7 +77,7 @@ export class Tab4Page implements OnInit {
   }
 
   async ngOnInit() {
-    this.userId = localStorage.getItem("my-userId");
+    this.userId = localStorage.getItem("userId");
     this.getVisitors();
   }
 
@@ -109,7 +109,7 @@ export class Tab4Page implements OnInit {
           this.VisitorsList = await Utils.sortJsonVisitors(
             this.VisitorsList,
             "name",
-            true,
+            true
           );
 
         this.VisitorsList[0].open = true;
@@ -135,7 +135,7 @@ export class Tab4Page implements OnInit {
               this.VisitorsList.splice(index, 1);
               localStorage.setItem(
                 "visitors",
-                JSON.stringify(this.VisitorsList),
+                JSON.stringify(this.VisitorsList)
               );
               this.VisitorsList[0].open = true;
             } catch (e) {
@@ -143,7 +143,7 @@ export class Tab4Page implements OnInit {
                 "Aviso",
                 "Ocurrio una excepcion al borrar",
                 "Error: " + e,
-                ["Cerrar"],
+                ["Cerrar"]
               );
             }
           },
@@ -158,7 +158,7 @@ export class Tab4Page implements OnInit {
     this.VisitorsList[index].open = !this.VisitorsList[index].open;
     if (this.automaticClose && this.VisitorsList[index].open) {
       this.VisitorsList.filter(
-        (item: [], itemIndex: number) => itemIndex != index,
+        (item: [], itemIndex: number) => itemIndex != index
       ).map((item: any) => (item.open = false));
     }
   }
@@ -180,7 +180,7 @@ export class Tab4Page implements OnInit {
     field: string,
     visitorId: string,
     visitor: string,
-    ActualValue: string,
+    ActualValue: string
   ) {
     let dbField = "email";
     switch (field) {
@@ -207,20 +207,20 @@ export class Tab4Page implements OnInit {
                 await this.api
                   .putData(
                     "api/visitors/simple/" + this.userId + "/" + visitorId,
-                    data,
+                    data
                   )
                   .then(
                     async (resp) => {},
                     (error) => {
                       this.errorUpdate(field);
-                    },
+                    }
                   );
               } else {
                 this.toolService.toastAlert(
                   "No hay acceso a internet",
                   0,
                   ["Ok"],
-                  "middle",
+                  "middle"
                 );
               }
             } catch (err) {
@@ -228,7 +228,7 @@ export class Tab4Page implements OnInit {
                 "Aviso",
                 "Ocurrio una excepcion al cambiar " + field,
                 "Error: " + err,
-                ["Cerrar"],
+                ["Cerrar"]
               );
             }
           },
@@ -295,7 +295,7 @@ export class Tab4Page implements OnInit {
               try {
                 await this.api.putData(
                   "api/visitors/simple/" + this.userId + "/" + visitorId,
-                  data,
+                  data
                 );
                 await this.getVisitors();
               } catch (err) {

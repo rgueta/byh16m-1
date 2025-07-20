@@ -108,7 +108,6 @@ export class InfoPage implements OnInit {
   image: any;
 
   ImageSize: any;
-  public pinFormatter: any;
 
   REST_API_SERVER = environment.cloud.server_url;
 
@@ -137,7 +136,7 @@ export class InfoPage implements OnInit {
 
   async ngOnInit() {
     this.localTitle = "Aqui va el titulo..";
-    this.userId = localStorage.getItem("my-userId")!;
+    this.userId = localStorage.getItem("userId")!;
     this.collectCountries();
     this.collectInfo();
   }
@@ -148,18 +147,31 @@ export class InfoPage implements OnInit {
       next: async (result) => {
         this.countriesList = result;
       },
-      error: (error) => {
-        this.toolService.toastAlert("Error: " + error, 0, ["Ok"], "middle");
+      error: (error: any) => {
+        this.toolService.toastAlert(
+          "Fallo obteniendo countries: " + error,
+          0,
+          ["Ok"],
+          "middle"
+        );
       },
     });
   }
 
   async collectStates(country: any) {
-    this.api
-      .getData("api/states/" + country + "/" + this.userId)
-      .subscribe(async (statesResult) => {
+    this.api.getData("api/states/" + country + "/" + this.userId).subscribe({
+      next: async (statesResult) => {
         this.statesList = statesResult;
-      });
+      },
+      error: (error) => {
+        this.toolService.showAlertBasic(
+          "Aviso",
+          "Fallo obteniendo error:",
+          `Error: ${error}`,
+          ["Cerrar"]
+        );
+      },
+    });
   }
 
   async collectCities(state: any) {
@@ -167,8 +179,18 @@ export class InfoPage implements OnInit {
       .getData(
         "api/cities/" + this.localCountry + "/" + state + "/" + this.userId
       )
-      .subscribe(async (citiesResult) => {
-        this.citiesList = citiesResult;
+      .subscribe({
+        next: async (citiesResult) => {
+          this.citiesList = citiesResult;
+        },
+        error: (error) => {
+          this.toolService.showAlertBasic(
+            "Aviso",
+            "Fallo obteniendo cities:",
+            `Error: ${error}`,
+            ["Cerrar"]
+          );
+        },
       });
   }
 
@@ -184,8 +206,18 @@ export class InfoPage implements OnInit {
           "/" +
           this.userId
       )
-      .subscribe(async (divisionsResult) => {
-        this.divisionsList = divisionsResult;
+      .subscribe({
+        next: async (divisionsResult) => {
+          this.divisionsList = divisionsResult;
+        },
+        error: (error) => {
+          this.toolService.showAlertBasic(
+            "Aviso",
+            "Fallo obteniendo divisions:",
+            `Error: ${error}`,
+            ["Cerrar"]
+          );
+        },
       });
   }
 
@@ -203,8 +235,18 @@ export class InfoPage implements OnInit {
           "/" +
           this.userId
       )
-      .subscribe(async (cpusResult) => {
-        this.cpusList = cpusResult;
+      .subscribe({
+        next: async (cpusResult) => {
+          this.cpusList = cpusResult;
+        },
+        error: (error) => {
+          this.toolService.showAlertBasic(
+            "Aviso",
+            "Fallo obteniendo cpus/basic:",
+            `Error: ${error}`,
+            ["Cerrar"]
+          );
+        },
       });
   }
   async collectCores(cpu: any) {
@@ -223,13 +265,23 @@ export class InfoPage implements OnInit {
           "/" +
           this.userId
       )
-      .subscribe(async (coresResult) => {
-        this.coresList = coresResult;
+      .subscribe({
+        next: async (coresResult) => {
+          this.coresList = coresResult;
+        },
+        error: (error) => {
+          this.toolService.showAlertBasic(
+            "Aviso",
+            "Fallo obteniendo cores light:",
+            `Error: ${error}`,
+            ["Cerrar"]
+          );
+        },
       });
   }
 
-  async countrySelection(country: any) {
-    let countryObj = this.RegisterForm.controls["frmCtrl_country"].value;
+  async countrySelection() {
+    let country = this.RegisterForm.controls["frmCtrl_country"].value;
     if (country) {
       this.collectStates(country);
       this.localCountry = country;
@@ -240,27 +292,32 @@ export class InfoPage implements OnInit {
     // this.localCountry = countryObj.name;
   }
 
-  async stateSelection(state: any) {
+  async stateSelection() {
+    let state = this.RegisterForm.controls["frmCtrl_state"].value;
     this.collectCities(state);
     this.localState = state;
   }
 
-  async citySelection(city: any) {
-    this.collectDivisions(city[0]);
-    this.localCity = city[0];
+  async citySelection() {
+    let city = this.RegisterForm.controls["frmCtrl_city"].value;
+    this.collectDivisions(city);
+    this.localCity = city;
   }
 
-  async divisionSelection(division: any) {
-    await this.collectCpus(division[0]);
-    this.localDivision = await division[0];
+  async divisionSelection() {
+    let division = this.RegisterForm.controls["frmCtrl_division"].value;
+    await this.collectCpus(division);
+    this.localDivision = await division;
   }
 
-  async cpuSelection(cpu: any) {
+  async cpuSelection() {
+    let cpu = this.RegisterForm.controls["frmCtrl_cpu"].value;
     await this.collectCores(cpu);
     this.localCpu = await cpu;
   }
 
-  async coreSelection(core: any) {
+  async coreSelection() {
+    let core = this.RegisterForm.controls["frmCtrl_core"].value;
     this.localCore = core;
     this.imgFolder =
       this.localCountry +
@@ -398,7 +455,7 @@ export class InfoPage implements OnInit {
           console.log("info --> ", result);
           this.localInfo = result;
         },
-        error: (err) => {
+        error: (err: any) => {
           console.log("Error collectInfo --> ", err);
           this.toolService.toastAlert("Error: " + err, 0, ["Ok"], "middle");
         },

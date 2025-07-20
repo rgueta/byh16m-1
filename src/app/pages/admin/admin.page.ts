@@ -332,8 +332,8 @@ export class AdminPage implements OnInit {
   }
 
   async ngOnInit() {
-    this.core_sim = localStorage.getItem("my-core-sim")!;
-    this.userId = localStorage.getItem("my-userId")!;
+    this.core_sim = localStorage.getItem("coreSim")!;
+    this.userId = localStorage.getItem("userId")!;
     this.emailToVisitor = localStorage.getItem("emailToVisitor") === "true";
     this.getCores();
     if (!localStorage.getItem("roles")) {
@@ -363,17 +363,15 @@ export class AdminPage implements OnInit {
   }
 
   async getRoles() {
-    this.api
-      .getData(`api/roles/${localStorage.getItem("my-userId")}/`)
-      .subscribe({
-        next: async (result) => {
-          this.RoleList = result;
-          localStorage.setItem("roles", JSON.stringify(result));
-        },
-        error: (err) => {
-          console.log("Error --> ", JSON.stringify(err));
-        },
-      });
+    this.api.getData(`api/roles/${localStorage.getItem("userId")}/`).subscribe({
+      next: async (result) => {
+        this.RoleList = result;
+        localStorage.setItem("roles", JSON.stringify(result));
+      },
+      error: (err: any) => {
+        console.log("Error --> ", JSON.stringify(err));
+      },
+    });
   }
 
   async clicked(item: string) {
@@ -745,7 +743,7 @@ export class AdminPage implements OnInit {
                   .then(async (res) => {
                     res.present();
 
-                    localStorage.setItem("my-core-sim", this.sim);
+                    localStorage.setItem("coreSim", this.sim);
 
                     try {
                       if (this.sim.length >= 10) {

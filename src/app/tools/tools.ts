@@ -105,10 +105,8 @@ export const Utils = {
 
   cleanLocalStorage: async () => {
     let myVisitors: string | null = "";
-
-    let myToken_px: string = "";
-    let mycore_id: string = "";
-    let my_refresh_token: string = "";
+    let coreId: string = "";
+    let refreshToken: string = "";
     let netStatus: string | null = "";
 
     if (localStorage.getItem("netStatus") !== null) {
@@ -122,14 +120,10 @@ export const Utils = {
 
       myVisitors = localStorage.getItem("visitors")!;
     }
-
-    if (localStorage.getItem("token_px") !== null) {
-      let myToken_px = localStorage.getItem("token_px");
-    }
-
-    if (localStorage.getItem("my-refresh-token") !== null) {
-      let my_refresh_token = localStorage.getItem("my-refresh-token");
-    }
+    // comentado por aplicar la seguridad con capacitor/preferences
+    // if (localStorage.getItem("refreshToken") !== null) {
+    //   let refreshToken = localStorage.getItem("refreshToken");
+    // }
 
     if (localStorage.getItem("core-id") !== null) {
       let mycore_id = localStorage.getItem("core-id");
@@ -138,9 +132,8 @@ export const Utils = {
     localStorage.clear();
     localStorage.setItem("netStatus", netStatus!);
     localStorage.setItem("visitors", myVisitors);
-    localStorage.setItem("token_px", myToken_px);
-    localStorage.setItem("my-refresh-token", my_refresh_token);
-    localStorage.setItem("core-id", mycore_id);
+    localStorage.setItem("refreshToken", refreshToken);
+    localStorage.setItem("coreId", coreId);
   },
 
   getTimestamp: async () => {
@@ -149,7 +142,7 @@ export const Utils = {
 
   convertUTCDateToLocalDate: async (date: Date) => {
     var newDate = new Date(
-      date.getTime() + date.getTimezoneOffset() * 60 * 1000,
+      date.getTime() + date.getTimezoneOffset() * 60 * 1000
     );
 
     console.log("newDate antes: ", newDate);
@@ -168,7 +161,7 @@ export const Utils = {
 
     console.log(
       "newDate: ",
-      new Date(new Date().setHours(new Date().getHours() - offset)),
+      new Date(new Date().setHours(new Date().getHours() - offset))
     );
 
     return newDate;

@@ -109,7 +109,7 @@ export class UpdCpusPage implements OnInit {
   }
 
   async getCpus() {
-    this.userId = localStorage.getItem("my-userId");
+    this.userId = localStorage.getItem("userId");
     let location = localStorage.getItem("location")!.split(".");
 
     this.api
@@ -148,7 +148,7 @@ export class UpdCpusPage implements OnInit {
               this.cpus.school = this.CpuList[index]["school"];
               try {
                 await this.api.putData(
-                  "api/cpus/updCpu/" + localStorage.getItem("my-userId"),
+                  "api/cpus/updCpu/" + localStorage.getItem("userId"),
                   this.cpus
                 );
                 this.isReadOnly = true;

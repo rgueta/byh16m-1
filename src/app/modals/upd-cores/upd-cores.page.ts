@@ -120,7 +120,7 @@ export class UpdCoresPage implements OnInit {
   }
 
   async ngOnInit() {
-    this.userId = localStorage.getItem("my-userId")!;
+    this.userId = localStorage.getItem("userId")!;
     this.location = localStorage.getItem("location");
 
     var locationArr = this.location.split(".");

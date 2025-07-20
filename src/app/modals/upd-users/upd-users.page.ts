@@ -86,7 +86,7 @@ export class UpdUsersPage implements OnInit {
     private toolService: ToolsService,
     public alertCtrl: AlertController,
     private loadingController: LoadingController,
-    private popoverCtrl: PopoverController,
+    private popoverCtrl: PopoverController
   ) {
     addIcons({ arrowBackCircleOutline });
 
@@ -110,7 +110,7 @@ export class UpdUsersPage implements OnInit {
     if (this.MyRole == "admin") {
       this.RegisterForm.addControl(
         "Roles",
-        new FormControl("NA", [Validators.required]),
+        new FormControl("NA", [Validators.required])
       );
     }
   }
@@ -126,7 +126,7 @@ export class UpdUsersPage implements OnInit {
       CoreName: ${this.coreName}, CoreId: ${this.coreId},
       pathLocation: ${this.pathLocation}`);
 
-    this.MyRole = localStorage.getItem("my-role")!;
+    this.MyRole = localStorage.getItem("myRole")!;
     if (localStorage.getItem("demoMode")) {
       this.demoMode = localStorage.getItem("demoMode") == "true" ? true : false;
     }
@@ -153,7 +153,7 @@ export class UpdUsersPage implements OnInit {
     // if(this.sourcePage == 'tab1NewNeighbor'){
     if (this.MyRole == "admin" || this.MyRole == "neighborAdmin") {
       this.RegisterForm.get("Cpu")!.setValue("byh16");
-      this.RegisterForm.get("Core")!.setValue(localStorage.getItem("core-id"));
+      this.RegisterForm.get("Core")!.setValue(localStorage.getItem("coreId"));
       this.location = localStorage.getItem("location")!;
       this.getRoles();
     }
@@ -165,7 +165,7 @@ export class UpdUsersPage implements OnInit {
     ) {
       this.getCpus();
       this.RegisterForm.get("Uuid")!.setValue(
-        localStorage.getItem("device-uuid"),
+        localStorage.getItem("device-uuid")
       );
     }
 
@@ -217,12 +217,12 @@ export class UpdUsersPage implements OnInit {
       next: async (result) => {
         this.CpuList = result;
       },
-      error: (error) => {
+      error: (error: any) => {
         this.toolService.showAlertBasic(
           "Alerta",
           "Error, getCpus: ",
           JSON.stringify(error),
-          ["Ok"],
+          ["Ok"]
         );
       },
     });
@@ -238,7 +238,7 @@ export class UpdUsersPage implements OnInit {
           "Alerta",
           "Error, getCores: ",
           JSON.stringify(error),
-          ["Ok"],
+          ["Ok"]
         );
       },
     });
@@ -250,19 +250,19 @@ export class UpdUsersPage implements OnInit {
       url = "api/roles/neiAdmin/";
     }
 
-    this.api.getData(url + localStorage.getItem("my-userId")).subscribe(
-      async (result: any) => {
+    this.api.getData(url + localStorage.getItem("userId")).subscribe({
+      next: async (result: any) => {
         this.RoleList = await result;
       },
-      (error: any) => {
+      error: (error: any) => {
         this.toolService.showAlertBasic(
           "Alerta",
           "Error, getRoles: ",
           JSON.stringify(error),
-          ["Ok"],
+          ["Ok"]
         );
       },
-    );
+    });
   }
 
   DemoMode() {
@@ -336,7 +336,7 @@ export class UpdUsersPage implements OnInit {
       this.showLoading(2500);
       //  add new user
       await this.api
-        .postData("api/users/new/" + localStorage.getItem("my-userId"), pkg)
+        .postData("api/users/new/" + localStorage.getItem("userId"), pkg)
         .then(async (resUser: any) => {
           // create password reset
 
@@ -348,9 +348,9 @@ export class UpdUsersPage implements OnInit {
                 this.api
                   .deleteData(
                     "api/backstage/" +
-                      localStorage.getItem("my-userId") +
+                      localStorage.getItem("userId") +
                       "/" +
-                      this.id,
+                      this.id
                   )
                   .then(async (result) => {
                     const options: SmsOptions = {
@@ -381,8 +381,8 @@ export class UpdUsersPage implements OnInit {
                           "Error",
                           "Adding newUser error",
                           e,
-                          ["Ok"],
-                        ),
+                          ["Ok"]
+                        )
                       );
                   })
                   .catch((err) => {
@@ -390,7 +390,7 @@ export class UpdUsersPage implements OnInit {
                       "Alerta",
                       "Error, delete backstage: ",
                       JSON.stringify(err),
-                      ["Ok"],
+                      ["Ok"]
                     );
                   });
               }
@@ -400,7 +400,7 @@ export class UpdUsersPage implements OnInit {
                 "Alerta",
                 "Error, pwd reset: ",
                 JSON.stringify(err),
-                ["Ok"],
+                ["Ok"]
               );
             });
         })
@@ -409,7 +409,7 @@ export class UpdUsersPage implements OnInit {
             "Alert",
             "Error api call",
             "Can not add user, " + JSON.stringify(rej["error"]["msg"]),
-            ["Ok"],
+            ["Ok"]
           );
         });
 
@@ -417,7 +417,7 @@ export class UpdUsersPage implements OnInit {
         "",
         "Se agrego el usuario:",
         this.RegisterForm.get("Name")!.value,
-        ["Ok"],
+        ["Ok"]
       );
 
       // exit model
@@ -437,7 +437,7 @@ export class UpdUsersPage implements OnInit {
     email: string,
     sim: string,
     house: string,
-    gender: any,
+    gender: any
   ) {
     const comment = document.getElementById("comment")!;
 
@@ -490,7 +490,7 @@ export class UpdUsersPage implements OnInit {
           "",
           "Requerimiento enviado",
           "Pronto recibiras un correo",
-          ["Ok"],
+          ["Ok"]
         );
 
         return true;
@@ -500,7 +500,7 @@ export class UpdUsersPage implements OnInit {
           "",
           "Error",
           JSON.stringify(err["error"]["msg"]),
-          ["Ok"],
+          ["Ok"]
         );
         return false;
       });
@@ -577,7 +577,7 @@ export class UpdUsersPage implements OnInit {
   }
 
   async newExtrange() {
-    const coreSim = localStorage.getItem("my-core-sim");
+    const coreSim = localStorage.getItem("coreSim");
     const options: SmsOptions = {
       replaceLineBreaks: false,
       android: {
@@ -605,7 +605,7 @@ export class UpdUsersPage implements OnInit {
               "," +
               this.RegisterForm.get("Sim")!.value +
               "," +
-              localStorage.getItem("my-userId");
+              localStorage.getItem("userId");
 
             await this.sms
               .send(coreSim!, pkgDevice, options)
@@ -618,8 +618,8 @@ export class UpdUsersPage implements OnInit {
                   "Error",
                   "Falla conexion a red telefonica",
                   "",
-                  ["Ok"],
-                ),
+                  ["Ok"]
+                )
               );
           },
         },
@@ -646,8 +646,8 @@ export class UpdUsersPage implements OnInit {
         {
           text: "Si",
           handler: async () => {
-            const coreId = localStorage.getItem("core-id");
-            const userId = localStorage.getItem("my-userId");
+            const coreId = localStorage.getItem("coreId");
+            const userId = localStorage.getItem("userId");
 
             try {
               this.api
@@ -667,9 +667,9 @@ export class UpdUsersPage implements OnInit {
                       "",
                       "Can not sent comment",
                       "error: " + JSON.stringify(error),
-                      ["Ok"],
+                      ["Ok"]
                     );
-                  },
+                  }
                 );
             } catch (err) {
               this.loadingController.dismiss();
@@ -677,7 +677,7 @@ export class UpdUsersPage implements OnInit {
                 "",
                 "Can not sent comment",
                 "error: " + err,
-                ["Ok"],
+                ["Ok"]
               );
             }
           },

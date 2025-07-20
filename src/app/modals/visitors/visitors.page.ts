@@ -93,7 +93,7 @@ export class VisitorsPage implements OnInit {
       LocalSim: ["", [Validators.required]],
     });
 
-    this.userId = localStorage.getItem("my-userId")!;
+    this.userId = localStorage.getItem("userId")!;
 
     if (localStorage.getItem(VISITORS) !== null) {
       // this.visitors = localStorage.getItem(VISITORS)!;

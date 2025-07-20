@@ -26,11 +26,12 @@ import {
 } from "ionicons/icons";
 import { NgStyle, DatePipe, NgFor, NgIf } from "@angular/common";
 import { NetworkService } from "../services/network.service";
+import { Subscriber } from "rxjs";
 
-const USERID = "my-userId";
-const REFRESH_TOKEN_KEY = "my-refresh-token";
-const TOKEN_KEY = "my-token";
-const CORE_SIM = "my-core-sim";
+const USERID = "userId";
+const REFRESH_TOKEN = "refreshToken";
+const TOKEN = "authToken";
+const CORE_SIM = "coreSim";
 const netStatus = "netStatus";
 
 @Component({
@@ -92,7 +93,7 @@ export class Tab2Page implements OnInit {
 
   async ionViewWillEnter() {
     this.myUserId = localStorage.getItem(USERID);
-    this.myToken = localStorage.getItem(TOKEN_KEY);
+    this.myToken = localStorage.getItem(TOKEN);
     this.Core_sim = localStorage.getItem(CORE_SIM);
   }
 
@@ -152,29 +153,39 @@ export class Tab2Page implements OnInit {
             "/" +
             this.Final
         )
-        .subscribe(async (result) => {
-          this.EventsList = result;
+        .subscribe({
+          next: async (result) => {
+            this.EventsList = result;
 
-          if (this.EventsList.length > 0) {
-            console.log("Initial: ", this.Initial);
-            console.log("Final: ", this.Final);
-            console.log("codeEvents: ", result);
-            this.EventsList.forEach(async (item: any) => {
-              let d = new Date(item.createdAt.replace("Z", ""));
-              item.createdAt = new Date(
-                d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+            if (this.EventsList.length > 0) {
+              console.log("Initial: ", this.Initial);
+              console.log("Final: ", this.Final);
+              console.log("codeEvents: ", result);
+              this.EventsList.forEach(async (item: any) => {
+                let d = new Date(item.createdAt.replace("Z", ""));
+                item.createdAt = new Date(
+                  d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+                );
+              });
+
+              this.EventsList[0].open = true;
+            } else {
+              this.toolsService.toastAlert(
+                "No hay eventos para esta fecha",
+                0,
+                ["Ok"],
+                "middle"
               );
-            });
-
-            this.EventsList[0].open = true;
-          } else {
-            this.toolsService.toastAlert(
-              "No hay eventos para esta fecha",
-              0,
-              ["Ok"],
-              "middle"
+            }
+          },
+          error: (error) => {
+            this.toolsService.showAlertBasic(
+              "Aviso",
+              "Fallo al obtener codeEvents: ",
+              error,
+              ["Cerrar"]
             );
-          }
+          },
         });
     } catch (e) {
       this.toolsService.showAlertBasic(

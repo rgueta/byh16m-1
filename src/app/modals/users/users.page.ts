@@ -85,7 +85,7 @@ export class UsersPage implements OnInit {
     private toolService: ToolsService,
     private sms: SMS,
     public navCtrl: NavController,
-    private loadingController: LoadingController,
+    private loadingController: LoadingController
   ) {
     addIcons({
       arrowBackCircleOutline,
@@ -99,33 +99,31 @@ export class UsersPage implements OnInit {
   }
 
   async ionViewWillEnter() {
-    this.soyAdmin = localStorage.getItem("my-role") == "admin" ? true : false;
+    this.soyAdmin = localStorage.getItem("myRole") == "admin" ? true : false;
     this.soyNeighborAdmin =
-      localStorage.getItem("my-role") == "neighborAdmin" ? true : false;
+      localStorage.getItem("myRole") == "neighborAdmin" ? true : false;
     this.getUsers();
     this.getRoles();
   }
 
   async ngOnInit() {
-    this.userId = localStorage.getItem("my-userId")!;
+    this.userId = localStorage.getItem("userId")!;
   }
 
   async getRoles() {
-    this.api
-      .getData("api/roles/" + localStorage.getItem("my-userId"))
-      .subscribe({
-        next: async (result: any) => {
-          this.RoleList = await result;
-        },
-        error: (error: any) => {
-          this.toolService.showAlertBasic(
-            "Alerta",
-            "Error, getRoles: ",
-            JSON.stringify(error),
-            ["Ok"],
-          );
-        },
-      });
+    this.api.getData("api/roles/" + localStorage.getItem("userId")).subscribe({
+      next: async (result: any) => {
+        this.RoleList = await result;
+      },
+      error: (error: any) => {
+        this.toolService.showAlertBasic(
+          "Alerta",
+          "Error, getRoles: ",
+          JSON.stringify(error),
+          ["Ok"]
+        );
+      },
+    });
   }
 
   async getUsers() {
@@ -139,10 +137,10 @@ export class UsersPage implements OnInit {
 
     console.log(
       "url user: ",
-      url + this.coreId + "/" + localStorage.getItem("my-userId"),
+      url + this.coreId + "/" + localStorage.getItem("userId")
     );
     this.api
-      .getData(url + this.coreId + "/" + localStorage.getItem("my-userId"))
+      .getData(url + this.coreId + "/" + localStorage.getItem("userId"))
       .subscribe({
         next: async (result: any) => {
           if (result) this.users = result;
@@ -160,7 +158,7 @@ export class UsersPage implements OnInit {
   }
 
   async simChange(neighborId: string, actualSim: string) {
-    const coreSim = localStorage.getItem("my-core-sim")!;
+    const coreSim = localStorage.getItem("coreSim")!;
     var options: SmsOptions = {
       replaceLineBreaks: false,
       android: {
@@ -202,7 +200,7 @@ export class UsersPage implements OnInit {
                               actualSim +
                               "," +
                               this.sim,
-                            options,
+                            options
                           )
                           .then(() => {
                             this.sim = "";
@@ -212,7 +210,7 @@ export class UsersPage implements OnInit {
                               "",
                               "Sim cambiado",
                               "",
-                              ["Ok"],
+                              ["Ok"]
                             );
                           })
                           .catch((err) => {
@@ -220,7 +218,7 @@ export class UsersPage implements OnInit {
                               "Error",
                               "Falla conexion a red telefonica",
                               "",
-                              ["Ok"],
+                              ["Ok"]
                             );
                           });
                       })
@@ -229,7 +227,7 @@ export class UsersPage implements OnInit {
                           "",
                           "updSim API error: <br>",
                           JSON.stringify(err),
-                          ["Ok"],
+                          ["Ok"]
                         );
                       });
                   } else {
@@ -237,7 +235,7 @@ export class UsersPage implements OnInit {
                       "",
                       "No hay Acceso a internet",
                       "",
-                      ["Ok"],
+                      ["Ok"]
                     );
                   }
                 } else {
@@ -245,7 +243,7 @@ export class UsersPage implements OnInit {
                     "",
                     "El sim nuevo es igual al actual",
                     "",
-                    ["Ok"],
+                    ["Ok"]
                   );
                 }
               } else {
@@ -258,7 +256,7 @@ export class UsersPage implements OnInit {
                 "",
                 "Error, updSim: ",
                 JSON.stringify(e),
-                ["Ok"],
+                ["Ok"]
               );
             }
           },
@@ -310,7 +308,7 @@ export class UsersPage implements OnInit {
 
   async changeRoles(event: any, userId: string, name: string) {
     console.log(event.detail.value);
-    const userAdminId = localStorage.getItem("my-userId");
+    const userAdminId = localStorage.getItem("userId");
     const pkg = { userId: userId, roles: event.detail.value };
     // console.log('user event: ', event)
     // console.log('user pkg: ',pkg)
@@ -339,7 +337,7 @@ export class UsersPage implements OnInit {
                   "Alert",
                   "Error api call",
                   "Can not update roles, error " + JSON.stringify(rej),
-                  ["Ok"],
+                  ["Ok"]
                 );
               });
           },
@@ -357,9 +355,9 @@ export class UsersPage implements OnInit {
     sim: string,
     name: string,
     house: string,
-    coreSim: string,
+    coreSim: string
   ) {
-    const adminId = localStorage.getItem("my-userId");
+    const adminId = localStorage.getItem("userId");
     const titleMsg = userStatus ? "Desbloqueo" : "Bloqueo";
     const status = userStatus ? "unlock" : "lock";
 
@@ -422,7 +420,7 @@ export class UsersPage implements OnInit {
                             "Alerta",
                             "Falla conexion a red telefonica",
                             "",
-                            ["Ok"],
+                            ["Ok"]
                           );
                         });
 
@@ -433,9 +431,9 @@ export class UsersPage implements OnInit {
                         "Alert",
                         "Error api call",
                         "Can not " + status + " user, " + err,
-                        ["Ok"],
+                        ["Ok"]
                       );
-                    },
+                    }
                   );
               });
           },
@@ -447,7 +445,7 @@ export class UsersPage implements OnInit {
   }
 
   async delUser(userId: string, name: string, coreSim: string) {
-    const adminId = localStorage.getItem("my-userId");
+    const adminId = localStorage.getItem("userId");
 
     let alert = await this.alertCtrl.create({
       subHeader: "Continuar con borrar",
@@ -495,7 +493,7 @@ export class UsersPage implements OnInit {
                             "Alerta",
                             "Falla conexion a red telefonica",
                             "",
-                            ["Ok"],
+                            ["Ok"]
                           );
                         });
 
@@ -507,9 +505,9 @@ export class UsersPage implements OnInit {
                         "Alert",
                         "Error api call",
                         "Can not delete" + " user, " + JSON.stringify(err),
-                        ["Ok"],
+                        ["Ok"]
                       );
-                    },
+                    }
                   );
               });
           },

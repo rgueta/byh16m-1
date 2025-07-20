@@ -41,8 +41,8 @@ import { addIcons } from "ionicons";
 import { eye, eyeOffOutline } from "ionicons/icons";
 import { catchError, switchMap, throwError } from "rxjs";
 
-const USER_ROLES = "my-roles";
-const USER_ROLE = "my-role";
+const USER_ROLES = "roles";
+const USER_ROLE = "myRole";
 const VISITORS = "visitors";
 const DEVICE_UUID = "device-uuid";
 const DEVICE_PKG = "device-pkg";
@@ -176,7 +176,7 @@ export class LoginPage implements OnInit {
           } catch (e) {
             console.error(
               "Soy android, error al borrar algunos campos de device_info : ",
-              e,
+              e
             );
           }
           //#endregion  ---------------------------------------
@@ -196,16 +196,21 @@ export class LoginPage implements OnInit {
 
   // get Config App ----
   async getConfigApp() {
-    this.api.getData("api/config/").subscribe(async (result: any) => {
-      this.admin_device = result[0].admin_device;
-      this.admin_sim = result[0].admin_sim;
-      this.admin_email = result[0].admin_email;
-      localStorage.setItem("admin_sim", JSON.stringify(result[0].admin_sim));
-      localStorage.setItem(ADMIN_DEVICE, await result[0].admin_device);
-      localStorage.setItem(
-        "admin_email",
-        JSON.stringify(result[0].admin_email),
-      );
+    this.api.getData("api/config/").subscribe({
+      next: async (result: any) => {
+        this.admin_device = result[0].admin_device;
+        this.admin_sim = result[0].admin_sim;
+        this.admin_email = result[0].admin_email;
+        localStorage.setItem("admin_sim", JSON.stringify(result[0].admin_sim));
+        localStorage.setItem(ADMIN_DEVICE, await result[0].admin_device);
+        localStorage.setItem(
+          "admin_email",
+          JSON.stringify(result[0].admin_email)
+        );
+      },
+      error: (error) => {
+        console.log("Fallo obtener config: ", error);
+      },
     });
   }
 
@@ -228,7 +233,7 @@ export class LoginPage implements OnInit {
                 console.log("Sim info: ", info);
               })
               .catch((err: any) =>
-                console.error("Unable to get sim info: " + err),
+                console.error("Unable to get sim info: " + err)
               );
           }
         })
@@ -250,7 +255,7 @@ export class LoginPage implements OnInit {
           "No hay acceso a internet",
           0,
           ["Ok"],
-          "middle",
+          "middle"
         );
         return;
       } else {

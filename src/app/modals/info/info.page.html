@@ -25,8 +25,7 @@
         label="Country"
         ok-text="Seleccionar"
         cancel-text="Cancelar"
-        [(ngModel)]="localCountry"
-        (ionChange)="countrySelection(localCountry)"
+        (ionChange)="countrySelection()"
         formControlName="frmCtrl_country"
       >
         <ion-select-option
@@ -41,10 +40,9 @@
       <!-- <ion-label class="labelInput" floating>State:</ion-label> -->
       <ion-select
         label="State"
-        [(ngModel)]="localState"
         ok-text="Seleccionar"
         cancel-text="Cancelar"
-        (ionChange)="stateSelection(localState)"
+        (ionChange)="stateSelection()"
         formControlName="frmCtrl_state"
       >
         <ion-select-option
@@ -59,11 +57,9 @@
       <!-- <ion-label class="labelInput" floating>City:</ion-label> -->
       <ion-select
         label="City"
-        multiple
-        [(ngModel)]="localCity"
         ok-text="Seleccionar"
         cancel-text="Cancelar"
-        (ionChange)="citySelection(localCity)"
+        (ionChange)="citySelection()"
         formControlName="frmCtrl_city"
       >
         <ion-select-option
@@ -78,10 +74,9 @@
       <!-- <ion-label class="labelInput" floating>Division:</ion-label> -->
       <ion-select
         label="Division"
-        [(ngModel)]="localDivision"
         ok-text="Seleccionar"
         cancel-text="Cancelar"
-        (ionChange)="divisionSelection(localDivision);"
+        (ionChange)="divisionSelection();"
         formControlName="frmCtrl_division"
       >
         <ion-select-option
@@ -96,10 +91,9 @@
       <!-- <ion-label class="labelInput" floating>Cpu:</ion-label> -->
       <ion-select
         label="Cpu"
-        [(ngModel)]="localCpu"
         ok-text="Seleccionar"
         cancel-text="Cancelar"
-        (ionChange)="cpuSelection(localCpu)"
+        (ionChange)="cpuSelection()"
         formControlName="frmCtrl_cpu"
       >
         <ion-select-option
@@ -114,10 +108,9 @@
       <!-- <ion-label class="labelInput" floating>Core:</ion-label> -->
       <ion-select
         label="Core"
-        [(ngModel)]="localCore"
         ok-text="Seleccionar"
         cancel-text="Cancelar"
-        (ionChange)="coreSelection(localCore)"
+        (ionChange)="coreSelection()"
         formControlName="frmCtrl_core"
       >
         <ion-select-option
@@ -145,7 +138,6 @@
         max="100"
         step="10"
         (ionChange)="rangeChange($event)"
-        [pinFormatter]="pinFormatter"
         [value]="{ upper: 10 }"
       >
         <ion-icon slot="start" size="small" name="image-outline"></ion-icon>

@@ -47,7 +47,7 @@ import { QrCodeComponent } from "ng-qrcode";
 import { addIcons } from "ionicons";
 import { arrowBackCircleOutline } from "ionicons/icons";
 
-const USERID = "my-userId";
+const USERID = "userId";
 
 @Component({
   selector: "app-upd-codes-modal",
@@ -105,7 +105,7 @@ export class UpdCodesModalPage implements OnInit {
     public toast: ToastController,
     private alertController: AlertController,
     private loadingController: LoadingController,
-    private toolService: ToolsService,
+    private toolService: ToolsService
   ) {
     addIcons({ arrowBackCircleOutline });
     this.validateControls();
@@ -119,7 +119,7 @@ export class UpdCodesModalPage implements OnInit {
   }
 
   async ngOnInit() {
-    this.userId = localStorage.getItem("my-userId")!;
+    this.userId = localStorage.getItem("userId")!;
 
     this.code_expiry = Number(localStorage.getItem("code_expiry")!);
 
@@ -134,12 +134,12 @@ export class UpdCodesModalPage implements OnInit {
 
     this.libSim.requestReadPermission().then(
       () => console.log("Permission granted"),
-      () => console.log("Permission denied"),
+      () => console.log("Permission denied")
     );
 
     this.libSim.getSimInfo().then(
       (info: any) => console.log("Sim info: ", info),
-      (err: any) => console.log("Unable to get sim info: ", err),
+      (err: any) => console.log("Unable to get sim info: ", err)
     );
   }
 
@@ -160,7 +160,7 @@ export class UpdCodesModalPage implements OnInit {
   async initDates() {
     this.initial = new Date();
     this.expiry = new Date(
-      new Date().setHours(new Date().getHours() + this.code_expiry),
+      new Date().setHours(new Date().getHours() + this.code_expiry)
     );
     this.diff = (
       Math.abs(this.initial.getTime() - this.expiry.getTime()) / 3600000
@@ -168,7 +168,7 @@ export class UpdCodesModalPage implements OnInit {
 
     this.initial = new Date().toISOString();
     this.expiry = new Date(
-      new Date().setHours(new Date().getHours() + this.code_expiry),
+      new Date().setHours(new Date().getHours() + this.code_expiry)
     ).toISOString();
   }
 
@@ -177,7 +177,7 @@ export class UpdCodesModalPage implements OnInit {
     this.diff = event.detail.value;
 
     this.expiry = expiry.setHours(
-      expiry.getHours() + Number(event.detail.value),
+      expiry.getHours() + Number(event.detail.value)
     );
   }
 
@@ -191,7 +191,7 @@ export class UpdCodesModalPage implements OnInit {
       this.myVisitors = await Utils.sortJsonVisitors(
         this.myVisitors,
         "name",
-        true,
+        true
       );
     }
   }
@@ -225,7 +225,7 @@ export class UpdCodesModalPage implements OnInit {
     var charactersLength = characters.length;
     for (var i = 0; i < len; i++) {
       result.push(
-        characters.charAt(Math.floor(Math.random() * charactersLength)),
+        characters.charAt(Math.floor(Math.random() * charactersLength))
       );
     }
     return result.join("");
@@ -240,9 +240,9 @@ export class UpdCodesModalPage implements OnInit {
     var dateFinal = "";
     this.codeCreated = true;
 
-    const coreSim = localStorage.getItem("my-core-sim");
-    const userSim = localStorage.getItem("my-sim");
-    const coreName = localStorage.getItem("core-name");
+    const coreSim = localStorage.getItem("coreSim");
+    const userSim = localStorage.getItem("sim");
+    const coreName = localStorage.getItem("coreName");
     const expire = (
       (new Date(this.expiry).getTime() - new Date().getTime()) /
       3600000
@@ -304,7 +304,7 @@ export class UpdCodesModalPage implements OnInit {
                         "",
                         "Error, send sms to core:",
                         e,
-                        ["Ok"],
+                        ["Ok"]
                       );
                       this.closeModal();
                       return;
@@ -322,9 +322,9 @@ export class UpdCodesModalPage implements OnInit {
                   "",
                   "Can not create code",
                   "error: " + error,
-                  ["Ok"],
+                  ["Ok"]
                 );
-              },
+              }
             );
         } catch (err) {
           this.loadingController.dismiss();
@@ -332,7 +332,7 @@ export class UpdCodesModalPage implements OnInit {
             "",
             "Can not create code",
             "error: " + err,
-            ["Ok"],
+            ["Ok"]
           );
         }
       });
@@ -363,7 +363,7 @@ export class UpdCodesModalPage implements OnInit {
       } else {
         this.api.postData(
           "api/twilio/open/" + this.userId + "/" + text + "/" + sim,
-          "",
+          ""
         );
       }
     } catch (e) {
@@ -386,7 +386,7 @@ export class UpdCodesModalPage implements OnInit {
       "Mandar codigo de " + Number(this.diff).toFixed(0) + txtHrs,
       "btns",
       "Si",
-      "No",
+      "No"
     );
   }
 
@@ -448,7 +448,7 @@ export class UpdCodesModalPage implements OnInit {
     msg: string,
     btns: any,
     txtConfirm: string,
-    txtCancel: string,
+    txtCancel: string
   ) {
     const alert = await this.alertController.create({
       header: Header,
