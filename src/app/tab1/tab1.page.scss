@@ -35,6 +35,10 @@
 #popover-button {
   padding-top: 0px;
   font-size: 2.5rem;
+
+  &.ios{
+   font-size:1.2rem;
+   }
 }
 
 .mainTitle {
