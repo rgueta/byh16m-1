@@ -59,7 +59,7 @@ import {
 export class BackstagePage implements OnInit {
   backstageList: any;
   simSectionOpen = false;
-  public MyRole: string = "visitor";
+  public MyRole: any = "visitor";
   sourcePage: string = "";
   RoleList: any = [];
 
@@ -79,7 +79,7 @@ export class BackstagePage implements OnInit {
   }
 
   async ionViewWillEnter() {
-    this.MyRole = localStorage.getItem("myRole")!;
+    this.MyRole = this.toolService.getSecureStorage("myRole")!;
   }
 
   ngOnInit() {

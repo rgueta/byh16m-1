@@ -293,7 +293,7 @@ export class AdminPage implements OnInit {
   emailToVisitor: boolean = true;
   public simSectionOpen = false;
   sim: string = "";
-  public core_sim: string = "";
+  public coreSim: any = "";
   public routine_byh16s: string = "";
   input: boolean = false;
   backstageList: any;
@@ -332,11 +332,13 @@ export class AdminPage implements OnInit {
   }
 
   async ngOnInit() {
-    this.core_sim = localStorage.getItem("coreSim")!;
-    this.userId = localStorage.getItem("userId")!;
-    this.emailToVisitor = localStorage.getItem("emailToVisitor") === "true";
+    this.coreSim = this.toolService.getSecureStorage("coreSim");
+    this.userId = this.toolService.getSecureStorage("userId");
+    let value: any | null = null;
+    value = this.toolService.getSecureStorage("emailToVisitor");
+    this.emailToVisitor = value === "true";
     this.getCores();
-    if (!localStorage.getItem("roles")) {
+    if (!this.toolService.getSecureStorage("roles")) {
       this.getRoles();
     }
 

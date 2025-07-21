@@ -71,7 +71,7 @@ export class UsersPage implements OnInit {
   RoleList: any = [];
 
   editRole: boolean = false;
-  soyAdmin: boolean = false;
+  soyAdmin: any = false;
   soyNeighborAdmin: boolean = false;
   editSim: boolean = false;
   sim: string = "";
@@ -99,9 +99,13 @@ export class UsersPage implements OnInit {
   }
 
   async ionViewWillEnter() {
-    this.soyAdmin = localStorage.getItem("myRole") == "admin" ? true : false;
-    this.soyNeighborAdmin =
-      localStorage.getItem("myRole") == "neighborAdmin" ? true : false;
+    let value: any | null = null;
+    value = this.toolService.getSecureStorage("myRole");
+    this.soyAdmin = value === "admin" ? true : false;
+
+    let valueRole: any | null = null;
+    valueRole = this.toolService.getSecureStorage("myRole");
+    this.soyNeighborAdmin = valueRole == "neighborAdmin" ? true : false;
     this.getUsers();
     this.getRoles();
   }

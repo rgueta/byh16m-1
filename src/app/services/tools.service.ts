@@ -17,12 +17,12 @@ export class ToolsService {
 
   // -------- secure storage  ---------------------------
   // Guardar authToken
-  async setSecureStorage(key: string, token: string): Promise<string | null> {
+  async setSecureStorage(key: string, value: string): Promise<string | null> {
     await Preferences.set({
       key: key,
-      value: token,
+      value: value,
     });
-    return token;
+    return value;
   }
 
   // Obtener token Promise

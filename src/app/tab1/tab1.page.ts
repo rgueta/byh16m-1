@@ -115,7 +115,7 @@ export class Tab1Page implements OnInit {
   @Input() sim: string = "";
   myToast: any;
   myRoles: any;
-  public MyRole: string | null = "visitor";
+  public MyRole: any | null = "visitor";
   isAndroid: any;
   currentUser = "";
   public version = "";
@@ -128,12 +128,12 @@ export class Tab1Page implements OnInit {
   titleMenuButtons = "Ocultar botones";
 
   infoPanel: any;
-  myEmail: string | null = "";
-  myName: string | null = "";
+  myEmail: any | null = "";
+  myName: any | null = "";
   REST_API_SERVER = environment.cloud.server_url;
   iosOrAndroid: boolean = false;
   demoMode: boolean = false;
-  remote: boolean = false;
+  remote: any = false;
   // #endregion -----
   constructor(
     private sms: SMS,
@@ -170,10 +170,10 @@ export class Tab1Page implements OnInit {
       this.isAndroid = true;
     }
 
-    this.MyRole = localStorage.getItem("myRole");
-    this.myEmail = localStorage.getItem("email");
-    this.myName = localStorage.getItem("name");
-    this.remote = localStorage.getItem("remote") === "true";
+    this.MyRole = this.toolService.getSecureStorage("myRole");
+    this.myEmail = this.toolService.getSecureStorage("email");
+    this.myName = this.toolService.getSecureStorage("name");
+    this.remote = this.toolService.getSecureStorage("remote");
 
     if (localStorage.getItem("demoMode")) {
       this.demoMode = localStorage.getItem("demoMode") == "true" ? true : false;
@@ -193,8 +193,10 @@ export class Tab1Page implements OnInit {
     this.coreId = localStorage.getItem("coreId");
 
     // -----------------firebase Push notification
-
-    if (["android", "ios"].includes(localStorage.getItem("devicePlatform")!)) {
+    //
+    let devicePlatform: any | null = null;
+    devicePlatform = this.toolService.getSecureStorage("devicePlatform");
+    if (["android", "ios"].includes(devicePlatform)) {
       PushNotifications.requestPermissions().then((resul) => {
         if (resul.receive === "granted") {
           PushNotifications.register();
@@ -344,7 +346,9 @@ export class Tab1Page implements OnInit {
   }
 
   lockToPortrait() {
-    if (["android", "ios"].includes(localStorage.getItem("devicePlatform")!))
+    let devicePlatform: any | null = null;
+    devicePlatform = this.toolService.getSecureStorage("devicePlatform");
+    if (["android", "ios"].includes(devicePlatform))
       this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.PORTRAIT);
   }
 
@@ -495,7 +499,7 @@ export class Tab1Page implements OnInit {
 
     const local_sim = localStorage.getItem("coreSim");
     const use_twilio = localStorage.getItem("twilio");
-    const uuid = localStorage.getItem("device-uuid");
+    const uuid = this.toolService.getSecureStorage("deviceUuid");
     // const local_sim =  await this.storage.get('coreSim');
 
     // create milliseconds block  for local timestamp -------

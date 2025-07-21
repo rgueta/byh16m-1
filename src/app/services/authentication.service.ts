@@ -17,27 +17,6 @@ import { ToolsService } from "../services/tools.service";
 
 // #region constants ----------------------------------
 const helper = new JwtHelperService();
-const TOKEN = "authToken";
-const REFRESH_TOKEN = "refreshToken";
-const TOKEN_EXP = "token-exp";
-const TOKEN_IAT = "token-iat";
-
-const USER_NAME = "name";
-const USERID = "userId";
-const USER_ROLES = "roles";
-const MY_SIM = "sim";
-const CORE_SIM = "coreSim";
-const USER_ROLE = "role";
-const CORE_ID = "coreId";
-const CORE_NAME = "coreName";
-const LOCATION = "location";
-const TWILIO = "twilio";
-const CODE_EXPIRY = "code_expiry";
-
-const LOCKED = "locked";
-const EMAIL_TO_VISITOR = "emailToVisitor";
-const EMAIL_TO_CORE = "emailToCore";
-
 // #endregion
 
 @Injectable({
@@ -62,12 +41,12 @@ export class AuthenticationService {
     private router: Router,
     private toolService: ToolsService
   ) {
-    localStorage.setItem(TWILIO, "false");
+    toolService.setSecureStorage("twilio", "false");
     this.loadToken();
   }
 
   async loadToken() {
-    const token = localStorage.getItem(TOKEN);
+    const token = this.toolService.getSecureStorage("authToken");
 
     if (token) {
       this.currentAuthToken = token;
@@ -119,28 +98,31 @@ export class AuthenticationService {
           // ------------------------------
 
           this.MyRole(tokens.roles).then(async (val_role) => {
-            localStorage.setItem("myRole", val_role);
+            this.toolService.setSecureStorage("myRole", val_role);
           });
 
-          localStorage.setItem("email", tokens.email);
+          this.toolService.setSecureStorage("email", tokens.email);
 
-          localStorage.setItem(USERID, tokens.userId);
-          localStorage.setItem(USER_NAME, tokens.userName);
-          localStorage.setItem(USER_ROLES, JSON.stringify(tokens.roles));
-          localStorage.setItem(CORE_SIM, tokens.coreSim);
-          localStorage.setItem(MY_SIM, tokens.sim);
-          localStorage.setItem(CORE_ID, tokens.coreId);
-          localStorage.setItem(CORE_NAME, tokens.coreName);
-          localStorage.setItem(LOCATION, tokens.location);
-          localStorage.setItem(TWILIO, "false");
-          localStorage.setItem(CODE_EXPIRY, tokens.code_expiry);
+          this.toolService.setSecureStorage("userId", tokens.userId);
+          this.toolService.setSecureStorage("name", tokens.userName);
+          this.toolService.setSecureStorage(
+            "roles",
+            JSON.stringify(tokens.roles)
+          );
+          this.toolService.setSecureStorage("coreSim", tokens.coreSim);
+          this.toolService.setSecureStorage("sim", tokens.sim);
+          this.toolService.setSecureStorage("coreId", tokens.coreId);
+          this.toolService.setSecureStorage("coreName", tokens.coreName);
+          this.toolService.setSecureStorage("location", tokens.location);
+          this.toolService.setSecureStorage("twilio", "false");
+          this.toolService.setSecureStorage("codeExpiry", tokens.code_expiry);
 
-          localStorage.setItem(TOKEN_IAT, tokens.iatDate);
-          localStorage.setItem(TOKEN_EXP, tokens.expDate);
-          localStorage.setItem(LOCKED, tokens.locked);
-          localStorage.setItem(EMAIL_TO_VISITOR, "true");
-          localStorage.setItem(EMAIL_TO_CORE, "true");
-          localStorage.setItem("remote", tokens.remote);
+          this.toolService.setSecureStorage("tokenIAT", tokens.iatDate);
+          this.toolService.setSecureStorage("tokenEXP", tokens.expDate);
+          this.toolService.setSecureStorage("locked", tokens.locked);
+          this.toolService.setSecureStorage("emailToVisitor", "true");
+          this.toolService.setSecureStorage("emailToCore", "true");
+          this.toolService.setSecureStorage("remote", tokens.remote);
 
           // const authToken = localStorage.setItem(TOKEN, tokens.authToken);
           // const refreshToken = localStorage.setItem(
@@ -209,7 +191,9 @@ export class AuthenticationService {
   getNewAccessToken() {
     // commented for migration removed from
     // const refreshToken = from(localStorage.getItem(REFRESH_TOKEN_KEY));
-    const refreshToken = from(localStorage.getItem(REFRESH_TOKEN) ?? "");
+    const refreshToken = from(
+      this.toolService.getSecureStorage("refreshToken") ?? ""
+    );
 
     return refreshToken.pipe(
       switchMap((token) => {

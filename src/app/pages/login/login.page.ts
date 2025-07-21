@@ -44,7 +44,6 @@ import { catchError, switchMap, throwError } from "rxjs";
 const USER_ROLES = "roles";
 const USER_ROLE = "myRole";
 const VISITORS = "visitors";
-const DEVICE_UUID = "device-uuid";
 const DEVICE_PKG = "device-pkg";
 const ADMIN_DEVICE = "admin_device";
 
@@ -102,10 +101,10 @@ export class LoginPage implements OnInit {
   private REST_API_SERVER = environment.cloud.server_url;
   public version = "";
   net_status: any;
-  device_uuid: string = "";
-  admin_device: any;
-  admin_sim: [] = [];
-  admin_email: [] = [];
+  deviceUuid: string = "";
+  adminDevice: any;
+  adminSim: [] = [];
+  adminEmail: [] = [];
 
   public myToast: any;
 
@@ -152,8 +151,11 @@ export class LoginPage implements OnInit {
         //#region get device uuid  --------------------------------
         await Device.getId()
           .then(async (deviceId: any) => {
-            localStorage.setItem(DEVICE_UUID, deviceId["identifier"]);
-            this.device_uuid = await deviceId["identifier"];
+            this.toolService.setSecureStorage(
+              "deviceUuid",
+              deviceId["identifier"]
+            );
+            this.deviceUuid = await deviceId["identifier"];
           })
           .catch((err) => {
             console.error("Error Device.getId inside Device.getInfo: ", err);
@@ -161,7 +163,7 @@ export class LoginPage implements OnInit {
 
         //#endregion  -------------
 
-        this.device_info.uuid = this.device_uuid;
+        this.device_info.uuid = this.deviceUuid;
         localStorage.setItem(DEVICE_PKG, JSON.stringify(this.device_info));
         localStorage.setItem("devicePlatform", this.device_info.platform);
         //#region soy android ---------------------------------
@@ -181,10 +183,13 @@ export class LoginPage implements OnInit {
           }
           //#endregion  ---------------------------------------
         }
-        localStorage.setItem("device_info", JSON.stringify(this.device_info));
+        this.toolService.setSecureStorage(
+          "deviceInfo",
+          JSON.stringify(this.device_info)
+        );
 
         // Hard Code -----
-        if (this.device_info.uuid == this.device_uuid) {
+        if (this.device_info.uuid == this.deviceUuid) {
           this.credentials.get("email")!.setValue(environment.cloud.admin);
           this.credentials.get("pwd")!.setValue(environment.cloud.padmin);
         }
@@ -198,15 +203,28 @@ export class LoginPage implements OnInit {
   async getConfigApp() {
     this.api.getData("api/config/").subscribe({
       next: async (result: any) => {
-        this.admin_device = result[0].admin_device;
-        this.admin_sim = result[0].admin_sim;
-        this.admin_email = result[0].admin_email;
-        localStorage.setItem("admin_sim", JSON.stringify(result[0].admin_sim));
-        localStorage.setItem(ADMIN_DEVICE, await result[0].admin_device);
-        localStorage.setItem(
-          "admin_email",
+        this.adminDevice = result[0].admin_device;
+        this.adminSim = result[0].admin_sim;
+        this.adminEmail = result[0].admin_email;
+
+        // secure storage ----------------
+        this.toolService.setSecureStorage(
+          "adminSim",
+          JSON.stringify(result[0].admin_sim)
+        );
+        this.toolService.setSecureStorage("adminDevice", this.adminDevice);
+        this.toolService.setSecureStorage(
+          "adminEmail",
           JSON.stringify(result[0].admin_email)
         );
+
+        // -----------------------------
+        // localStorage.setItem("admin_sim", JSON.stringify(result[0].admin_sim));
+        // localStorage.setItem(ADMIN_DEVICE, await result[0].admin_device);
+        // localStorage.setItem(
+        //   "admin_email",
+        //   JSON.stringify(result[0].admin_email)
+        // );
       },
       error: (error) => {
         console.log("Fallo obtener config: ", error);

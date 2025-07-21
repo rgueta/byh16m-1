@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from "@angular/core";
 import { CommonModule, NgFor, NgIf } from "@angular/common";
+import { Observable, from, of } from "rxjs";
 import {
   FormsModule,
   FormGroup,
@@ -76,7 +77,7 @@ export class UpdUsersPage implements OnInit {
   uuid: string = "";
   uuidReadonly: boolean = true;
   demoMode: boolean = false;
-  public MyRole: string = "visitor";
+  public MyRole: any = "visitor";
   comment: string = "";
 
   constructor(
@@ -126,14 +127,12 @@ export class UpdUsersPage implements OnInit {
       CoreName: ${this.coreName}, CoreId: ${this.coreId},
       pathLocation: ${this.pathLocation}`);
 
-    this.MyRole = localStorage.getItem("myRole")!;
+    this.MyRole = this.toolService.getSecureStorage("myRole")!;
     if (localStorage.getItem("demoMode")) {
       this.demoMode = localStorage.getItem("demoMode") == "true" ? true : false;
     }
 
-    this.devicePkg = localStorage.getItem("device_info");
-
-    // this.sourcePage = this.navParams.data["SourcePage"];
+    this.devicePkg = this.toolService.getSecureStorage("deviceInfo");
 
     // // if (this.navParams.data["core"]) {
     //    if (this.navParams.data["core"]) {
@@ -165,7 +164,7 @@ export class UpdUsersPage implements OnInit {
     ) {
       this.getCpus();
       this.RegisterForm.get("Uuid")!.setValue(
-        localStorage.getItem("device-uuid")
+        this.toolService.getSecureStorage("deviceUuid")
       );
     }
 
@@ -308,7 +307,8 @@ export class UpdUsersPage implements OnInit {
 
     if (localStorage.getItem("demoMode")) {
       if (localStorage.getItem("demoMode") == "true") {
-        email = JSON.parse(localStorage.getItem("admin_email")!)[0]["email"];
+        email = this.toolService.getSecureStorage("adminEmail");
+        email = JSON.parse(email!)[0]["email"];
       } else {
         email = this.RegisterForm.get("Email")!.value;
       }
@@ -451,7 +451,7 @@ export class UpdUsersPage implements OnInit {
       house: house,
       gender: gender,
       note: comment.textContent,
-      uuid: localStorage.getItem("device-uuid"),
+      uuid: this.toolService.getSecureStorage("deviceUuid"),
     };
 
     // >> Confirmation ------------------------------------
@@ -481,7 +481,11 @@ export class UpdUsersPage implements OnInit {
   }
 
   async sendUserReq(pkg: any): Promise<any> {
-    const admin_sim = JSON.parse(localStorage.getItem("admin_sim")!);
+    let adminSim: any | null = null;
+    adminSim = this.toolService.getSecureStorageP("adminSim");
+    adminSim = JSON.parse(adminSim);
+
+    // const admin_sim = JSON.parse(localStorage.getItem("admin_sim")!);
     this.showLoading(2500);
     this.api
       .postData("api/backstage/", pkg)
