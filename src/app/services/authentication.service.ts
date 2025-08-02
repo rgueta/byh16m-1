@@ -93,11 +93,12 @@ export class AuthenticationService {
               console.log("Error in authentication.service.ts --> ", err);
             });
 
-          // localStorage.setItem(TOKEN_PX, tokens.pwd);
+          console.log("roles at auth :", tokens.roles);
 
           // ------------------------------
 
           this.MyRole(tokens.roles).then(async (val_role) => {
+            console.log("MyRole at auth: ", val_role);
             this.toolService.setSecureStorage("myRole", val_role);
           });
 

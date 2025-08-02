@@ -127,12 +127,53 @@ export class UpdUsersPage implements OnInit {
       CoreName: ${this.coreName}, CoreId: ${this.coreId},
       pathLocation: ${this.pathLocation}`);
 
-    this.MyRole = this.toolService.getSecureStorage("myRole")!;
-    if (localStorage.getItem("demoMode")) {
-      this.demoMode = localStorage.getItem("demoMode") == "true" ? true : false;
-    }
+    // this.MyRole = this.toolService.getSecureStorage("myRole")!;
+    this.toolService.getSecureStorage("myRole").subscribe({
+      next: async (result) => {
+        this.MyRole = await result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo myRole en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
 
-    this.devicePkg = this.toolService.getSecureStorage("deviceInfo");
+    this.toolService.getSecureStorage("demoMode").subscribe({
+      next: async (result) => {
+        this.demoMode = (await result) == "true" ? true : false;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo demoMode en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    // if (localStorage.getItem("demoMode")) {
+    //   this.demoMode = localStorage.getItem("demoMode") == "true" ? true : false;
+    // }
+
+    // this.devicePkg = this.toolService.getSecureStorage("deviceInfo");
+    this.toolService.getSecureStorage("deviceInfo").subscribe({
+      next: async (result) => {
+        this.devicePkg = await result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo deviceInfo en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
 
     // // if (this.navParams.data["core"]) {
     //    if (this.navParams.data["core"]) {
@@ -146,7 +187,22 @@ export class UpdUsersPage implements OnInit {
 
     // if(this.sourcePage == 'admin' || this.sourcePage == 'adminNew'){
     if (this.MyRole == "admin") {
-      this.RoleList = JSON.parse(localStorage.getItem("roles")!);
+      let valueRoles: any | null = null;
+
+      this.toolService.getSecureStorage("roles").subscribe({
+        next: async (result) => {
+          valueRoles = await result;
+        },
+        error: (err) => {
+          this.toolService.toastAlert(
+            "error, obteniendo roles en getSecureStorage: " + err,
+            0,
+            ["Ok"],
+            "middle"
+          );
+        },
+      });
+      this.RoleList = JSON.parse(valueRoles);
     }
 
     // if(this.sourcePage == 'tab1NewNeighbor'){
@@ -163,9 +219,19 @@ export class UpdUsersPage implements OnInit {
       this.sourcePage == "adminNewExtrange"
     ) {
       this.getCpus();
-      this.RegisterForm.get("Uuid")!.setValue(
-        this.toolService.getSecureStorage("deviceUuid")
-      );
+      this.toolService.getSecureStorage("deviceUuid").subscribe({
+        next: async (result) => {
+          this.RegisterForm.get("Uuid")!.setValue(result);
+        },
+        error: (err) => {
+          this.toolService.toastAlert(
+            "error, obteniendo deviceUuid en getSecureStorage: " + err,
+            0,
+            ["Ok"],
+            "middle"
+          );
+        },
+      });
     }
 
     // if(this.sourcePage == 'admin'){

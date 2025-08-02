@@ -34,7 +34,7 @@ export class ToolsService {
   }
 
   // Obtener token Observable
-  getSecureStorage(key: string): Observable<string | null> {
+  getSecureStorage(key: string): Observable<any> {
     // Usamos 'from' para convertir la promesa de Capacitor en un Observable
     return from(Preferences.get({ key: key })).pipe(
       map(({ value }) => {

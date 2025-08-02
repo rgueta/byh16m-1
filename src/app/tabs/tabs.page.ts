@@ -36,6 +36,18 @@ export class TabsPage {
   }
 
   async ionViewWillEnter() {
-    this.MyRole = this.toolService.getSecureStorage("myRole");
+    this.toolService.getSecureStorage("myRole").subscribe({
+      next: (result) => {
+        this.MyRole = result || "visitor";
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo myRole en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
   }
 }

@@ -39,13 +39,8 @@ import {
 
 import { addIcons } from "ionicons";
 import { eye, eyeOffOutline } from "ionicons/icons";
-import { catchError, switchMap, throwError } from "rxjs";
-
-const USER_ROLES = "roles";
-const USER_ROLE = "myRole";
-const VISITORS = "visitors";
-const DEVICE_PKG = "device-pkg";
-const ADMIN_DEVICE = "admin_device";
+import { catchError, throwError, from, Observable, of } from "rxjs";
+import { tap, switchMap } from "rxjs/operators";
 
 @Component({
   selector: "app-login",
@@ -164,8 +159,14 @@ export class LoginPage implements OnInit {
         //#endregion  -------------
 
         this.device_info.uuid = this.deviceUuid;
-        localStorage.setItem(DEVICE_PKG, JSON.stringify(this.device_info));
-        localStorage.setItem("devicePlatform", this.device_info.platform);
+        this.toolService.setSecureStorage(
+          "devicePkg",
+          JSON.stringify(this.device_info)
+        );
+        this.toolService.setSecureStorage(
+          "devicePlatform",
+          this.device_info.platform
+        );
         //#region soy android ---------------------------------
 
         if (this.device_info.platform === "android") {
@@ -217,14 +218,6 @@ export class LoginPage implements OnInit {
           "adminEmail",
           JSON.stringify(result[0].admin_email)
         );
-
-        // -----------------------------
-        // localStorage.setItem("admin_sim", JSON.stringify(result[0].admin_sim));
-        // localStorage.setItem(ADMIN_DEVICE, await result[0].admin_device);
-        // localStorage.setItem(
-        //   "admin_email",
-        //   JSON.stringify(result[0].admin_email)
-        // );
       },
       error: (error) => {
         console.log("Fallo obtener config: ", error);
@@ -266,6 +259,10 @@ export class LoginPage implements OnInit {
   }
 
   async login() {
+    var lockedValue: "true";
+
+    let roles: any | null = null;
+
     try {
       const netStatus = await this.networkService.checkInternetConnection();
       if (!netStatus) {
@@ -284,25 +281,42 @@ export class LoginPage implements OnInit {
         this.authService.login(this.credentials.value).subscribe({
           next: async (res) => {
             await loading.dismiss();
-            const roles: any = localStorage.getItem(USER_ROLES); // typeof object
-            for (const val_myrole of JSON.parse(roles)) {
-              if (localStorage.getItem("locked") === "true") {
-                console.log("Usuario Locked...");
-                await this.lockedUser("Usuario bloqueado !");
-                return;
-              }
-              if (
-                val_myrole.name === "admin" ||
-                val_myrole.name === "neighbor" ||
-                val_myrole.name === "neighborAdmin"
-              ) {
-                this.router.navigateByUrl("/tabs", { replaceUrl: true });
-              } else {
-                this.router.navigateByUrl("/store", { replaceUrl: true });
-              }
-            }
-            // get config info
-            this.getConfigApp();
+
+            // Check Locked --------------------
+            this.toolService.getSecureStorage("locked").subscribe({
+              next: async (result) => {
+                lockedValue = result;
+              },
+            });
+
+            // In your component
+            this.toolService.getSecureStorage("roles").subscribe({
+              next: async (result) => {
+                roles = await result;
+                console.log("Result roles :", roles);
+
+                for (const val_myrole of JSON.parse(roles)) {
+                  console.log("lockedValue: ", lockedValue);
+                  if (lockedValue === "true") {
+                    console.log("Usuario Locked...");
+                    await this.lockedUser("Usuario bloqueado !");
+                    return;
+                  }
+                  if (
+                    val_myrole.name === "admin" ||
+                    val_myrole.name === "neighbor" ||
+                    val_myrole.name === "neighborAdmin"
+                  ) {
+                    this.router.navigateByUrl("/tabs", { replaceUrl: true });
+                  } else {
+                    this.router.navigateByUrl("/store", { replaceUrl: true });
+                  }
+                }
+                // get config info
+                this.getConfigApp();
+              },
+              error: (err) => {},
+            });
           },
           error: async (err) => {
             if (err.error.errId == 1) {

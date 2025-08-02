@@ -108,8 +108,10 @@ export class CodesPage implements OnInit {
 
     let uId = localStorage.getItem("userId");
     this.userId = uId!;
-    this.myRoles = localStorage.getItem("roles")!;
-    this.code_expiry = Number(localStorage.getItem("code_expiry"));
+    this.myRoles = this.toolsService.getSecureStorage("roles");
+    this.code_expiry = Number(
+      this.toolsService.getSecureStorage("code_expiry")
+    );
 
     this.initial = new Date();
     this.expiry = new Date(

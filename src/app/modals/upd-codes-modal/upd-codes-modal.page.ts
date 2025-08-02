@@ -212,7 +212,10 @@ export class UpdCodesModalPage implements OnInit {
       }
     }
 
-    localStorage.setItem("visitors", JSON.stringify(this.myVisitors));
+    this.toolService.setSecureStorage(
+      "visitors",
+      JSON.stringify(this.myVisitors)
+    );
   }
 
   newCode() {
@@ -240,9 +243,50 @@ export class UpdCodesModalPage implements OnInit {
     var dateFinal = "";
     this.codeCreated = true;
 
-    const coreSim = localStorage.getItem("coreSim");
-    const userSim = localStorage.getItem("sim");
-    const coreName = localStorage.getItem("coreName");
+    let coreSim: any | null = null;
+    this.toolService.getSecureStorage("coreSim").subscribe({
+      next: async (result) => {
+        coreSim = await result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo coreSim en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    let userSim: string;
+    this.toolService.getSecureStorage("sim").subscribe({
+      next: async (result) => {
+        userSim = await result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo sim en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    let coreName: string;
+    this.toolService.getSecureStorage("coreName").subscribe({
+      next: async (result) => {
+        coreName = await result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo coreName en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
     const expire = (
       (new Date(this.expiry).getTime() - new Date().getTime()) /
       3600000

@@ -73,6 +73,8 @@ import {
   mailOutline,
   menu,
 } from "ionicons/icons";
+import { catchError, throwError, from, Observable, of } from "rxjs";
+import { tap, switchMap } from "rxjs/operators";
 
 @Component({
   selector: "app-tab1",
@@ -115,14 +117,14 @@ export class Tab1Page implements OnInit {
   @Input() sim: string = "";
   myToast: any;
   myRoles: any;
-  public MyRole: any | null = "visitor";
+  public MyRole: string | "" = "admin";
   isAndroid: any;
   currentUser = "";
   public version = "";
   public coreName: string | null = "";
   public coreId: string | null = "";
   twilio_client: any;
-  userId: string | null = "";
+  userId: string = "";
   id: number = 0;
   btnVisible: boolean = true;
   titleMenuButtons = "Ocultar botones";
@@ -170,14 +172,9 @@ export class Tab1Page implements OnInit {
       this.isAndroid = true;
     }
 
-    this.MyRole = this.toolService.getSecureStorage("myRole");
-    this.myEmail = this.toolService.getSecureStorage("email");
-    this.myName = this.toolService.getSecureStorage("name");
-    this.remote = this.toolService.getSecureStorage("remote");
-
-    if (localStorage.getItem("demoMode")) {
-      this.demoMode = localStorage.getItem("demoMode") == "true" ? true : false;
-    }
+    // if (this.toolService.getSecureStorage("demoMode")) {
+    //   this.demoMode = localStorage.getItem("demoMode") == "true" ? true : false;
+    // }
 
     if (!this.remote) {
       document
@@ -187,15 +184,154 @@ export class Tab1Page implements OnInit {
   }
 
   async ngOnInit() {
-    const sim = localStorage.getItem("coreSim");
-    this.userId = localStorage.getItem("userId");
-    this.coreName = localStorage.getItem("coreName");
-    this.coreId = localStorage.getItem("coreId");
+    //   getting myRole ---------------------------
+    this.toolService.getSecureStorage("myRole").subscribe({
+      next: (result) => {
+        this.MyRole = result || "visitor";
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo myRole en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    //   getting email ---------------------------
+    this.toolService.getSecureStorage("email").subscribe({
+      next: async (result) => {
+        this.myEmail = await result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo email en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    // this.myName = this.toolService.getSecureStorage("name");
+    //   getting name ---------------------------
+    this.toolService.getSecureStorage("name").subscribe({
+      next: async (result) => {
+        this.myName = await result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo name en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    // this.remote = this.toolService.getSecureStorage("remote");
+    //   getting name ---------------------------
+    this.toolService.getSecureStorage("remote").subscribe({
+      next: async (result) => {
+        this.remote = await result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo remote en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    console.log("MyRole at ngOnInit: ", this.MyRole);
+
+    var sim = "";
+    // localStorage.getItem("coreSim");
+    // getting coreSim ---------------------------
+    this.toolService.getSecureStorage("coreSim").subscribe({
+      next: (result) => {
+        sim = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo coreSim en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    // this.userId = localStorage.getItem("userId");
+    //   getting userId ---------------------------
+    this.toolService.getSecureStorage("userId").subscribe({
+      next: (result) => {
+        this.userId = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo userId en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    // this.coreName = localStorage.getItem("coreName");
+    //   getting coreName ---------------------------
+    this.toolService.getSecureStorage("coreName").subscribe({
+      next: (result) => {
+        this.coreName = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo coreName en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    //   getting demoMode ---------------------------
+    this.toolService.getSecureStorage("demoMode").subscribe({
+      next: (result) => {
+        this.demoMode = result == "true" ? true : false;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo demoMode en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    console.log("demoMode at ngOnInit: ", this.demoMode);
 
     // -----------------firebase Push notification
     //
     let devicePlatform: any | null = null;
     devicePlatform = this.toolService.getSecureStorage("devicePlatform");
+    this.toolService.getSecureStorage("devicePlatform").subscribe({
+      next: (result) => {
+        devicePlatform = result || "visitor";
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo myRole en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
     if (["android", "ios"].includes(devicePlatform)) {
       PushNotifications.requestPermissions().then((resul) => {
         if (resul.receive === "granted") {
@@ -215,7 +351,7 @@ export class Tab1Page implements OnInit {
       });
 
       //  Subscribe to a specific topic
-      FCM.subscribeTo({ topic: localStorage.getItem("core-id")! })
+      FCM.subscribeTo({ topic: this.coreId! })
         .then()
         .catch((err) => console.log(err));
 

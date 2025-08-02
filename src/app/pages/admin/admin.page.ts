@@ -368,7 +368,7 @@ export class AdminPage implements OnInit {
     this.api.getData(`api/roles/${localStorage.getItem("userId")}/`).subscribe({
       next: async (result) => {
         this.RoleList = result;
-        localStorage.setItem("roles", JSON.stringify(result));
+        this.toolService.setSecureStorage("roles", JSON.stringify(result));
       },
       error: (err: any) => {
         console.log("Error --> ", JSON.stringify(err));
