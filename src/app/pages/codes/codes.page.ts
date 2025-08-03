@@ -2,7 +2,6 @@ import { Component, OnInit } from "@angular/core";
 import { DatabaseService } from "../../services/database.service";
 import { AnimationController, AlertController } from "@ionic/angular";
 import { UpdCodesModalPage } from "../../modals/upd-codes-modal/upd-codes-modal.page";
-import { Utils } from "../../tools/tools";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { SMS, SmsOptions } from "@ionic-native/sms/ngx";
@@ -81,15 +80,17 @@ export class CodesPage implements OnInit {
   expiry: any = new Date().toISOString();
   code_expiry: any;
   pkg: any = {};
+  demoMode: boolean = false;
+  coreSim = "";
 
   constructor(
     public api: DatabaseService,
     public modalController: ModalController,
     public animationController: AnimationController,
     private sms: SMS,
-    private toolsService: ToolsService,
     public alertCtrl: AlertController,
-    public router: Router
+    public router: Router,
+    private toolsService: ToolsService
   ) {
     addIcons({
       chevronUpOutline,
@@ -101,17 +102,95 @@ export class CodesPage implements OnInit {
   }
 
   async ngOnInit() {
-    this.MyRole = localStorage.getItem("role")!;
+    //   getting role ---------------------------
+    this.toolsService.getSecureStorage("role").subscribe({
+      next: (result) => {
+        this.MyRole = result;
+      },
+      error: (err) => {
+        this.toolsService.toastAlert(
+          "error, obteniendo role en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
 
-    this.myToken = this.toolsService.getSecureStorage("authToken");
-    // this.myToken = localStorage.getItem("authToken")!;
+    //   getting authToken ---------------------------
+    this.toolsService.getSecureStorage("authToken").subscribe({
+      next: (result) => {
+        this.myToken = result;
+      },
+      error: (err) => {
+        this.toolsService.toastAlert(
+          "error, obteniendo authToken en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
 
-    let uId = localStorage.getItem("userId");
-    this.userId = uId!;
-    this.myRoles = this.toolsService.getSecureStorage("roles");
-    this.code_expiry = Number(
-      this.toolsService.getSecureStorage("code_expiry")
-    );
+    //   getting userId ---------------------------
+    this.toolsService.getSecureStorage("userId").subscribe({
+      next: (result) => {
+        this.userId = result;
+      },
+      error: (err) => {
+        this.toolsService.toastAlert(
+          "error, obteniendo userId en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    //   getting roles ---------------------------
+    this.toolsService.getSecureStorage("roles").subscribe({
+      next: (result) => {
+        this.myRoles = result;
+      },
+      error: (err) => {
+        this.toolsService.toastAlert(
+          "error, obteniendo roles en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    //   getting codeExpiry ---------------------------
+    this.toolsService.getSecureStorage("codeExpiry").subscribe({
+      next: (result) => {
+        this.code_expiry = Number(result);
+      },
+      error: (err) => {
+        this.toolsService.toastAlert(
+          "error, obteniendo codeExpiry en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    //   getting coreSim ---------------------------
+    this.toolsService.getSecureStorage("coreSim").subscribe({
+      next: (result) => {
+        this.coreSim = result;
+      },
+      error: (err) => {
+        this.toolsService.toastAlert(
+          "error, obteniendo coreSim en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
 
     this.initial = new Date();
     this.expiry = new Date(
@@ -178,12 +257,10 @@ export class CodesPage implements OnInit {
   }
 
   async sendCode(pkg: any) {
-    const sim = localStorage.getItem("coreSim")!;
-
     try {
       if (environment.app.debugging_send_sms) {
         await this.sms.send(
-          sim,
+          this.coreSim,
           "codigo," +
             this.pkg["code"] +
             "," +
@@ -240,13 +317,13 @@ export class CodesPage implements OnInit {
 
   async ResendCode(code: string, codeId: string, Initial: any, Expiry: any) {
     this.expiry = this.initial = new Date();
-    this.initial = Utils.convDate(new Date(this.initial));
+    this.initial = this.toolsService.convDate(new Date(this.initial));
     this.pkg = { code: "", _id: "", initial: "", expiry: "" };
 
     this.expiry = this.expiry.setHours(
       this.expiry.getHours() + Number(this.diff)
     );
-    this.expiry = Utils.convDate(new Date(this.expiry));
+    this.expiry = this.toolsService.convDate(new Date(this.expiry));
 
     await this.showAlert(
       "",
@@ -263,7 +340,6 @@ export class CodesPage implements OnInit {
         intent: "",
       },
     };
-    const sim = localStorage.getItem("coreSim");
 
     this.pkg["code"] = code;
     this.pkg["_id"] = codeId;
@@ -282,7 +358,7 @@ export class CodesPage implements OnInit {
       return;
     } else {
       this.expiry = new Date(expiry);
-      this.diff = await (
+      this.diff = (
         Math.abs(new Date().getTime() - this.expiry.getTime()) / 3600000
       ).toFixed(1);
       if (this.diff > 0) {
@@ -312,9 +388,9 @@ export class CodesPage implements OnInit {
       // this.diff =  await (Math.abs(this.initial.getTime() - this.expiry.getTime()) / 3600000).toFixed(1);
       console.log(
         "Initial : " +
-          Utils.convDate(this.initial) +
+          this.toolsService.convDate(this.initial) +
           "\nExpiry :  " +
-          Utils.convDate(this.expiry) +
+          this.toolsService.convDate(this.expiry) +
           "\nDiff hrs. " +
           this.diff
       );

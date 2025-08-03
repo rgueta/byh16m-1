@@ -27,7 +27,6 @@ import {
 import { CommonModule } from "@angular/common";
 
 import { DatabaseService } from "../../services/database.service";
-import { Utils } from "../../tools/tools";
 import { Sim } from "@ionic-native/sim/ngx";
 import { SMS, SmsOptions } from "@ionic-native/sms/ngx";
 import {
@@ -119,9 +118,33 @@ export class UpdCodesModalPage implements OnInit {
   }
 
   async ngOnInit() {
-    this.userId = localStorage.getItem("userId")!;
+    this.toolService.getSecureStorage("userId").subscribe({
+      next: (result) => {
+        this.userId = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo userId en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
 
-    this.code_expiry = Number(localStorage.getItem("code_expiry")!);
+    this.toolService.getSecureStorage("codeExpiry").subscribe({
+      next: (result) => {
+        this.code_expiry = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo codeExpiry en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
 
     this.code = this.genCode(7);
     this.getVisitors();
@@ -182,18 +205,27 @@ export class UpdCodesModalPage implements OnInit {
   }
 
   async getVisitors() {
-    const visitors = localStorage.getItem("visitors");
-    const lenVisitors = visitors !== null ? visitors.length : 0;
-    if (lenVisitors > 0) {
-      this.myVisitors = await JSON.parse(localStorage.getItem("visitors")!);
-
-      //Sort Visitors by name
-      this.myVisitors = await Utils.sortJsonVisitors(
-        this.myVisitors,
-        "name",
-        true
-      );
-    }
+    this.toolService.getSecureStorage("visitors").subscribe({
+      next: async (result) => {
+        if (result.length > 0) {
+          this.myVisitors = JSON.parse(result);
+          //Sort Visitors by name
+          this.myVisitors = await this.toolService.sortJsonVisitors(
+            this.myVisitors,
+            "name",
+            true
+          );
+        }
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo visitors en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
   }
 
   async setupCode(event: any) {
@@ -305,8 +337,8 @@ export class UpdCodesModalPage implements OnInit {
             .postData("api/codes/" + this.userId, {
               code: this.code,
               sim: this.visitorSim,
-              initial: Utils.convDate(new Date(this.initial)),
-              expiry: Utils.convDate(new Date(this.expiry)),
+              initial: this.toolService.convDate(new Date(this.initial)),
+              expiry: this.toolService.convDate(new Date(this.expiry)),
               visitorSim: "n/a",
               visitorName: "n/a",
               comment: this.localComment,
@@ -330,7 +362,7 @@ export class UpdCodesModalPage implements OnInit {
                   "," +
                   this.code +
                   "," +
-                  Utils.convDate(new Date(this.expiry)) +
+                  this.toolService.convDate(new Date(this.expiry)) +
                   "," +
                   this.userId +
                   ",n/a," +
@@ -399,7 +431,20 @@ export class UpdCodesModalPage implements OnInit {
       },
     };
 
-    const use_twilio = localStorage.getItem("twilio");
+    let use_twilio = "";
+    this.toolService.getSecureStorage("twilio").subscribe({
+      next: (result) => {
+        use_twilio = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo twilio en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
 
     try {
       if (use_twilio == "false") {

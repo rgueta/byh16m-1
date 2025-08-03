@@ -19,7 +19,6 @@ import {
   IonButtons,
 } from "@ionic/angular/standalone";
 import { Contacts, GetContactsResult } from "@capacitor-community/contacts";
-import { Utils } from "../../tools/tools";
 import { ToolsService } from "../../services/tools.service";
 import { addIcons } from "ionicons";
 import {
@@ -67,7 +66,7 @@ export class ContactsPage implements OnInit {
     private modalController: ModalController,
     private loadingController: LoadingController,
     public alertCtrl: AlertController,
-    private toolService: ToolsService,
+    private toolService: ToolsService
   ) {
     addIcons({
       peopleCircleOutline,
@@ -79,12 +78,23 @@ export class ContactsPage implements OnInit {
   async ngOnInit() {
     this.basicLoader();
     await this.loadContacts();
-    if (localStorage.getItem("lista") !== null) {
-    }
   }
 
   async loadContacts() {
-    this.contacts = JSON.parse(localStorage.getItem("lista")!);
+    this.toolService.getSecureStorage("lista").subscribe({
+      next: (result) => {
+        this.contacts = JSON.parse(result);
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo contact lista en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
     try {
       await Contacts.getContacts({
         projection: {
@@ -102,7 +112,11 @@ export class ContactsPage implements OnInit {
           if (item.name) await allName.push(item);
         });
 
-        this.contacts = await Utils.sortJSON(allName, "display", true);
+        this.contacts = await this.toolService.sortJSON(
+          allName,
+          "display",
+          true
+        );
         // await localStorage.setItem('lista',await JSON.stringify(this.contacts));
       });
     } catch (e) {
@@ -110,7 +124,7 @@ export class ContactsPage implements OnInit {
         "Get contacts, error:<br>" + e,
         0,
         ["Ok"],
-        "middle",
+        "middle"
       );
     }
   }

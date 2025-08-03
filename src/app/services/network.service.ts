@@ -1,17 +1,27 @@
-import { Injectable, NgZone } from '@angular/core';
-import { Network, ConnectionStatus } from '@capacitor/network';
-import { BehaviorSubject, Observable, from, of } from 'rxjs'; // Import 'from' and 'of'
-import { Platform } from '@ionic/angular';
-import { switchMap, catchError } from 'rxjs/operators'; // Import operators
+import { Injectable, NgZone } from "@angular/core";
+import { Network, ConnectionStatus } from "@capacitor/network";
+import { BehaviorSubject, Observable, from, of } from "rxjs"; // Import 'from' and 'of'
+import { Platform } from "@ionic/angular";
+import { switchMap, catchError } from "rxjs/operators"; // Import operators
+import { ToolsService } from "../services/tools.service";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class NetworkService {
-  private networkStatusSubject: BehaviorSubject<ConnectionStatus> = new BehaviorSubject<ConnectionStatus>({ connected: false, connectionType: 'unknown' });
-  public networkStatus$: Observable<ConnectionStatus> = this.networkStatusSubject.asObservable();
+  private networkStatusSubject: BehaviorSubject<ConnectionStatus> =
+    new BehaviorSubject<ConnectionStatus>({
+      connected: false,
+      connectionType: "unknown",
+    });
+  public networkStatus$: Observable<ConnectionStatus> =
+    this.networkStatusSubject.asObservable();
 
-  constructor(private platform: Platform, private ngZone: NgZone) {
+  constructor(
+    private platform: Platform,
+    private ngZone: NgZone,
+    private toolsService: ToolsService
+  ) {
     this.initializeNetworkMonitoring();
   }
 
@@ -23,7 +33,7 @@ export class NetworkService {
     this.updateNetworkStatus(initialStatus);
 
     // Escuchar cambios
-    Network.addListener('networkStatusChange', (status: ConnectionStatus) => {
+    Network.addListener("networkStatusChange", (status: ConnectionStatus) => {
       this.ngZone.run(() => {
         this.updateNetworkStatus(status);
       });
@@ -32,7 +42,10 @@ export class NetworkService {
 
   private updateNetworkStatus(status: ConnectionStatus) {
     this.networkStatusSubject.next(status);
-    localStorage.setItem('netStatus', status.connected? 'true' : 'false' )
+    this.toolsService.setSecureStorage(
+      "netStatus",
+      status.connected ? "true" : "false"
+    );
   }
 
   /**
@@ -64,21 +77,22 @@ export class NetworkService {
    * que solo la verificación local del dispositivo.
    */
   public checkInternetConnection_(): Observable<boolean> {
-    console.log('Entre a la verificacion netword_ ...');
+    console.log("Entre a la verificacion netword_ ...");
 
     return from(this.getCurrentNetworkStatus()).pipe(
-      switchMap(status => {
-        console.error('verificacion netword antes del IF');
+      switchMap((status) => {
+        console.error("verificacion netword antes del IF");
         if (!status.connected) {
-          console.error('verificacion netword...FALSE');
+          console.error("verificacion netword...FALSE");
           return of(false); // No hay conexión local
         } else {
-          console.error('verificacion netword...TRUE');
+          console.error("verificacion netword...TRUE");
           // Opcional: Intentar un ping a un sitio confiable para una verificación más profunda
           // Esto puede tardar un poco y agregar latencia
-          return from(fetch('https://www.google.com/favicon.ico', { mode: 'no-cors' })
-            .then(() => true)
-            .catch(() => false)
+          return from(
+            fetch("https://www.google.com/favicon.ico", { mode: "no-cors" })
+              .then(() => true)
+              .catch(() => false)
           ).pipe(
             catchError(() => of(false)) // En caso de cualquier error con fetch, asumir offline
           );
@@ -88,16 +102,15 @@ export class NetworkService {
     );
   }
 
-  public checkInternetConnection(){
+  public checkInternetConnection() {
     return this.getCurrentNetworkStatus()
-    .then((status) => {
-      return status.connected
-    })
-    .catch((e) =>{
-      catchError(() => of(false)) 
-      console.error('Error :' + e.message());
-      return of(false);
-    });
+      .then((status) => {
+        return status.connected;
+      })
+      .catch((e) => {
+        catchError(() => of(false));
+        console.error("Error :" + e.message());
+        return of(false);
+      });
   }
-
 }

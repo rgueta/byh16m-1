@@ -31,6 +31,7 @@ import {
   chevronDownOutline,
   arrowBackOutline,
 } from "ionicons/icons";
+import { ToolsService } from "../../services/tools.service";
 
 @Component({
   selector: "app-upd-cpus",
@@ -76,7 +77,8 @@ export class UpdCpusPage implements OnInit {
   constructor(
     public modalController: ModalController,
     public api: DatabaseService,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private toolService: ToolsService
   ) {
     addIcons({
       arrowBackCircleOutline,
@@ -109,8 +111,34 @@ export class UpdCpusPage implements OnInit {
   }
 
   async getCpus() {
-    this.userId = localStorage.getItem("userId");
-    let location = localStorage.getItem("location")!.split(".");
+    this.toolService.getSecureStorage("userId").subscribe({
+      next: (result) => {
+        this.userId = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo userId en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    let location: any;
+    this.toolService.getSecureStorage("location").subscribe({
+      next: async (result) => {
+        location = await result.split(".");
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo location en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
 
     this.api
       .getData(
@@ -148,7 +176,7 @@ export class UpdCpusPage implements OnInit {
               this.cpus.school = this.CpuList[index]["school"];
               try {
                 await this.api.putData(
-                  "api/cpus/updCpu/" + localStorage.getItem("userId"),
+                  "api/cpus/updCpu/" + this.userId,
                   this.cpus
                 );
                 this.isReadOnly = true;

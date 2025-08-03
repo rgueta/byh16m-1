@@ -124,11 +124,6 @@ export class AuthenticationService {
           this.toolService.setSecureStorage("emailToVisitor", "true");
           this.toolService.setSecureStorage("emailToCore", "true");
           this.toolService.setSecureStorage("remote", tokens.remote);
-
-          // const authToken = localStorage.setItem(TOKEN, tokens.authToken);
-          // const refreshToken = localStorage.setItem(
-          //   REFRESH_TOKEN,
-          //   tokens.refreshToken
           // );
           //
           return from(Promise.all([authToken, refreshToken]));
@@ -191,7 +186,6 @@ export class AuthenticationService {
   // then attach it as the header for one specific API call
   getNewAccessToken() {
     // commented for migration removed from
-    // const refreshToken = from(localStorage.getItem(REFRESH_TOKEN_KEY));
     const refreshToken = from(
       this.toolService.getSecureStorage("refreshToken") ?? ""
     );
@@ -220,13 +214,10 @@ export class AuthenticationService {
   // Store a new access token
   storeAccessToken(authToken: any) {
     this.currentAuthToken = authToken;
-    // return from(throwError(localStorage.setItem(TOKEN,authToken)));
     throwError(() => {
       // secure storage ---------
       return this.toolService.setSecureStorage("authToken", authToken);
-      // return localStorage.setItem(TOKEN, authToken);
     });
-    // return from(Observable.throw(localStorage.setItem(TOKEN,authToken)));
     // return from(this.storage.set(TOKEN, authToken));
   }
 }

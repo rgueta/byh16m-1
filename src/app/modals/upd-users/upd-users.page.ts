@@ -79,6 +79,7 @@ export class UpdUsersPage implements OnInit {
   demoMode: boolean = false;
   public MyRole: any = "visitor";
   comment: string = "";
+  userId = "";
 
   constructor(
     private modalController: ModalController,
@@ -120,6 +121,49 @@ export class UpdUsersPage implements OnInit {
     console.log(`Entre upd-users, sourcePage: ${this.sourcePage},
       CoreName: ${this.coreName}, CoreId: ${this.coreId},
       pathLocation: ${this.pathLocation}`);
+    //   getting userId ---------------------------
+    this.toolService.getSecureStorage("userId").subscribe({
+      next: (result) => {
+        this.userId = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo userId en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    //   getting demoMode ---------------------------
+    this.toolService.getSecureStorage("demoMode").subscribe({
+      next: (result) => {
+        this.demoMode = result == "true" ? true : false;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo demoMode en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    this.toolService.getSecureStorage("coreId").subscribe({
+      next: (result) => {
+        this.coreId = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo coreId en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
   }
 
   ngOnInit_() {
@@ -315,7 +359,7 @@ export class UpdUsersPage implements OnInit {
       url = "api/roles/neiAdmin/";
     }
 
-    this.api.getData(url + localStorage.getItem("userId")).subscribe({
+    this.api.getData(url + this.userId).subscribe({
       next: async (result: any) => {
         this.RoleList = await result;
       },
@@ -332,7 +376,7 @@ export class UpdUsersPage implements OnInit {
 
   DemoMode() {
     this.demoMode = !this.demoMode;
-    localStorage.setItem("demoMode", this.demoMode.toString());
+    this.toolService.setSecureStorage("demoMode", this.demoMode.toString());
   }
 
   showLoading(duration: number) {
@@ -371,13 +415,9 @@ export class UpdUsersPage implements OnInit {
 
     let email: any;
 
-    if (localStorage.getItem("demoMode")) {
-      if (localStorage.getItem("demoMode") == "true") {
-        email = this.toolService.getSecureStorage("adminEmail");
-        email = JSON.parse(email!)[0]["email"];
-      } else {
-        email = this.RegisterForm.get("Email")!.value;
-      }
+    if (this.demoMode) {
+      email = this.toolService.getSecureStorage("adminEmail");
+      email = JSON.parse(email!)[0]["email"];
     } else {
       email = this.RegisterForm.get("Email")!.value;
     }
@@ -402,7 +442,7 @@ export class UpdUsersPage implements OnInit {
       this.showLoading(2500);
       //  add new user
       await this.api
-        .postData("api/users/new/" + localStorage.getItem("userId"), pkg)
+        .postData("api/users/new/" + this.userId, pkg)
         .then(async (resUser: any) => {
           // create password reset
 
@@ -412,12 +452,7 @@ export class UpdUsersPage implements OnInit {
               if (this.MyRole == "admin" || this.MyRole == "neighborAdmin") {
                 // delete backstage document
                 this.api
-                  .deleteData(
-                    "api/backstage/" +
-                      localStorage.getItem("userId") +
-                      "/" +
-                      this.id
-                  )
+                  .deleteData("api/backstage/" + this.userId + "/" + this.id)
                   .then(async (result) => {
                     const options: SmsOptions = {
                       replaceLineBreaks: false,
@@ -647,7 +682,21 @@ export class UpdUsersPage implements OnInit {
   }
 
   async newExtrange() {
-    const coreSim = localStorage.getItem("coreSim");
+    let coreSim = "";
+    //   getting demoMode ---------------------------
+    this.toolService.getSecureStorage("coreSim").subscribe({
+      next: (result) => {
+        coreSim = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo coreSim en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
     const options: SmsOptions = {
       replaceLineBreaks: false,
       android: {
@@ -675,7 +724,7 @@ export class UpdUsersPage implements OnInit {
               "," +
               this.RegisterForm.get("Sim")!.value +
               "," +
-              localStorage.getItem("userId");
+              this.userId;
 
             await this.sms
               .send(coreSim!, pkgDevice, options)
@@ -716,8 +765,8 @@ export class UpdUsersPage implements OnInit {
         {
           text: "Si",
           handler: async () => {
-            const coreId = localStorage.getItem("coreId");
-            const userId = localStorage.getItem("userId");
+            const coreId = this.coreId;
+            const userId = this.userId;
 
             try {
               this.api

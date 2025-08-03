@@ -332,24 +332,78 @@ export class AdminPage implements OnInit {
   }
 
   async ngOnInit() {
-    this.coreSim = this.toolService.getSecureStorage("coreSim");
-    this.userId = this.toolService.getSecureStorage("userId");
+    //   getting coreSim ---------------------------
+    this.toolService.getSecureStorage("coreSim").subscribe({
+      next: async (result) => {
+        this.coreSim = await result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo coreSim en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    //   getting userId ---------------------------
+    this.toolService.getSecureStorage("userId").subscribe({
+      next: (result) => {
+        this.userId = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo userId en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    //   getting demoMode ---------------------------
+    this.toolService.getSecureStorage("demoMode").subscribe({
+      next: (result) => {
+        this.demoMode = result == "true" ? true : false;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo demoMode en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
     let value: any | null = null;
     value = this.toolService.getSecureStorage("emailToVisitor");
+    //   getting demoMode ---------------------------
+    this.toolService.getSecureStorage("demoMode").subscribe({
+      next: (result) => {
+        this.demoMode = result == "true" ? true : false;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo demoMode en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
     this.emailToVisitor = value === "true";
     this.getCores();
     if (!this.toolService.getSecureStorage("roles")) {
       this.getRoles();
     }
-
-    if (localStorage.getItem("demoMode")) {
-      this.demoMode = localStorage.getItem("demoMode") == "true" ? true : false;
-    }
   }
 
   DemoMode() {
     this.demoMode = !this.demoMode;
-    localStorage.setItem("demoMode", this.demoMode.toString());
+    this.toolService.setSecureStorage("demoMode", this.demoMode.toString());
   }
 
   async getCores() {
@@ -365,7 +419,7 @@ export class AdminPage implements OnInit {
   }
 
   async getRoles() {
-    this.api.getData(`api/roles/${localStorage.getItem("userId")}/`).subscribe({
+    this.api.getData(`api/roles/${this.userId}/`).subscribe({
       next: async (result) => {
         this.RoleList = result;
         this.toolService.setSecureStorage("roles", JSON.stringify(result));
@@ -562,27 +616,25 @@ export class AdminPage implements OnInit {
 
   async TwilioToggleEven($event: any) {
     if ($event.detail.checked) {
-      console.log("Usar twilio");
-      localStorage.setItem(TWILIO, "true");
+      this.toolService.setSecureStorage("twilio", "true");
     } else {
-      console.log("Usar Sim");
-      localStorage.setItem(TWILIO, "false");
+      this.toolService.setSecureStorage("twilio", "false");
     }
   }
 
   async EmailVisitorToggleEven($event: any) {
     if ($event.detail.checked) {
-      localStorage.setItem(EMAIL_TO_VISITOR, "true");
+      this.toolService.setSecureStorage("emailToVisitor", "true");
     } else {
-      localStorage.setItem(EMAIL_TO_VISITOR, "false");
+      this.toolService.setSecureStorage("emailToVisitor", "false");
     }
   }
 
   async EmailCoreToggleEven($event: any) {
     if ($event.detail.checked) {
-      localStorage.setItem(EMAIL_TO_CORE, "true");
+      this.toolService.setSecureStorage("emailToCore", "true");
     } else {
-      localStorage.setItem(EMAIL_TO_CORE, "false");
+      this.toolService.setSecureStorage("emailToCore", "false");
     }
   }
 
@@ -709,7 +761,7 @@ export class AdminPage implements OnInit {
                     .then(
                       async (onResolve) => {
                         if (option == "chgRemoteButtons") {
-                          localStorage.setItem(
+                          this.toolService.setSecureStorage(
                             "remote",
                             event.target.checked.toString()
                           );
@@ -745,7 +797,7 @@ export class AdminPage implements OnInit {
                   .then(async (res) => {
                     res.present();
 
-                    localStorage.setItem("coreSim", this.sim);
+                    this.toolService.setSecureStorage("coreSim", this.sim);
 
                     try {
                       if (this.sim.length >= 10) {

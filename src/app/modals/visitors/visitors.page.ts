@@ -31,6 +31,7 @@ import { DatabaseService } from "../../services/database.service";
 import { ContactsPage } from "../../modals/contacts/contacts.page";
 import { addIcons } from "ionicons";
 import { arrowBackCircleOutline } from "ionicons/icons";
+import { ToolsService } from "../../services/tools.service";
 
 const VISITORS = "visitors";
 
@@ -82,7 +83,8 @@ export class VisitorsPage implements OnInit {
     private modalController: ModalController,
     private toast: ToastController,
     public api: DatabaseService,
-    private animationController: AnimationController
+    private animationController: AnimationController,
+    private toolService: ToolsService
   ) {
     addIcons({ arrowBackCircleOutline });
   }
@@ -93,17 +95,43 @@ export class VisitorsPage implements OnInit {
       LocalSim: ["", [Validators.required]],
     });
 
-    this.userId = localStorage.getItem("userId")!;
+    //   getting userId ---------------------------
+    this.toolService.getSecureStorage("userId").subscribe({
+      next: (result) => {
+        this.userId = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo userId en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
 
-    if (localStorage.getItem(VISITORS) !== null) {
-      // this.visitors = localStorage.getItem(VISITORS)!;
-      this.visitors = await JSON.parse(localStorage.getItem(VISITORS)!);
-    }
+    //   getting visitors ---------------------------
+    this.toolService.getSecureStorage("visitors").subscribe({
+      next: (result) => {
+        this.visitors = JSON.parse(result);
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo visitors en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
   }
 
   async appendVisitor(pkg: any) {
     await this.visitors.push(pkg);
-    localStorage.setItem(VISITORS, JSON.stringify(this.visitors));
+    this.toolService.setSecureStorage(
+      "visitors",
+      JSON.stringify(this.visitors)
+    );
   }
 
   async onSubmit() {

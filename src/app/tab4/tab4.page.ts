@@ -20,7 +20,6 @@ import {
 import { SMS, SmsOptions } from "@ionic-native/sms/ngx";
 import { DatabaseService } from "../services/database.service";
 import { VisitorsPage } from "../modals/visitors/visitors.page";
-import { Utils } from "../tools/tools";
 import { ToolsService } from "../services/tools.service";
 import { addIcons } from "ionicons";
 import {
@@ -77,7 +76,20 @@ export class Tab4Page implements OnInit {
   }
 
   async ngOnInit() {
-    this.userId = localStorage.getItem("userId");
+    this.toolService.getSecureStorage("userId").subscribe({
+      next: async (result) => {
+        this.userId = await result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo userId en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
     this.getVisitors();
   }
 
@@ -94,27 +106,33 @@ export class Tab4Page implements OnInit {
   }
 
   async getVisitors() {
-    // let visitors = [{'name':'name 1','cell':'1234'},
-    //                 {'name':'name 2','cell':'12345'},
-    //                 {'name':'name 3','cell':'123456'}
-    // ]
+    this.toolService.getSecureStorage("visitors").subscribe({
+      next: async (result) => {
+        if (result) {
+          this.VisitorsList = JSON.parse(result);
+          //Sort Visitors by name
+          if (this.VisitorsList !== null && this.VisitorsList.length > 0) {
+            console.log("this.VisitorsList:", this.VisitorsList);
+            if ((this, this.VisitorsList))
+              this.VisitorsList = await this.toolService.sortJsonVisitors(
+                this.VisitorsList,
+                "name",
+                true
+              );
 
-    if (localStorage.getItem("visitors")) {
-      this.VisitorsList = await JSON.parse(localStorage.getItem("visitors")!);
-
-      //Sort Visitors by name
-      if (this.VisitorsList !== null && this.VisitorsList.length > 0) {
-        console.log("this.VisitorsList:", this.VisitorsList);
-        if ((this, this.VisitorsList))
-          this.VisitorsList = await Utils.sortJsonVisitors(
-            this.VisitorsList,
-            "name",
-            true
-          );
-
-        this.VisitorsList[0].open = true;
-      }
-    }
+            this.VisitorsList[0].open = true;
+          }
+        }
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo remote en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
   }
 
   async removeVisitor(index: number, name: string) {
@@ -133,7 +151,7 @@ export class Tab4Page implements OnInit {
           handler: async () => {
             try {
               this.VisitorsList.splice(index, 1);
-              localStorage.setItem(
+              this.toolService.setSecureStorage(
                 "visitors",
                 JSON.stringify(this.VisitorsList)
               );

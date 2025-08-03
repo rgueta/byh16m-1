@@ -136,7 +136,20 @@ export class InfoPage implements OnInit {
 
   async ngOnInit() {
     this.localTitle = "Aqui va el titulo..";
-    this.userId = localStorage.getItem("userId")!;
+    this.toolService.getSecureStorage("userId").subscribe({
+      next: (result) => {
+        this.userId = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo userId en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
     this.collectCountries();
     this.collectInfo();
   }

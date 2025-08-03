@@ -17,7 +17,6 @@ import {
 } from "@ionic/angular/standalone";
 import { ScreenOrientation } from "@ionic-native/screen-orientation/ngx";
 import { Device } from "@capacitor/device";
-import { Utils } from "src/app/tools/tools";
 import { RequestsPage } from "../../modals/requests/requests.page";
 import { Sim } from "@ionic-native/sim/ngx";
 import { DatabaseService } from "../../services/database.service";
@@ -129,7 +128,7 @@ export class LoginPage implements OnInit {
     }
 
     this.getConfigApp();
-    Utils.cleanLocalStorage();
+    this.toolService.cleanLocalStorage();
     this.init();
     this.version = environment.app.version;
 

@@ -75,7 +75,7 @@ export class Tab2Page implements OnInit {
 
   constructor(
     public api: DatabaseService,
-    private toolsService: ToolsService,
+    private toolService: ToolsService,
     public networkService: NetworkService
   ) {
     addIcons({
@@ -92,9 +92,47 @@ export class Tab2Page implements OnInit {
   }
 
   async ionViewWillEnter() {
-    this.myUserId = localStorage.getItem(USERID);
-    this.myToken = localStorage.getItem(TOKEN);
-    this.Core_sim = localStorage.getItem(CORE_SIM);
+    this.toolService.getSecureStorage("userId").subscribe({
+      next: (result) => {
+        this.myUserId = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo userId en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    this.toolService.getSecureStorage("authToken").subscribe({
+      next: (result) => {
+        this.myToken = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo authToken en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    this.toolService.getSecureStorage("coreSim").subscribe({
+      next: (result) => {
+        this.Core_sim = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo coreSim en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
   }
 
   async getEventsInitial(event: any) {
@@ -134,7 +172,7 @@ export class Tab2Page implements OnInit {
 
   async getEvents() {
     if (!(await this.networkService.checkInternetConnection())) {
-      this.toolsService.toastAlert(
+      this.toolService.toastAlert(
         "No hay Acceso a internet",
         0,
         ["Ok"],
@@ -170,7 +208,7 @@ export class Tab2Page implements OnInit {
 
               this.EventsList[0].open = true;
             } else {
-              this.toolsService.toastAlert(
+              this.toolService.toastAlert(
                 "No hay eventos para esta fecha",
                 0,
                 ["Ok"],
@@ -179,7 +217,7 @@ export class Tab2Page implements OnInit {
             }
           },
           error: (error) => {
-            this.toolsService.showAlertBasic(
+            this.toolService.showAlertBasic(
               "Aviso",
               "Fallo al obtener codeEvents: ",
               error,
@@ -188,7 +226,7 @@ export class Tab2Page implements OnInit {
           },
         });
     } catch (e) {
-      this.toolsService.showAlertBasic(
+      this.toolService.showAlertBasic(
         "Aviso",
         "Ocurrio una excepción revisar:",
         `1. Acceso a la red<br>` + `2. Permiso para envio de sms`,
