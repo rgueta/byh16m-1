@@ -1,8 +1,10 @@
 import { Component, OnInit, Input } from "@angular/core";
 import { CommonModule, NgFor, NgIf } from "@angular/common";
+import { Observable, from, of } from "rxjs";
 import {
   FormsModule,
   FormGroup,
+  FormBuilder,
   FormControl,
   ReactiveFormsModule,
   Validators,
@@ -54,6 +56,7 @@ export class UpdUsersPage implements OnInit {
   @Input() avatar: string = "";
   @Input() localComment: string = "";
 
+  // Datos recividos de la pagina madre
   @Input() sourcePage!: any;
   @Input() coreId!: any;
   @Input() coreName!: any;
@@ -70,14 +73,16 @@ export class UpdUsersPage implements OnInit {
   localCore: any;
   pkgUser: any;
   devicePkg: any;
-  location: string = "";
+  location: string | null = "";
   locationReadonly: boolean = true;
   id: string = "";
   uuid: string = "";
   uuidReadonly: boolean = true;
   demoMode: boolean = false;
-  public MyRole: string = "visitor";
+  public MyRole: any = "visitor";
   comment: string = "";
+  userId: string | null = "";
+  codeId = "";
 
   constructor(
     private modalController: ModalController,
@@ -86,25 +91,23 @@ export class UpdUsersPage implements OnInit {
     private toolService: ToolsService,
     public alertCtrl: AlertController,
     private loadingController: LoadingController,
-    private popoverCtrl: PopoverController
+    private popoverCtrl: PopoverController,
+    private fb: FormBuilder
   ) {
     addIcons({ arrowBackCircleOutline });
 
-    this.RegisterForm = new FormGroup({
-      Cpu: new FormControl("", [Validators.required]),
-      Core: new FormControl("", [Validators.required]),
-      Name: new FormControl("", [Validators.required]),
-      UserName: new FormControl("", [Validators.required]),
-      Email: new FormControl("", [
-        Validators.required,
-        Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"),
-      ]),
-      Sim: new FormControl("", [Validators.required]),
-      House: new FormControl("", [Validators.required]),
-      Gender: new FormControl("", [Validators.required]),
-      Roles: new FormControl("neighbor", [Validators.required]),
-      Location: new FormControl("", [Validators.required]),
-      Uuid: new FormControl("", [Validators.required]),
+    this.RegisterForm = this.fb.group({
+      Cpu: [""],
+      Core: ["", [Validators.required]],
+      Name: ["", [Validators.required]],
+      UserName: ["", [Validators.required]],
+      Email: ["", [Validators.required]],
+      Sim: ["", [Validators.required]],
+      House: ["", [Validators.required]],
+      Gender: ["", [Validators.required]],
+      Roles: ["neighbor", [Validators.required]],
+      pathLocation: [""],
+      Uuid: ["", [Validators.required]],
     });
 
     if (this.MyRole == "admin") {
@@ -119,42 +122,131 @@ export class UpdUsersPage implements OnInit {
     console.log(`Entre upd-users, sourcePage: ${this.sourcePage},
       CoreName: ${this.coreName}, CoreId: ${this.coreId},
       pathLocation: ${this.pathLocation}`);
+
+    //   getting userId ---------------------------
+    this.toolService.getSecureStorage("userId").subscribe({
+      next: (result) => {
+        this.userId = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo userId en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    //   getting demoMode ---------------------------
+    this.toolService.getSecureStorage("demoMode").subscribe({
+      next: (result) => {
+        this.demoMode = result == "true" ? true : false;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo demoMode en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    this.toolService.getSecureStorage("coreId").subscribe({
+      next: (result) => {
+        this.coreId = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo coreId en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    this.toolService.getSecureStorage("myRole").subscribe({
+      next: async (result) => {
+        this.MyRole = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo myRole en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    this.toolService.getSecureStorage("deviceInfo").subscribe({
+      next: async (result) => {
+        this.devicePkg = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo deviceInfo en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    if (this.MyRole == "admin") {
+      let valueRoles: any | null = null;
+
+      this.toolService.getSecureStorage("roles").subscribe({
+        next: async (result) => {
+          this.RoleList = await JSON.parse(result!);
+        },
+        error: (err) => {
+          this.toolService.toastAlert(
+            "error, obteniendo roles en getSecureStorage: " + err,
+            0,
+            ["Ok"],
+            "middle"
+          );
+        },
+      });
+    }
+
+    this.toolService.getSecureStorage("location").subscribe({
+      next: async (result) => {
+        this.location = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo location en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    this.toolService.getSecureStorage("deviceUuid").subscribe({
+      next: async (result) => {
+        this.RegisterForm.get("Uuid")!.setValue(result);
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo deviceUuid en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
   }
 
-  ngOnInit_() {
-    console.log(`Entre upd-users, sourcePage: ${this.sourcePage},
-      CoreName: ${this.coreName}, CoreId: ${this.coreId},
-      pathLocation: ${this.pathLocation}`);
-
-    this.MyRole = localStorage.getItem("myRole")!;
-    if (localStorage.getItem("demoMode")) {
-      this.demoMode = localStorage.getItem("demoMode") == "true" ? true : false;
-    }
-
-    this.devicePkg = localStorage.getItem("device_info");
-
-    // this.sourcePage = this.navParams.data["SourcePage"];
-
-    // // if (this.navParams.data["core"]) {
-    //    if (this.navParams.data["core"]) {
-    //   this.coreId = this.navParams.data["core"];
-    // }
-
-    // // if (this.navParams.data["coreName"]) {
-    //   if (this.coreName) {
-    //   this.coreName = this.navParams.data["coreName"];
-    // }
-
-    // if(this.sourcePage == 'admin' || this.sourcePage == 'adminNew'){
-    if (this.MyRole == "admin") {
-      this.RoleList = JSON.parse(localStorage.getItem("roles")!);
-    }
-
-    // if(this.sourcePage == 'tab1NewNeighbor'){
+  async ionViewWillEnter() {
     if (this.MyRole == "admin" || this.MyRole == "neighborAdmin") {
+      console.log("Entre en ---- > ionViewWillEnter: ");
       this.RegisterForm.get("Cpu")!.setValue("byh16");
-      this.RegisterForm.get("Core")!.setValue(localStorage.getItem("coreId"));
-      this.location = localStorage.getItem("location")!;
+      this.RegisterForm.get("Core")!.setValue(this.coreId);
       this.getRoles();
     }
 
@@ -164,17 +256,7 @@ export class UpdUsersPage implements OnInit {
       this.sourcePage == "adminNewExtrange"
     ) {
       this.getCpus();
-      this.RegisterForm.get("Uuid")!.setValue(
-        localStorage.getItem("device-uuid")
-      );
     }
-
-    // if(this.sourcePage == 'admin'){
-    // if (this.navParams.data["pkg"]) {
-    //   this.pkgUser = this.navParams.data["pkg"];
-    //   this.coreName = this.pkgUser["coreName"];
-    // this.fillData();
-    // }
 
     if (this.sourcePage == "adminNewExtrange") {
       this.RegisterForm.get("House")!.setValue("NA");
@@ -250,7 +332,7 @@ export class UpdUsersPage implements OnInit {
       url = "api/roles/neiAdmin/";
     }
 
-    this.api.getData(url + localStorage.getItem("userId")).subscribe({
+    this.api.getData(url + this.userId).subscribe({
       next: async (result: any) => {
         this.RoleList = await result;
       },
@@ -267,7 +349,7 @@ export class UpdUsersPage implements OnInit {
 
   DemoMode() {
     this.demoMode = !this.demoMode;
-    localStorage.setItem("demoMode", this.demoMode.toString());
+    this.toolService.setSecureStorage("demoMode", this.demoMode.toString());
   }
 
   showLoading(duration: number) {
@@ -306,12 +388,9 @@ export class UpdUsersPage implements OnInit {
 
     let email: any;
 
-    if (localStorage.getItem("demoMode")) {
-      if (localStorage.getItem("demoMode") == "true") {
-        email = JSON.parse(localStorage.getItem("admin_email")!)[0]["email"];
-      } else {
-        email = this.RegisterForm.get("Email")!.value;
-      }
+    if (this.demoMode) {
+      email = this.toolService.getSecureStorage("adminEmail");
+      email = JSON.parse(email!)[0]["email"];
     } else {
       email = this.RegisterForm.get("Email")!.value;
     }
@@ -332,11 +411,13 @@ export class UpdUsersPage implements OnInit {
       avatar: "",
     };
 
+    console.log("newUser pkg: ", pkg);
+
     try {
       this.showLoading(2500);
       //  add new user
       await this.api
-        .postData("api/users/new/" + localStorage.getItem("userId"), pkg)
+        .postData("api/users/new/" + this.userId, pkg)
         .then(async (resUser: any) => {
           // create password reset
 
@@ -346,12 +427,7 @@ export class UpdUsersPage implements OnInit {
               if (this.MyRole == "admin" || this.MyRole == "neighborAdmin") {
                 // delete backstage document
                 this.api
-                  .deleteData(
-                    "api/backstage/" +
-                      localStorage.getItem("userId") +
-                      "/" +
-                      this.id
-                  )
+                  .deleteData("api/backstage/" + this.userId + "/" + this.id)
                   .then(async (result) => {
                     const options: SmsOptions = {
                       replaceLineBreaks: false,
@@ -451,7 +527,7 @@ export class UpdUsersPage implements OnInit {
       house: house,
       gender: gender,
       note: comment.textContent,
-      uuid: localStorage.getItem("device-uuid"),
+      uuid: this.toolService.getSecureStorage("deviceUuid"),
     };
 
     // >> Confirmation ------------------------------------
@@ -481,7 +557,11 @@ export class UpdUsersPage implements OnInit {
   }
 
   async sendUserReq(pkg: any): Promise<any> {
-    const admin_sim = JSON.parse(localStorage.getItem("admin_sim")!);
+    let adminSim: any | null = null;
+    adminSim = this.toolService.getSecureStorageP("adminSim");
+    adminSim = JSON.parse(adminSim);
+
+    // const admin_sim = JSON.parse(localStorage.getItem("admin_sim")!);
     this.showLoading(2500);
     this.api
       .postData("api/backstage/", pkg)
@@ -577,7 +657,21 @@ export class UpdUsersPage implements OnInit {
   }
 
   async newExtrange() {
-    const coreSim = localStorage.getItem("coreSim");
+    let coreSim: string | null = "";
+    //   getting demoMode ---------------------------
+    this.toolService.getSecureStorage("coreSim").subscribe({
+      next: (result) => {
+        coreSim = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo coreSim en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
     const options: SmsOptions = {
       replaceLineBreaks: false,
       android: {
@@ -605,7 +699,7 @@ export class UpdUsersPage implements OnInit {
               "," +
               this.RegisterForm.get("Sim")!.value +
               "," +
-              localStorage.getItem("userId");
+              this.userId;
 
             await this.sms
               .send(coreSim!, pkgDevice, options)
@@ -646,8 +740,8 @@ export class UpdUsersPage implements OnInit {
         {
           text: "Si",
           handler: async () => {
-            const coreId = localStorage.getItem("coreId");
-            const userId = localStorage.getItem("userId");
+            const coreId = this.coreId;
+            const userId = this.userId;
 
             try {
               this.api
