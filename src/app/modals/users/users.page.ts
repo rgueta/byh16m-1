@@ -210,7 +210,7 @@ export class UsersPage implements OnInit {
             try {
               if (this.sim.length >= 10) {
                 if (actualSim != this.sim) {
-                  if (await this.toolService.verifyNetStatus()) {
+                  if (await this.toolService.getSecureBoolean("netStatus")) {
                     await this.api
                       .postData("api/users/updSim/" + this.userId, {
                         userId: neighborId,

@@ -4,6 +4,7 @@ import { Observable, from, of } from "rxjs";
 import {
   FormsModule,
   FormGroup,
+  FormBuilder,
   FormControl,
   ReactiveFormsModule,
   Validators,
@@ -55,6 +56,7 @@ export class UpdUsersPage implements OnInit {
   @Input() avatar: string = "";
   @Input() localComment: string = "";
 
+  // Datos recividos de la pagina madre
   @Input() sourcePage!: any;
   @Input() coreId!: any;
   @Input() coreName!: any;
@@ -80,6 +82,7 @@ export class UpdUsersPage implements OnInit {
   public MyRole: any = "visitor";
   comment: string = "";
   userId = "";
+  codeId = "";
 
   constructor(
     private modalController: ModalController,
@@ -88,25 +91,23 @@ export class UpdUsersPage implements OnInit {
     private toolService: ToolsService,
     public alertCtrl: AlertController,
     private loadingController: LoadingController,
-    private popoverCtrl: PopoverController
+    private popoverCtrl: PopoverController,
+    private fb: FormBuilder
   ) {
     addIcons({ arrowBackCircleOutline });
 
-    this.RegisterForm = new FormGroup({
-      Cpu: new FormControl("", [Validators.required]),
-      Core: new FormControl("", [Validators.required]),
-      Name: new FormControl("", [Validators.required]),
-      UserName: new FormControl("", [Validators.required]),
-      Email: new FormControl("", [
-        Validators.required,
-        Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"),
-      ]),
-      Sim: new FormControl("", [Validators.required]),
-      House: new FormControl("", [Validators.required]),
-      Gender: new FormControl("", [Validators.required]),
-      Roles: new FormControl("neighbor", [Validators.required]),
-      Location: new FormControl("", [Validators.required]),
-      Uuid: new FormControl("", [Validators.required]),
+    this.RegisterForm = this.fb.group({
+      Cpu: [""],
+      Core: ["", [Validators.required]],
+      Name: ["", [Validators.required]],
+      UserName: ["", [Validators.required]],
+      Email: ["", [Validators.required]],
+      Sim: ["", [Validators.required]],
+      House: ["", [Validators.required]],
+      Gender: ["", [Validators.required]],
+      Roles: ["neighbor", [Validators.required]],
+      pathLocation: [""],
+      Uuid: ["", [Validators.required]],
     });
 
     if (this.MyRole == "admin") {
@@ -121,6 +122,7 @@ export class UpdUsersPage implements OnInit {
     console.log(`Entre upd-users, sourcePage: ${this.sourcePage},
       CoreName: ${this.coreName}, CoreId: ${this.coreId},
       pathLocation: ${this.pathLocation}`);
+
     //   getting userId ---------------------------
     this.toolService.getSecureStorage("userId").subscribe({
       next: (result) => {
@@ -164,14 +166,7 @@ export class UpdUsersPage implements OnInit {
         );
       },
     });
-  }
 
-  ngOnInit_() {
-    console.log(`Entre upd-users, sourcePage: ${this.sourcePage},
-      CoreName: ${this.coreName}, CoreId: ${this.coreId},
-      pathLocation: ${this.pathLocation}`);
-
-    // this.MyRole = this.toolService.getSecureStorage("myRole")!;
     this.toolService.getSecureStorage("myRole").subscribe({
       next: async (result) => {
         this.MyRole = await result;
@@ -186,25 +181,6 @@ export class UpdUsersPage implements OnInit {
       },
     });
 
-    this.toolService.getSecureStorage("demoMode").subscribe({
-      next: async (result) => {
-        this.demoMode = (await result) == "true" ? true : false;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo demoMode en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
-
-    // if (localStorage.getItem("demoMode")) {
-    //   this.demoMode = localStorage.getItem("demoMode") == "true" ? true : false;
-    // }
-
-    // this.devicePkg = this.toolService.getSecureStorage("deviceInfo");
     this.toolService.getSecureStorage("deviceInfo").subscribe({
       next: async (result) => {
         this.devicePkg = await result;
@@ -219,23 +195,12 @@ export class UpdUsersPage implements OnInit {
       },
     });
 
-    // // if (this.navParams.data["core"]) {
-    //    if (this.navParams.data["core"]) {
-    //   this.coreId = this.navParams.data["core"];
-    // }
-
-    // // if (this.navParams.data["coreName"]) {
-    //   if (this.coreName) {
-    //   this.coreName = this.navParams.data["coreName"];
-    // }
-
-    // if(this.sourcePage == 'admin' || this.sourcePage == 'adminNew'){
     if (this.MyRole == "admin") {
       let valueRoles: any | null = null;
 
       this.toolService.getSecureStorage("roles").subscribe({
         next: async (result) => {
-          valueRoles = await result;
+          this.RoleList = await JSON.parse(result);
         },
         error: (err) => {
           this.toolService.toastAlert(
@@ -246,14 +211,42 @@ export class UpdUsersPage implements OnInit {
           );
         },
       });
-      this.RoleList = JSON.parse(valueRoles);
     }
 
-    // if(this.sourcePage == 'tab1NewNeighbor'){
+    this.toolService.getSecureStorage("location").subscribe({
+      next: async (result) => {
+        this.location = await result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo location en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    this.toolService.getSecureStorage("deviceUuid").subscribe({
+      next: async (result) => {
+        this.RegisterForm.get("Uuid")!.setValue(result);
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo deviceUuid en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+  }
+
+  async ionViewWillEnter() {
     if (this.MyRole == "admin" || this.MyRole == "neighborAdmin") {
+      console.log("Entre en ---- > ionViewWillEnter: ");
       this.RegisterForm.get("Cpu")!.setValue("byh16");
-      this.RegisterForm.get("Core")!.setValue(localStorage.getItem("coreId"));
-      this.location = localStorage.getItem("location")!;
+      this.RegisterForm.get("Core")!.setValue(this.coreId);
       this.getRoles();
     }
 
@@ -263,27 +256,7 @@ export class UpdUsersPage implements OnInit {
       this.sourcePage == "adminNewExtrange"
     ) {
       this.getCpus();
-      this.toolService.getSecureStorage("deviceUuid").subscribe({
-        next: async (result) => {
-          this.RegisterForm.get("Uuid")!.setValue(result);
-        },
-        error: (err) => {
-          this.toolService.toastAlert(
-            "error, obteniendo deviceUuid en getSecureStorage: " + err,
-            0,
-            ["Ok"],
-            "middle"
-          );
-        },
-      });
     }
-
-    // if(this.sourcePage == 'admin'){
-    // if (this.navParams.data["pkg"]) {
-    //   this.pkgUser = this.navParams.data["pkg"];
-    //   this.coreName = this.pkgUser["coreName"];
-    // this.fillData();
-    // }
 
     if (this.sourcePage == "adminNewExtrange") {
       this.RegisterForm.get("House")!.setValue("NA");
@@ -403,6 +376,10 @@ export class UpdUsersPage implements OnInit {
   }
 
   async onSubmit() {
+    console.log("grabar nuevo usuario...");
+  }
+
+  async onSubmit_() {
     const localCpu =
       typeof this.RegisterForm.get("Cpu")!.value == "object"
         ? this.RegisterForm.get("Cpu")!.value["id"]

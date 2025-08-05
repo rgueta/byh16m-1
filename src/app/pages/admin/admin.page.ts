@@ -299,6 +299,7 @@ export class AdminPage implements OnInit {
   backstageList: any;
   RoleList: any;
   demoMode: boolean = false;
+  userName = "";
 
   constructor(
     public animationController: AnimationController,
@@ -377,16 +378,14 @@ export class AdminPage implements OnInit {
       },
     });
 
-    let value: any | null = null;
-    value = this.toolService.getSecureStorage("emailToVisitor");
-    //   getting demoMode ---------------------------
-    this.toolService.getSecureStorage("demoMode").subscribe({
+    //   getting emailToVisitor ---------------------------
+    this.toolService.getSecureStorage("emailToVisitor").subscribe({
       next: (result) => {
-        this.demoMode = result == "true" ? true : false;
+        this.emailToVisitor = result == "true" ? true : false;
       },
       error: (err) => {
         this.toolService.toastAlert(
-          "error, obteniendo demoMode en getSecureStorage: " + err,
+          "error, obteniendo emailToVisitor en getSecureStorage: " + err,
           0,
           ["Ok"],
           "middle"
@@ -394,11 +393,41 @@ export class AdminPage implements OnInit {
       },
     });
 
-    this.emailToVisitor = value === "true";
+    //   getting roles ---------------------------
+    this.toolService.getSecureStorage("roles").subscribe({
+      next: (result) => {
+        if (result) {
+          this.getRoles();
+        }
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo roles en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    //   getting userName ---------------------------
+    this.toolService.getSecureStorage("userName").subscribe({
+      next: (result) => {
+        this.userName = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo userName en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+  }
+
+  async ionViewWillEnter() {
     this.getCores();
-    if (!this.toolService.getSecureStorage("roles")) {
-      this.getRoles();
-    }
   }
 
   DemoMode() {
@@ -413,6 +442,12 @@ export class AdminPage implements OnInit {
         this.CoresList[0].open = true;
       },
       error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo userName en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
         console.log("Error --> ", err.message);
       },
     });
@@ -452,7 +487,7 @@ export class AdminPage implements OnInit {
     const modal = await this.modalController.create({
       component: UpdUsersPage,
       componentProps: {
-        sourcePage: "adminNew",
+        sourcePage: "adminNewUser",
         coreName: CoreName,
         coreId: CoreId,
         pathLocation: pathLocation,
@@ -734,7 +769,7 @@ export class AdminPage implements OnInit {
             switch (option) {
               case "chgStatusCore":
               case "chgRemoteButtons":
-                if (await this.toolService.verifyNetStatus()) {
+                if (await this.toolService.getSecureBoolean("netStatus")) {
                   let jsonItem: any;
                   let valueItem = "";
                   switch (option) {
@@ -801,7 +836,9 @@ export class AdminPage implements OnInit {
 
                     try {
                       if (this.sim.length >= 10) {
-                        if (await this.toolService.verifyNetStatus()) {
+                        if (
+                          await this.toolService.getSecureBoolean("netStatus")
+                        ) {
                           await this.api
                             .postData("api/cores/chgSim/" + this.userId, {
                               coreId: item._id,

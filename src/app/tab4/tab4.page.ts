@@ -221,7 +221,7 @@ export class Tab4Page implements OnInit {
           text: "Cambiar",
           handler: async (data: any) => {
             try {
-              if (await this.toolService.verifyNetStatus()) {
+              if (await this.toolService.getSecureBoolean("netStatus")) {
                 await this.api
                   .putData(
                     "api/visitors/simple/" + this.userId + "/" + visitorId,

@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { AlertController, ToastController } from "@ionic/angular";
 import { Preferences } from "@capacitor/preferences";
-import { Observable, from, of } from "rxjs";
+import { Observable, from, of, firstValueFrom } from "rxjs";
 import { map, catchError } from "rxjs/operators";
 
 const netStatus = "netStatus";
@@ -33,6 +33,14 @@ export class ToolsService {
     return storedValue;
   }
 
+  // Obtener token Single
+  async getSecureStorageS(key: string) {
+    let storedValue: string | null = null;
+    const { value } = await Preferences.get({ key: key });
+    storedValue = value;
+    return storedValue;
+  }
+
   // Obtener token Observable
   getSecureStorage(key: string): Observable<any> {
     // Usamos 'from' para convertir la promesa de Capacitor en un Observable
@@ -50,6 +58,13 @@ export class ToolsService {
         return of(null); // Retorna null en caso de error
       })
     );
+  }
+
+  async getSecureBoolean(key: string): Promise<boolean> {
+    const { value } = await Preferences.get({ key: key });
+    const result = value === "true";
+    console.log(`Valor obtenido para la clave '${key}': ${result}`);
+    return result;
   }
 
   // remove single key
@@ -237,31 +252,5 @@ export class ToolsService {
       position: position,
     });
     myToast.present();
-  }
-
-  async verifyNetStatus() {
-    let cnnStatus = "";
-    //   getting netStatus ---------------------------
-    this.getSecureStorage("netStatus").subscribe({
-      next: (result) => {
-        cnnStatus = result;
-      },
-      error: (err) => {
-        this.toastAlert(
-          "error, obteniendo netStatus en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
-
-    // if(!cnnStatus!.connected)
-    if (true == true) {
-      //just to continue migration  --------
-      return false;
-    } else {
-      return true;
-    }
   }
 }

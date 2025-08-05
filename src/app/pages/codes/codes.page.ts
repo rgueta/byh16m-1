@@ -282,7 +282,7 @@ export class CodesPage implements OnInit {
       }
 
       try {
-        if (await this.toolsService.verifyNetStatus()) {
+        if (await this.toolsService.getSecureBoolean("netStatus")) {
           await this.api.putData(
             "api/codes/update/" + this.userId + "/" + pkg["_id"],
             pkg

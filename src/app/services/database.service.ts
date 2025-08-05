@@ -9,7 +9,6 @@ import {
   HttpParams,
 } from "@angular/common/http";
 import { Router } from "@angular/router";
-import { Utils } from "../tools/tools";
 import { ToolsService } from "../services/tools.service";
 
 const REFRESH_TOKEN = "refreshToken";
