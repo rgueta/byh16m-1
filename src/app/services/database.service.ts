@@ -9,7 +9,6 @@ import {
   HttpParams,
 } from "@angular/common/http";
 import { Router } from "@angular/router";
-import { Utils } from "../tools/tools";
 import { ToolsService } from "../services/tools.service";
 
 const REFRESH_TOKEN = "refreshToken";
@@ -46,8 +45,23 @@ export class DatabaseService {
 
   // Load authToken on startup
   async loadToken() {
-    const token = this.toolService.getSecureStorage("authToken");
-    // const token = localStorage.getItem(TOKEN);
+    let token = "";
+    this.toolService.getSecureStorage("authToken");
+    //   getting role ---------------------------
+    this.toolService.getSecureStorage("authToken").subscribe({
+      next: (result) => {
+        token = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo authToken en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
     if (token) {
       this.currentAuthToken = token;
       this.isAuthenticated.next(true);
@@ -65,8 +79,10 @@ export class DatabaseService {
         switchMap((_) => {
           this.currentAuthToken = null;
           // Remove all stored tokens
-          const deleteAccess = localStorage.removeItem(TOKEN);
-          const deleteRefresh = localStorage.removeItem(REFRESH_TOKEN);
+          const deleteAccess =
+            this.toolService.removeSecureStorage("authToken");
+          const deleteRefresh =
+            this.toolService.removeSecureStorage("refreshToken");
           return from(Promise.all([deleteAccess, deleteRefresh]));
         }),
         tap((_) => {
@@ -80,9 +96,23 @@ export class DatabaseService {
   // Load the refresh token from storage
   // then attach it as the header for one specific API call
   getNewAccessToken() {
-    // const refreshToken = from<string>(localStorage.getItem(REFRESH_TOKEN_KEY));
-    const refreshToken = localStorage.getItem(REFRESH_TOKEN);
-    if (localStorage.getItem(REFRESH_TOKEN)) {
+    let refreshToken = "";
+    //   getting role ---------------------------
+    this.toolService.getSecureStorage("refreshToken").subscribe({
+      next: (result) => {
+        refreshToken = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, refreshToken role en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    if (refreshToken != "") {
       const httpOptions = {
         headers: new HttpHeaders({
           "Content-Type": "application/json",
@@ -110,13 +140,12 @@ export class DatabaseService {
     // secure storage ----------
     this.toolService.setSecureStorage("authToken", token.authToken);
 
-    localStorage.setItem(TOKEN_IAT, token.iatDate);
-    localStorage.setItem(TOKEN_EXP, token.expDate);
+    this.toolService.setSecureStorage("tokenIAT", token.iatDate);
+    this.toolService.setSecureStorage("tokenEXP", token.expDate);
 
     // get new refresh token-------------
     if (token.refreshToken !== "")
       this.toolService.setSecureStorage("refreshToken", token.refreshToken); //secure storage
-    // localStorage.setItem(REFRESH_TOKEN, token.refreshToken);
 
     return from(this.currentAuthToken);
     // return from(this.storage.set(TOKEN_KEY, accessToken));
@@ -125,9 +154,22 @@ export class DatabaseService {
   //---- GET data from server  ------
   getData_key(collection: String, data: any) {
     // secure storage --------------
-    const token = this.toolService.getSecureStorage("authToken");
+    let token = "";
 
-    // const token = localStorage.getItem(TOKEN);
+    //   getting authToken ---------------------------
+    this.toolService.getSecureStorage("authToken").subscribe({
+      next: (result) => {
+        token = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo authToken en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
 
     let options = {
       headers: {
@@ -185,8 +227,22 @@ export class DatabaseService {
 
   async postData(collection: String, data: any) {
     // secure storage ------------------
-    const token = this.toolService.getSecureStorage("authToken");
-    // const token = localStorage.getItem(TOKEN);
+    let token = "";
+
+    //   getting authToken ---------------------------
+    this.toolService.getSecureStorage("authToken").subscribe({
+      next: (result) => {
+        token = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo authToken en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
 
     let options = {
       headers: {
@@ -211,8 +267,22 @@ export class DatabaseService {
 
   async postDataInfo(collection: String, data: any, params: {}) {
     // secure storage ------------------
-    const token = this.toolService.getSecureStorage("authToken");
-    // const token = localStorage.getItem(TOKEN);
+    let token = "";
+
+    //   getting authToken ---------------------------
+    this.toolService.getSecureStorage("authToken").subscribe({
+      next: (result) => {
+        token = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo authToken en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
 
     let options = {
       headers: {
@@ -238,8 +308,22 @@ export class DatabaseService {
 
   async postRegisterData(url: String, data: any) {
     // secure storage ------------------
-    const token = this.toolService.getSecureStorage("authToken");
-    // const token = localStorage.getItem(TOKEN);
+    let token = "";
+
+    //   getting authToken ---------------------------
+    this.toolService.getSecureStorage("authToken").subscribe({
+      next: (result) => {
+        token = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo authToken en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
 
     let options = {
       headers: {
@@ -279,8 +363,23 @@ export class DatabaseService {
   //--- PUT data to server
   async putData(collecion: String, data: any) {
     // secure storage ------------------
-    const token = this.toolService.getSecureStorage("authToken");
-    // const token = localStorage.getItem(TOKEN);
+
+    let token = "";
+
+    //   getting authToken ---------------------------
+    this.toolService.getSecureStorage("authToken").subscribe({
+      next: (result) => {
+        token = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo authToken en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
 
     let options = {
       headers: {
@@ -304,8 +403,22 @@ export class DatabaseService {
   //--- DELETE data to server
   async deleteData(collection: String) {
     // secure storage ------------------
-    const token = this.toolService.getSecureStorage("authToken");
-    // const token = localStorage.getItem(TOKEN);
+    let token = "";
+
+    //   getting authToken ---------------------------
+    this.toolService.getSecureStorage("authToken").subscribe({
+      next: (result) => {
+        token = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo authToken en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
 
     let options = {
       headers: {

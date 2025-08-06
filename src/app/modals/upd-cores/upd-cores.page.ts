@@ -26,6 +26,7 @@ import {
 import { DatabaseService } from "../../services/database.service";
 import { addIcons } from "ionicons";
 import { arrowBackCircleOutline } from "ionicons/icons";
+import { ToolsService } from "../../services/tools.service";
 
 @Component({
   selector: "app-upd-cores",
@@ -91,7 +92,8 @@ export class UpdCoresPage implements OnInit {
 
   constructor(
     public api: DatabaseService,
-    public modalController: ModalController
+    public modalController: ModalController,
+    private toolService: ToolsService
   ) {
     addIcons({ arrowBackCircleOutline });
 
@@ -120,8 +122,33 @@ export class UpdCoresPage implements OnInit {
   }
 
   async ngOnInit() {
-    this.userId = localStorage.getItem("userId")!;
-    this.location = localStorage.getItem("location");
+    this.toolService.getSecureStorage("userId").subscribe({
+      next: (result) => {
+        this.userId = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo userId en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    this.toolService.getSecureStorage("location").subscribe({
+      next: (result) => {
+        this.location = result || "visitor";
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo location en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
 
     var locationArr = this.location.split(".");
     console.log("location Array --> ", locationArr);

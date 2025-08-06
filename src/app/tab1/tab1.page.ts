@@ -42,7 +42,6 @@ import { RequestsPage } from "../modals/requests/requests.page";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { DatabaseService } from "../services/database.service";
 import { Router } from "@angular/router";
-import { Utils } from "../tools/tools";
 import { UpdUsersPage } from "../modals/upd-users/upd-users.page";
 import { BackstagePage } from "../modals/backstage/backstage.page";
 import { FormsModule } from "@angular/forms";
@@ -73,6 +72,8 @@ import {
   mailOutline,
   menu,
 } from "ionicons/icons";
+import { catchError, throwError, from, Observable, of } from "rxjs";
+import { tap, switchMap } from "rxjs/operators";
 
 @Component({
   selector: "app-tab1",
@@ -115,25 +116,25 @@ export class Tab1Page implements OnInit {
   @Input() sim: string = "";
   myToast: any;
   myRoles: any;
-  public MyRole: string | null = "visitor";
+  public MyRole: string | "" = "admin";
   isAndroid: any;
   currentUser = "";
   public version = "";
   public coreName: string | null = "";
   public coreId: string | null = "";
   twilio_client: any;
-  userId: string | null = "";
+  userId: string = "";
   id: number = 0;
   btnVisible: boolean = true;
   titleMenuButtons = "Ocultar botones";
 
   infoPanel: any;
-  myEmail: string | null = "";
-  myName: string | null = "";
+  myEmail: any | null = "";
+  myName: any | null = "";
   REST_API_SERVER = environment.cloud.server_url;
   iosOrAndroid: boolean = false;
   demoMode: boolean = false;
-  remote: boolean = false;
+  remote: any = false;
   // #endregion -----
   constructor(
     private sms: SMS,
@@ -170,15 +171,6 @@ export class Tab1Page implements OnInit {
       this.isAndroid = true;
     }
 
-    this.MyRole = localStorage.getItem("myRole");
-    this.myEmail = localStorage.getItem("email");
-    this.myName = localStorage.getItem("name");
-    this.remote = localStorage.getItem("remote") === "true";
-
-    if (localStorage.getItem("demoMode")) {
-      this.demoMode = localStorage.getItem("demoMode") == "true" ? true : false;
-    }
-
     if (!this.remote) {
       document
         .getElementById("infoSection")!
@@ -187,14 +179,166 @@ export class Tab1Page implements OnInit {
   }
 
   async ngOnInit() {
-    const sim = localStorage.getItem("coreSim");
-    this.userId = localStorage.getItem("userId");
-    this.coreName = localStorage.getItem("coreName");
-    this.coreId = localStorage.getItem("coreId");
+    //   getting myRole ---------------------------
+    this.toolService.getSecureStorage("myRole").subscribe({
+      next: (result) => {
+        this.MyRole = result || "visitor";
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo myRole en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    //   getting email ---------------------------
+    this.toolService.getSecureStorage("email").subscribe({
+      next: async (result) => {
+        this.myEmail = await result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo email en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    // this.myName = this.toolService.getSecureStorage("name");
+    //   getting name ---------------------------
+    this.toolService.getSecureStorage("name").subscribe({
+      next: async (result) => {
+        this.myName = await result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo name en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    //   getting remote ---------------------------
+    this.toolService.getSecureStorage("remote").subscribe({
+      next: async (result) => {
+        this.remote = await result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo remote en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    console.log("MyRole at ngOnInit: ", this.MyRole);
+
+    var sim = "";
+    // getting coreSim ---------------------------
+    this.toolService.getSecureStorage("coreSim").subscribe({
+      next: (result) => {
+        sim = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo coreSim en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    //   getting userId ---------------------------
+    this.toolService.getSecureStorage("userId").subscribe({
+      next: (result) => {
+        this.userId = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo userId en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    //   getting coreId ---------------------------
+    this.toolService.getSecureStorage("coreId").subscribe({
+      next: (result) => {
+        this.coreId = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo coreId en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    //   getting coreName ---------------------------
+    this.toolService.getSecureStorage("coreName").subscribe({
+      next: (result) => {
+        this.coreName = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo coreName en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    //   getting demoMode ---------------------------
+    this.toolService.getSecureStorage("demoMode").subscribe({
+      next: (result) => {
+        this.demoMode = result == "true" ? true : false;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo demoMode en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    console.log("demoMode at ngOnInit: ", this.demoMode);
 
     // -----------------firebase Push notification
+    //
+    let devicePlatform: any | null = null;
+    devicePlatform = this.toolService.getSecureStorage("devicePlatform");
+    this.toolService.getSecureStorage("devicePlatform").subscribe({
+      next: (result) => {
+        devicePlatform = result || "visitor";
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo myRole en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
 
-    if (["android", "ios"].includes(localStorage.getItem("devicePlatform")!)) {
+    if (["android", "ios"].includes(devicePlatform)) {
       PushNotifications.requestPermissions().then((resul) => {
         if (resul.receive === "granted") {
           PushNotifications.register();
@@ -213,7 +357,7 @@ export class Tab1Page implements OnInit {
       });
 
       //  Subscribe to a specific topic
-      FCM.subscribeTo({ topic: localStorage.getItem("core-id")! })
+      FCM.subscribeTo({ topic: this.coreId! })
         .then()
         .catch((err) => console.log(err));
 
@@ -337,14 +481,13 @@ export class Tab1Page implements OnInit {
   }
 
   async fcmNotification() {
-    this.api.postData(
-      `api/alerts/${localStorage.getItem("core-id")}/peatonal open/`,
-      ""
-    );
+    this.api.postData(`api/alerts/${this.coreId}/peatonal open/`, "");
   }
 
   lockToPortrait() {
-    if (["android", "ios"].includes(localStorage.getItem("devicePlatform")!))
+    let devicePlatform: any | null = null;
+    devicePlatform = this.toolService.getSecureStorage("devicePlatform");
+    if (["android", "ios"].includes(devicePlatform))
       this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.PORTRAIT);
   }
 
@@ -364,11 +507,28 @@ export class Tab1Page implements OnInit {
   }
 
   async modalBackstage() {
+    let coreName = "";
+
+    //   getting coreName ---------------------------
+    this.toolService.getSecureStorage("coreName").subscribe({
+      next: async (result) => {
+        coreName = await result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo coreName en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
     const modal = await this.modalController.create({
       component: BackstagePage,
       componentProps: {
         SourcePage: "tab1NewNeighbor",
-        coreName: localStorage.getItem("core-name"),
+        coreName: coreName,
       },
     });
     return await modal.present();
@@ -376,26 +536,52 @@ export class Tab1Page implements OnInit {
 
   async collectInfo() {
     let timestamp: string = "";
+
     if (await this.networkService.checkInternetConnection()) {
+      let timestamp: any;
       // get last api call variable
-      if (!localStorage.getItem("lastInfo_updated")) {
-        timestamp = Utils.convDate(new Date());
-      } else {
-        timestamp = localStorage.getItem("lastInfo_updated") ?? "";
-        // timestamp = '2024-01-29T00:49:49.857Z'
-      }
 
-      if (this.localInfo.length == 0 && !localStorage.getItem("info")) {
-        let d = new Date();
-        d.setDate(d.getDate() - 180);
-        timestamp = Utils.convDate(d);
-      }
+      //   getting lastInfoUpdated ---------------------------
+      this.toolService.getSecureStorage("lastInfoUpdated").subscribe({
+        next: (result) => {
+          if (!result) {
+            timestamp = this.toolService.convDate(new Date());
+          } else {
+            timestamp = result;
+            // timestamp = '2024-01-29T00:49:49.857Z'
+          }
+        },
+        error: (err) => {
+          this.toolService.toastAlert(
+            "error, obteniendo lastInfoUpdated en getSecureStorage: " + err,
+            0,
+            ["Ok"],
+            "middle"
+          );
+        },
+      });
 
-      if (this.localInfo.length == 0 && localStorage.getItem("info")) {
-        // commented for migration removed JSON.parse
-        // this.localInfo = JSON.parse(localStorage.getItem('info'));
-        this.localInfo = localStorage.getItem("info");
-      }
+      this.toolService.getSecureStorage("info").subscribe({
+        next: (result) => {
+          if (this.localInfo.length == 0 && !result) {
+            let d = new Date();
+            d.setDate(d.getDate() - 180);
+            timestamp = this.toolService.convDate(d);
+          }
+
+          if (this.localInfo.length == 0 && result) {
+            this.localInfo = result;
+          }
+        },
+        error: (err) => {
+          this.toolService.toastAlert(
+            "error, obteniendo info en getSecureStorage: " + err,
+            0,
+            ["Ok"],
+            "middle"
+          );
+        },
+      });
 
       try {
         this.api
@@ -405,8 +591,6 @@ export class Tab1Page implements OnInit {
               if (Object.keys(result).length > 0) {
                 // get last api call variable
                 if (this.localInfo.length > 0) {
-                  // this.localInfo = JSON.parse(localStorage.getItem('info'));
-
                   Object.entries(result).forEach(async ([key, item]) => {
                     // this.localInfo.push(item);
                     this.localInfo = [...this.localInfo, item];
@@ -415,7 +599,7 @@ export class Tab1Page implements OnInit {
                   this.localInfo = result;
                 }
 
-                this.localInfo = await Utils.sortJsonVisitors(
+                this.localInfo = await this.toolService.sortJsonVisitors(
                   this.localInfo,
                   "updatedAt",
                   false
@@ -426,7 +610,10 @@ export class Tab1Page implements OnInit {
                   this.localInfo.splice(1000);
                 }
 
-                localStorage.setItem("info", JSON.stringify(this.localInfo));
+                this.toolService.setSecureStorage(
+                  "info",
+                  JSON.stringify(this.localInfo)
+                );
               }
             },
             error: (error: any) => {
@@ -434,15 +621,33 @@ export class Tab1Page implements OnInit {
             },
           });
 
-        localStorage.setItem("lastInfo_updated", Utils.convDate(new Date()));
+        this.toolService.setSecureStorage(
+          "lastInfoUpdated",
+          this.toolService.convDate(new Date())
+        );
       } catch (e) {
-        console.error("Error api call: ", e);
+        this.toolService.toastAlert(
+          "Error api/info/ call: " + e,
+          0,
+          ["Ok"],
+          "middle"
+        );
       }
     } else {
-      if (this.localInfo.length == 0 && localStorage.getItem("info")) {
-        // commented for migration removed JSON.parse
-        // this.localInfo = JSON.parse(localStorage.getItem('info'));
-        this.localInfo = localStorage.getItem("info");
+      if (this.localInfo.length == 0 && this.localInfo) {
+        this.toolService.getSecureStorage("info").subscribe({
+          next: (result) => {
+            this.localInfo = result;
+          },
+          error: (err) => {
+            this.toolService.toastAlert(
+              "error, obteniendo info en getSecureStorage: " + err,
+              0,
+              ["Ok"],
+              "middle"
+            );
+          },
+        });
       }
       this.toolService.toastAlert(
         "No hay acceso a internet",
@@ -463,7 +668,7 @@ export class Tab1Page implements OnInit {
 
   DemoMode() {
     this.demoMode = !this.demoMode;
-    localStorage.setItem("demoMode", this.demoMode.toString());
+    this.toolService.setSecureStorage("demoMode", this.demoMode.toString());
   }
 
   async openUrl(url: string) {
@@ -493,9 +698,51 @@ export class Tab1Page implements OnInit {
       },
     };
 
-    const local_sim = localStorage.getItem("coreSim");
-    const use_twilio = localStorage.getItem("twilio");
-    const uuid = localStorage.getItem("device-uuid");
+    let local_sim = "";
+    this.toolService.getSecureStorage("coreSim").subscribe({
+      next: (result) => {
+        local_sim = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo coreSim en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    let use_twilio = "";
+    this.toolService.getSecureStorage("twilio").subscribe({
+      next: (result) => {
+        use_twilio = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo twilio en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
+    let uuid = "";
+    this.toolService.getSecureStorage("deviceUuid").subscribe({
+      next: (result) => {
+        uuid = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo deviceUuid en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
     // const local_sim =  await this.storage.get('coreSim');
 
     // create milliseconds block  for local timestamp -------
@@ -600,7 +847,7 @@ export class Tab1Page implements OnInit {
           handler: async () => {
             this.api.logout();
             this.router.navigateByUrl("/", { replaceUrl: true });
-            Utils.cleanLocalStorage();
+            this.toolService.cleanSecureStorage();
           },
         },
       ],

@@ -17,7 +17,6 @@ import {
 } from "@ionic/angular/standalone";
 import { ScreenOrientation } from "@ionic-native/screen-orientation/ngx";
 import { Device } from "@capacitor/device";
-import { Utils } from "src/app/tools/tools";
 import { RequestsPage } from "../../modals/requests/requests.page";
 import { Sim } from "@ionic-native/sim/ngx";
 import { DatabaseService } from "../../services/database.service";
@@ -39,14 +38,8 @@ import {
 
 import { addIcons } from "ionicons";
 import { eye, eyeOffOutline } from "ionicons/icons";
-import { catchError, switchMap, throwError } from "rxjs";
-
-const USER_ROLES = "roles";
-const USER_ROLE = "myRole";
-const VISITORS = "visitors";
-const DEVICE_UUID = "device-uuid";
-const DEVICE_PKG = "device-pkg";
-const ADMIN_DEVICE = "admin_device";
+import { catchError, throwError, from, Observable, of } from "rxjs";
+import { tap, switchMap } from "rxjs/operators";
 
 @Component({
   selector: "app-login",
@@ -102,10 +95,10 @@ export class LoginPage implements OnInit {
   private REST_API_SERVER = environment.cloud.server_url;
   public version = "";
   net_status: any;
-  device_uuid: string = "";
-  admin_device: any;
-  admin_sim: [] = [];
-  admin_email: [] = [];
+  deviceUuid: string = "";
+  adminDevice: any;
+  adminSim: [] = [];
+  adminEmail: [] = [];
 
   public myToast: any;
 
@@ -135,7 +128,7 @@ export class LoginPage implements OnInit {
     }
 
     this.getConfigApp();
-    Utils.cleanLocalStorage();
+    this.toolService.cleanSecureStorage();
     this.init();
     this.version = environment.app.version;
 
@@ -152,8 +145,11 @@ export class LoginPage implements OnInit {
         //#region get device uuid  --------------------------------
         await Device.getId()
           .then(async (deviceId: any) => {
-            localStorage.setItem(DEVICE_UUID, deviceId["identifier"]);
-            this.device_uuid = await deviceId["identifier"];
+            this.toolService.setSecureStorage(
+              "deviceUuid",
+              deviceId["identifier"]
+            );
+            this.deviceUuid = await deviceId["identifier"];
           })
           .catch((err) => {
             console.error("Error Device.getId inside Device.getInfo: ", err);
@@ -161,9 +157,15 @@ export class LoginPage implements OnInit {
 
         //#endregion  -------------
 
-        this.device_info.uuid = this.device_uuid;
-        localStorage.setItem(DEVICE_PKG, JSON.stringify(this.device_info));
-        localStorage.setItem("devicePlatform", this.device_info.platform);
+        this.device_info.uuid = this.deviceUuid;
+        this.toolService.setSecureStorage(
+          "devicePkg",
+          JSON.stringify(this.device_info)
+        );
+        this.toolService.setSecureStorage(
+          "devicePlatform",
+          this.device_info.platform
+        );
         //#region soy android ---------------------------------
 
         if (this.device_info.platform === "android") {
@@ -181,10 +183,13 @@ export class LoginPage implements OnInit {
           }
           //#endregion  ---------------------------------------
         }
-        localStorage.setItem("device_info", JSON.stringify(this.device_info));
+        this.toolService.setSecureStorage(
+          "deviceInfo",
+          JSON.stringify(this.device_info)
+        );
 
         // Hard Code -----
-        if (this.device_info.uuid == this.device_uuid) {
+        if (this.device_info.uuid == this.deviceUuid) {
           this.credentials.get("email")!.setValue(environment.cloud.admin);
           this.credentials.get("pwd")!.setValue(environment.cloud.padmin);
         }
@@ -198,13 +203,18 @@ export class LoginPage implements OnInit {
   async getConfigApp() {
     this.api.getData("api/config/").subscribe({
       next: async (result: any) => {
-        this.admin_device = result[0].admin_device;
-        this.admin_sim = result[0].admin_sim;
-        this.admin_email = result[0].admin_email;
-        localStorage.setItem("admin_sim", JSON.stringify(result[0].admin_sim));
-        localStorage.setItem(ADMIN_DEVICE, await result[0].admin_device);
-        localStorage.setItem(
-          "admin_email",
+        this.adminDevice = result[0].admin_device;
+        this.adminSim = result[0].admin_sim;
+        this.adminEmail = result[0].admin_email;
+
+        // secure storage ----------------
+        this.toolService.setSecureStorage(
+          "adminSim",
+          JSON.stringify(result[0].admin_sim)
+        );
+        this.toolService.setSecureStorage("adminDevice", this.adminDevice);
+        this.toolService.setSecureStorage(
+          "adminEmail",
           JSON.stringify(result[0].admin_email)
         );
       },
@@ -248,6 +258,10 @@ export class LoginPage implements OnInit {
   }
 
   async login() {
+    var lockedValue: "true";
+
+    let roles: any | null = null;
+
     try {
       const netStatus = await this.networkService.checkInternetConnection();
       if (!netStatus) {
@@ -266,25 +280,42 @@ export class LoginPage implements OnInit {
         this.authService.login(this.credentials.value).subscribe({
           next: async (res) => {
             await loading.dismiss();
-            const roles: any = localStorage.getItem(USER_ROLES); // typeof object
-            for (const val_myrole of JSON.parse(roles)) {
-              if (localStorage.getItem("locked") === "true") {
-                console.log("Usuario Locked...");
-                await this.lockedUser("Usuario bloqueado !");
-                return;
-              }
-              if (
-                val_myrole.name === "admin" ||
-                val_myrole.name === "neighbor" ||
-                val_myrole.name === "neighborAdmin"
-              ) {
-                this.router.navigateByUrl("/tabs", { replaceUrl: true });
-              } else {
-                this.router.navigateByUrl("/store", { replaceUrl: true });
-              }
-            }
-            // get config info
-            this.getConfigApp();
+
+            // Check Locked --------------------
+            this.toolService.getSecureStorage("locked").subscribe({
+              next: async (result) => {
+                lockedValue = result;
+              },
+            });
+
+            // In your component
+            this.toolService.getSecureStorage("roles").subscribe({
+              next: async (result) => {
+                roles = await result;
+                console.log("Result roles :", roles);
+
+                for (const val_myrole of JSON.parse(roles)) {
+                  console.log("lockedValue: ", lockedValue);
+                  if (lockedValue === "true") {
+                    console.log("Usuario Locked...");
+                    await this.lockedUser("Usuario bloqueado !");
+                    return;
+                  }
+                  if (
+                    val_myrole.name === "admin" ||
+                    val_myrole.name === "neighbor" ||
+                    val_myrole.name === "neighborAdmin"
+                  ) {
+                    this.router.navigateByUrl("/tabs", { replaceUrl: true });
+                  } else {
+                    this.router.navigateByUrl("/store", { replaceUrl: true });
+                  }
+                }
+                // get config info
+                this.getConfigApp();
+              },
+              error: (err) => {},
+            });
           },
           error: async (err) => {
             if (err.error.errId == 1) {

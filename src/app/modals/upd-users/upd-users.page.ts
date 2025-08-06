@@ -68,7 +68,7 @@ export class UpdUsersPage implements OnInit {
 
   coreSim: string = "";
   public gender = "";
-  localRole: any = "";
+  localRole: any = [];
   localCpu: any;
   localCore: any;
   pkgUser: any;
@@ -82,6 +82,7 @@ export class UpdUsersPage implements OnInit {
   public MyRole: any = "visitor";
   comment: string = "";
   userId: string | null = "";
+
   codeId = "";
 
   constructor(
@@ -105,8 +106,8 @@ export class UpdUsersPage implements OnInit {
       Sim: ["", [Validators.required]],
       House: ["", [Validators.required]],
       Gender: ["", [Validators.required]],
-      Roles: ["neighbor", [Validators.required]],
-      pathLocation: [""],
+      Roles: [[], [Validators.required]],
+      Location: [""],
       Uuid: ["", [Validators.required]],
     });
 
@@ -389,7 +390,20 @@ export class UpdUsersPage implements OnInit {
     let email: any;
 
     if (this.demoMode) {
-      email = this.toolService.getSecureStorage("adminEmail");
+      this.toolService.getSecureStorage("adminEmail").subscribe({
+        next: (result) => {
+          email = result;
+        },
+        error: (err) => {
+          this.toolService.toastAlert(
+            "error, obteniendo email en getSecureStorage: " + err,
+            0,
+            ["Ok"],
+            "middle"
+          );
+        },
+      });
+
       email = JSON.parse(email!)[0]["email"];
     } else {
       email = this.RegisterForm.get("Email")!.value;
@@ -405,8 +419,8 @@ export class UpdUsersPage implements OnInit {
       sim: this.RegisterForm.get("Sim")!.value,
       house: this.RegisterForm.get("House")!.value,
       gender: this.RegisterForm.get("Gender")!.value,
-      roles: this.localRole,
-      uuid: this.uuid,
+      roles: this.RegisterForm.get("Roles")?.value,
+      uuid: this.RegisterForm.get("Uuid")?.value,
       location: this.location,
       avatar: "",
     };
@@ -558,10 +572,22 @@ export class UpdUsersPage implements OnInit {
 
   async sendUserReq(pkg: any): Promise<any> {
     let adminSim: any | null = null;
-    adminSim = this.toolService.getSecureStorageP("adminSim");
+
+    adminSim = this.toolService.getSecureStorage("adminSim").subscribe({
+      next: (result) => {
+        adminSim = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo adminSim en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
     adminSim = JSON.parse(adminSim);
 
-    // const admin_sim = JSON.parse(localStorage.getItem("admin_sim")!);
     this.showLoading(2500);
     this.api
       .postData("api/backstage/", pkg)
@@ -658,6 +684,7 @@ export class UpdUsersPage implements OnInit {
 
   async newExtrange() {
     let coreSim: string | null = "";
+
     //   getting demoMode ---------------------------
     this.toolService.getSecureStorage("coreSim").subscribe({
       next: (result) => {

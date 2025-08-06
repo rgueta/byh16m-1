@@ -71,7 +71,7 @@ export class UsersPage implements OnInit {
   RoleList: any = [];
 
   editRole: boolean = false;
-  soyAdmin: boolean = false;
+  soyAdmin: any = false;
   soyNeighborAdmin: boolean = false;
   editSim: boolean = false;
   sim: string = "";
@@ -99,19 +99,36 @@ export class UsersPage implements OnInit {
   }
 
   async ionViewWillEnter() {
-    this.soyAdmin = localStorage.getItem("myRole") == "admin" ? true : false;
-    this.soyNeighborAdmin =
-      localStorage.getItem("myRole") == "neighborAdmin" ? true : false;
+    let value: any | null = null;
+    value = this.toolService.getSecureStorage("myRole");
+    this.soyAdmin = value === "admin" ? true : false;
+
+    let valueRole: any | null = null;
+    valueRole = this.toolService.getSecureStorage("myRole");
+    this.soyNeighborAdmin = valueRole == "neighborAdmin" ? true : false;
     this.getUsers();
     this.getRoles();
   }
 
   async ngOnInit() {
-    this.userId = localStorage.getItem("userId")!;
+    //   getting userId ---------------------------
+    this.toolService.getSecureStorage("userId").subscribe({
+      next: (result) => {
+        this.userId = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo userId en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
   }
 
   async getRoles() {
-    this.api.getData("api/roles/" + localStorage.getItem("userId")).subscribe({
+    this.api.getData("api/roles/" + this.userId).subscribe({
       next: async (result: any) => {
         this.RoleList = await result;
       },
@@ -135,22 +152,17 @@ export class UsersPage implements OnInit {
       url = "api/users/coreNeighbor/";
     }
 
-    console.log(
-      "url user: ",
-      url + this.coreId + "/" + localStorage.getItem("userId")
-    );
-    this.api
-      .getData(url + this.coreId + "/" + localStorage.getItem("userId"))
-      .subscribe({
-        next: async (result: any) => {
-          if (result) this.users = result;
-          this.users[0].open = true;
-          console.log("users:", result);
-        },
-        error: (error: any) => {
-          console.log("Error call api: ", error);
-        },
-      });
+    console.log("url user: ", url + this.coreId + "/" + this.userId);
+    this.api.getData(url + this.coreId + "/" + this.userId).subscribe({
+      next: async (result: any) => {
+        if (result) this.users = result;
+        this.users[0].open = true;
+        console.log("users:", result);
+      },
+      error: (error: any) => {
+        console.log("Error call api: ", error);
+      },
+    });
   }
 
   onEditSim() {
@@ -158,7 +170,22 @@ export class UsersPage implements OnInit {
   }
 
   async simChange(neighborId: string, actualSim: string) {
-    const coreSim = localStorage.getItem("coreSim")!;
+    let coreSim = "";
+    //   getting coreSim ---------------------------
+    this.toolService.getSecureStorage("coreSim").subscribe({
+      next: (result) => {
+        coreSim = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo coreSim en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
     var options: SmsOptions = {
       replaceLineBreaks: false,
       android: {
@@ -183,7 +210,7 @@ export class UsersPage implements OnInit {
             try {
               if (this.sim.length >= 10) {
                 if (actualSim != this.sim) {
-                  if (await this.toolService.verifyNetStatus()) {
+                  if (await this.toolService.getSecureBoolean("netStatus")) {
                     await this.api
                       .postData("api/users/updSim/" + this.userId, {
                         userId: neighborId,
@@ -307,8 +334,6 @@ export class UsersPage implements OnInit {
   }
 
   async changeRoles(event: any, userId: string, name: string) {
-    console.log(event.detail.value);
-    const userAdminId = localStorage.getItem("userId");
     const pkg = { userId: userId, roles: event.detail.value };
     // console.log('user event: ', event)
     // console.log('user pkg: ',pkg)
@@ -328,7 +353,7 @@ export class UsersPage implements OnInit {
           text: "Ok",
           handler: async (data) => {
             await this.api
-              .postData("api/users/updroles/" + userAdminId, pkg)
+              .postData("api/users/updroles/" + this.userId, pkg)
               .then(async (res) => {
                 await this.getUsers();
               })
@@ -357,7 +382,7 @@ export class UsersPage implements OnInit {
     house: string,
     coreSim: string
   ) {
-    const adminId = localStorage.getItem("userId");
+    const adminId = this.userId;
     const titleMsg = userStatus ? "Desbloqueo" : "Bloqueo";
     const status = userStatus ? "unlock" : "lock";
 
@@ -445,8 +470,6 @@ export class UsersPage implements OnInit {
   }
 
   async delUser(userId: string, name: string, coreSim: string) {
-    const adminId = localStorage.getItem("userId");
-
     let alert = await this.alertCtrl.create({
       subHeader: "Continuar con borrar",
       message: "al usuario: " + name + "  ?",
@@ -474,7 +497,7 @@ export class UsersPage implements OnInit {
                 res.present();
 
                 await this.api
-                  .deleteData("api/users" + "/" + adminId + "/" + userId)
+                  .deleteData("api/users" + "/" + this.userId + "/" + userId)
                   .then(
                     async (onResolve) => {
                       // set lock status on device

@@ -73,7 +73,6 @@
           label="Tu privada: "
           placeholder="Privadas"
           cancel-text="Cancelar"
-          formControlName="localCore"
           ok-text="Seleccionar"
           (ionChange)="onChangeCore()"
           formControlName="Core"
@@ -109,7 +108,6 @@
           placeholder="Usuario"
           formControlName="UserName"
           value="{{username}}"
-          formControlName="username"
         ></ion-input>
       </ion-item>
 
@@ -123,7 +121,6 @@
           placeholder="Correo"
           formControlName="Email"
           value="{{email}}"
-          formControlName="email"
         ></ion-input>
       </ion-item>
 
@@ -150,43 +147,41 @@
           placeholder="# de casa"
           formControlName="House"
           value="{{house}}"
-          formControlName="house"
         ></ion-input>
       </ion-item>
 
-      <ion-item *ngIf="sourcePage == 'admin'" class="wrap-input">
+      <ion-item *ngIf="sourcePage == 'adminNewUser'" class="wrap-input">
         <ion-input
-          *ngIf="sourcePage == 'admin' "
+          *ngIf="sourcePage == 'adminNewUser' "
           class="input"
           type="text"
           name="location"
+          label="Location: "
           placeholder="Location"
           [readonly]="locationReadonly"
           formControlName="Location"
           value="{{location}}"
-          formControlName="location"
         >
         </ion-input>
       </ion-item>
 
-      <ion-item *ngIf="sourcePage == 'adminNew'" class="wrap-input">
+      <ion-item *ngIf="sourcePage == 'adminNewUser'" class="wrap-input">
         <ion-input
-          *ngIf="sourcePage == 'adminNew'"
+          *ngIf="sourcePage == 'adminNewUser'"
           class="input"
           type="text"
           name="uuid"
+          label="Dev. uuid: "
           placeholder="uuid"
           [readonly]="uuidReadonly"
           formControlName="Uuid"
           value="{{uuid}}"
-          formControlName="uuid"
         ></ion-input>
       </ion-item>
 
       <ion-item class="wrap-input" *ngIf="sourcePage != 'adminNewExtrange'">
         <ion-select
           value="gender"
-          formControlName="gender"
           label="Genero:"
           formControlName="Gender"
           okText="Aceptar"
@@ -203,7 +198,6 @@
       >
         <ion-select
           *ngIf="sourcePage != 'login' "
-          [ngModel]="localRole"
           ok-text="Seleccionar"
           label="Roles:"
           cancel-text="Cancelar"
@@ -247,14 +241,14 @@
     </ion-item>
 
     <ion-item
-      *ngIf="sourcePage == 'login' || sourcePage == 'adminNewExtrange'"
+      *ngIf="sourcePage == 'login' || sourcePage == 'adminNewUser'"
       class="wrap-input"
-      [disabled]="RegisterForm.invalid"
     >
       <div class="item-wripper">
         <input
+          type="submit"
           class="button-17 submit"
-          type="button"
+          [disabled]="RegisterForm.invalid"
           (click)="onSubmit()"
           value="Grabar"
         />

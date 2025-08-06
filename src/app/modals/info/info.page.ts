@@ -136,7 +136,22 @@ export class InfoPage implements OnInit {
 
   async ngOnInit() {
     this.localTitle = "Aqui va el titulo..";
-    this.userId = localStorage.getItem("userId")!;
+    this.toolService.getSecureStorage("userId").subscribe({
+      next: (result) => {
+        this.userId = result;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo userId en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+  }
+
+  async ionViewWillEnter() {
     this.collectCountries();
     this.collectInfo();
   }
@@ -389,7 +404,7 @@ export class InfoPage implements OnInit {
       params: params,
     };
 
-    if (await this.toolService.verifyNetStatus()) {
+    if (await this.toolService.getSecureBoolean("netStatus")) {
       const data$ = this.http.post<any>(
         this.REST_API_SERVER + "api/info/" + this.userId,
         formData,
@@ -398,7 +413,7 @@ export class InfoPage implements OnInit {
       const res = await lastValueFrom(data$);
     } else {
       this.toolService.toastAlert(
-        "No hay Acceso a internet",
+        "No hay Acceso a internet, uploadFile",
         0,
         ["Ok"],
         "middle"
@@ -420,13 +435,13 @@ export class InfoPage implements OnInit {
     };
 
     // use your own API
-    if (await this.toolService.verifyNetStatus()) {
+    if (await this.toolService.getSecureBoolean("netStatus")) {
       this.api
         .postDataInfo("api/info", formData, params)
         .then(async (resp) => {});
     } else {
       this.toolService.toastAlert(
-        "No hay Acceso a internet",
+        "No hay Acceso a internet, uploadData",
         0,
         ["Ok"],
         "middle"
@@ -449,7 +464,7 @@ export class InfoPage implements OnInit {
   //#endregion Image section ------------------------------------------------
 
   async collectInfo() {
-    if (await this.toolService.verifyNetStatus()) {
+    if (await this.toolService.getSecureBoolean("netStatus")) {
       this.api.getData("api/info/all/" + this.userId).subscribe({
         next: async (result) => {
           console.log("info --> ", result);
@@ -462,7 +477,7 @@ export class InfoPage implements OnInit {
       });
     } else {
       this.toolService.toastAlert(
-        "No hay Acceso a internet",
+        "No hay Acceso a internet, collectInfo",
         0,
         ["Ok"],
         "middle"
@@ -482,7 +497,7 @@ export class InfoPage implements OnInit {
     try {
       if (event.detail.checked && status) {
         //Show
-        if (await this.toolService.verifyNetStatus()) {
+        if (await this.toolService.getSecureBoolean("netStatus")) {
           await this.api
             .postData("api/info/updStatus/" + this.userId + "/" + infoId, {
               disable: false,
@@ -494,7 +509,7 @@ export class InfoPage implements OnInit {
             });
         } else {
           this.toolService.toastAlert(
-            "No hay Acceso a internet",
+            "No hay Acceso a internet, StatusInfo",
             0,
             ["Ok"],
             "middle"
@@ -502,7 +517,7 @@ export class InfoPage implements OnInit {
         }
       } else if (event.detail.checked && !status) {
         // Hide
-        if (await this.toolService.verifyNetStatus()) {
+        if (await this.toolService.getSecureBoolean("netStatus")) {
           await this.api
             .postData("api/info/updStatus/" + this.userId + "/" + infoId, {
               disable: true,
@@ -514,7 +529,7 @@ export class InfoPage implements OnInit {
             });
         } else {
           this.toolService.toastAlert(
-            "No hay Acceso a internet",
+            "No hay Acceso a internet, api/info/updStatus/",
             0,
             ["Ok"],
             "middle"
