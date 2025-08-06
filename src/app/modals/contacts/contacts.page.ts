@@ -117,7 +117,6 @@ export class ContactsPage implements OnInit {
           "display",
           true
         );
-        // await localStorage.setItem('lista',await JSON.stringify(this.contacts));
       });
     } catch (e) {
       this.toolService.toastAlert(

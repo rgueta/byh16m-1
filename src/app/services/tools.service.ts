@@ -130,7 +130,7 @@ export class ToolsService {
     });
   }
 
-  cleanLocalStorage() {
+  cleanSecureStorage() {
     let myVisitors: string = "";
     let coreId: string = "";
     let refreshToken: string = "";

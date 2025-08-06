@@ -119,9 +119,6 @@ export class VisitorListPage implements OnInit {
 
     modal.onDidDismiss().then(async (item) => {
       if (item.data) {
-        // Put local visitors to local variables
-        // this.myVisitors = await JSON.parse(localStorage.getItem('visitors')!)
-
         //Sort Visitors by name
         this.myVisitors = await this.toolService.sortJsonVisitors(
           this.myVisitors,

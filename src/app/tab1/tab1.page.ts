@@ -847,7 +847,7 @@ export class Tab1Page implements OnInit {
           handler: async () => {
             this.api.logout();
             this.router.navigateByUrl("/", { replaceUrl: true });
-            this.toolService.cleanLocalStorage();
+            this.toolService.cleanSecureStorage();
           },
         },
       ],

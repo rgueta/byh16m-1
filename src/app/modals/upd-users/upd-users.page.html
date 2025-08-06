@@ -159,7 +159,7 @@
           label="Location: "
           placeholder="Location"
           [readonly]="locationReadonly"
-          formControlName="pathLocation"
+          formControlName="Location"
           value="{{location}}"
         >
         </ion-input>
@@ -182,7 +182,6 @@
       <ion-item class="wrap-input" *ngIf="sourcePage != 'adminNewExtrange'">
         <ion-select
           value="gender"
-          formControlName="gender"
           label="Genero:"
           formControlName="Gender"
           okText="Aceptar"
@@ -199,7 +198,6 @@
       >
         <ion-select
           *ngIf="sourcePage != 'login' "
-          [ngModel]="localRole"
           ok-text="Seleccionar"
           label="Roles:"
           cancel-text="Cancelar"

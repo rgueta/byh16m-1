@@ -128,7 +128,7 @@ export class LoginPage implements OnInit {
     }
 
     this.getConfigApp();
-    this.toolService.cleanLocalStorage();
+    this.toolService.cleanSecureStorage();
     this.init();
     this.version = environment.app.version;
 

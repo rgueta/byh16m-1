@@ -79,8 +79,10 @@ export class DatabaseService {
         switchMap((_) => {
           this.currentAuthToken = null;
           // Remove all stored tokens
-          const deleteAccess = localStorage.removeItem(TOKEN);
-          const deleteRefresh = localStorage.removeItem(REFRESH_TOKEN);
+          const deleteAccess =
+            this.toolService.removeSecureStorage("authToken");
+          const deleteRefresh =
+            this.toolService.removeSecureStorage("refreshToken");
           return from(Promise.all([deleteAccess, deleteRefresh]));
         }),
         tap((_) => {
