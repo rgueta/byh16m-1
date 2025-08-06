@@ -425,10 +425,7 @@ export class UpdUsersPage implements OnInit {
       avatar: "",
     };
 
-    pkg.roles = pkg.roles.map((id: any) => {
-      pkg.roles("id");
-    });
-    console.log("newUser pkg: ", pkg);
+    pkg.roles = pkg.roles.map((role: any) => role.id);
 
     try {
       this.showLoading(2500);
