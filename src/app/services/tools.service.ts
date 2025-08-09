@@ -135,6 +135,7 @@ export class ToolsService {
     let coreId: string = "";
     let refreshToken: string = "";
     let netStatus: string = "";
+    let demoMode: boolean = false;
 
     this.getSecureStorage("netStatus").subscribe({
       next: (result) => {
@@ -196,11 +197,29 @@ export class ToolsService {
       },
     });
 
+    this.getSecureStorage("demoMode").subscribe({
+      next: (result) => {
+        demoMode = result == "true" ? true : false;
+        console.log("Valor demoMode antes del clear --> ", result);
+      },
+      error: (err) => {
+        this.toastAlert(
+          "error, obteniendo demoMode en tool.service.ts getSecureStorage: " +
+            err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
     this.clearAllPreferences();
     this.setSecureStorage("netStatus", netStatus);
     this.setSecureStorage("visitors", myVisitors);
     this.setSecureStorage("refreshToken", refreshToken);
     this.setSecureStorage("coreId", coreId);
+    this.setSecureStorage("demoMode", demoMode.toString());
+    console.log("cleanSecureStorage at tools.service.ts");
   }
 
   getTimestamp() {

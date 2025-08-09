@@ -269,6 +269,8 @@ export class UpdUsersPage implements OnInit {
       this.RegisterForm.controls["Gender"].clearValidators();
       this.RegisterForm.controls["Location"].clearValidators();
     }
+
+    console.log("devicePkg--> ", this.devicePkg);
   }
 
   async fillData() {
@@ -503,13 +505,6 @@ export class UpdUsersPage implements OnInit {
           );
         });
 
-      this.toolService.showAlertBasic(
-        "",
-        "Se agrego el usuario:",
-        this.RegisterForm.get("Name")!.value,
-        ["Ok"]
-      );
-
       // exit model
       this.modalController.dismiss("refresh");
     } catch (err) {
@@ -685,7 +680,7 @@ export class UpdUsersPage implements OnInit {
   async newExtrange() {
     let coreSim: string | null = "";
 
-    //   getting demoMode ---------------------------
+    //   getting coreSim ---------------------------
     this.toolService.getSecureStorage("coreSim").subscribe({
       next: (result) => {
         coreSim = result;
