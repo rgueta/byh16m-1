@@ -128,7 +128,7 @@ export class LoginPage implements OnInit {
     }
 
     this.getConfigApp();
-    this.toolService.cleanSecureStorage();
+    // this.toolService.cleanSecureStorage();
     this.init();
     this.version = environment.app.version;
 
@@ -362,9 +362,9 @@ export class LoginPage implements OnInit {
     const modal = await this.modalController.create({
       component: UpdUsersPage,
       componentProps: {
-        SourcePage: "login",
-        CoreName: "",
-        CoreId: "",
+        sourcePage: "login",
+        coreName: "",
+        coreId: "",
         pathLocation: "",
       },
     });

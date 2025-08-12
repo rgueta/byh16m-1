@@ -130,7 +130,7 @@ export class ToolsService {
     });
   }
 
-  cleanSecureStorage() {
+  async cleanSecureStorage() {
     let myVisitors: string = "";
     let coreId: string = "";
     let refreshToken: string = "";
@@ -200,7 +200,7 @@ export class ToolsService {
     this.getSecureStorage("demoMode").subscribe({
       next: (result) => {
         demoMode = result == "true" ? true : false;
-        console.log("Valor demoMode antes del clear --> ", result);
+        console.log("Valor demoMode antes del clear --> ", demoMode);
       },
       error: (err) => {
         this.toastAlert(
@@ -213,13 +213,16 @@ export class ToolsService {
       },
     });
 
-    this.clearAllPreferences();
-    this.setSecureStorage("netStatus", netStatus);
-    this.setSecureStorage("visitors", myVisitors);
-    this.setSecureStorage("refreshToken", refreshToken);
-    this.setSecureStorage("coreId", coreId);
-    this.setSecureStorage("demoMode", demoMode.toString());
-    console.log("cleanSecureStorage at tools.service.ts");
+    await this.clearAllPreferences();
+    await this.setSecureStorage("netStatus", netStatus);
+    await this.setSecureStorage("visitors", myVisitors);
+    await this.setSecureStorage("refreshToken", refreshToken);
+    await this.setSecureStorage("coreId", coreId);
+    await this.setSecureStorage("demoMode", demoMode.toString());
+    console.log(
+      "cleanSecureStorage at tools.service.ts, demoMode: ",
+      demoMode.toString()
+    );
   }
 
   getTimestamp() {

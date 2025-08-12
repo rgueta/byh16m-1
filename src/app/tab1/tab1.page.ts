@@ -44,7 +44,7 @@ import { DatabaseService } from "../services/database.service";
 import { Router } from "@angular/router";
 import { UpdUsersPage } from "../modals/upd-users/upd-users.page";
 import { BackstagePage } from "../modals/backstage/backstage.page";
-import { FormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { ToolsService } from "../services/tools.service";
 import { SMS, SmsOptions } from "@ionic-native/sms/ngx";
 import {
@@ -240,8 +240,6 @@ export class Tab1Page implements OnInit {
       },
     });
 
-    console.log("MyRole at ngOnInit: ", this.MyRole);
-
     var sim = "";
     // getting coreSim ---------------------------
     this.toolService.getSecureStorage("coreSim").subscribe({
@@ -304,21 +302,7 @@ export class Tab1Page implements OnInit {
     });
 
     //   getting demoMode ---------------------------
-    this.toolService.getSecureStorage("demoMode").subscribe({
-      next: (result) => {
-        this.demoMode = result == "true" ? true : false;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo demoMode en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
-
-    console.log("demoMode at ngOnInit: ", this.demoMode);
+    await this.getDemoMode();
 
     // -----------------firebase Push notification
     //
@@ -666,9 +650,26 @@ export class Tab1Page implements OnInit {
     }, 2000);
   }
 
-  DemoMode() {
-    this.demoMode = !this.demoMode;
+  async DemoMode() {
     this.toolService.setSecureStorage("demoMode", this.demoMode.toString());
+    console.log("Set DemoMode tab1: ", this.demoMode);
+  }
+
+  async getDemoMode() {
+    this.toolService.getSecureStorage("demoMode").subscribe({
+      next: (result) => {
+        this.demoMode = result == "true" ? true : false;
+        console.log("getDemoMode tab1: ", this.demoMode);
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo demoMode en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
   }
 
   async openUrl(url: string) {

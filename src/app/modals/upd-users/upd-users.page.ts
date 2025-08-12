@@ -119,7 +119,7 @@ export class UpdUsersPage implements OnInit {
     }
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     console.log(`Entre upd-users, sourcePage: ${this.sourcePage},
       CoreName: ${this.coreName}, CoreId: ${this.coreId},
       pathLocation: ${this.pathLocation}`);
@@ -197,11 +197,11 @@ export class UpdUsersPage implements OnInit {
     });
 
     if (this.MyRole == "admin") {
-      let valueRoles: any | null = null;
+      // let valueRoles: any | null = null;
 
       this.toolService.getSecureStorage("roles").subscribe({
         next: async (result) => {
-          this.RoleList = await JSON.parse(result!);
+          this.RoleList = await JSON.parse(result);
         },
         error: (err) => {
           this.toolService.toastAlert(
@@ -245,7 +245,6 @@ export class UpdUsersPage implements OnInit {
 
   async ionViewWillEnter() {
     if (this.MyRole == "admin" || this.MyRole == "neighborAdmin") {
-      console.log("Entre en ---- > ionViewWillEnter: ");
       this.RegisterForm.get("Cpu")!.setValue("byh16");
       this.RegisterForm.get("Core")!.setValue(this.coreId);
       this.getRoles();
@@ -269,8 +268,6 @@ export class UpdUsersPage implements OnInit {
       this.RegisterForm.controls["Gender"].clearValidators();
       this.RegisterForm.controls["Location"].clearValidators();
     }
-
-    console.log("devicePkg--> ", this.devicePkg);
   }
 
   async fillData() {
@@ -316,6 +313,7 @@ export class UpdUsersPage implements OnInit {
   async getCores(cpu: string) {
     this.api.getData("api/cores/" + cpu).subscribe({
       next: async (result: any) => {
+        console.log("coreList: ", result);
         this.CoreList = await result;
       },
       error: (error: any) => {
@@ -368,11 +366,13 @@ export class UpdUsersPage implements OnInit {
   }
 
   async onChangeCpu() {
+    console.log("localCpu id: ", this.localCpu["id"]);
     this.getCores(this.localCpu["id"]);
     this.location = this.localCpu["location"];
   }
 
   async onChangeCore() {
+    console.log("Si estoy aqui...");
     this.location =
       this.localCpu["location"] + "." + this.localCore["shortName"];
     this.RegisterForm.get("Location")!.setValue(this.location);
@@ -561,8 +561,6 @@ export class UpdUsersPage implements OnInit {
     });
 
     return await alert.present();
-
-    // << Confirmation  -----------------------------------
   }
 
   async sendUserReq(pkg: any): Promise<any> {

@@ -66,9 +66,7 @@
                 id="twilioToggle"
                 class="ion-toggle-red"
                 labelPlacement="start"
-                [ngModel]="demoMode"
-                [checked]="false"
-                [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="demoMode"
                 (ionChange)="DemoMode()"
                 >Demo mode
               </ion-toggle>
