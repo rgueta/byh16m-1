@@ -84,6 +84,7 @@ export class UpdUsersPage implements OnInit {
 
   codeId = "";
   adminEmail = "";
+  adminSim = "";
   selectedCpu: any = {};
   selectedCore: any = {};
 
@@ -276,10 +277,28 @@ export class UpdUsersPage implements OnInit {
         );
       },
     });
+
+    this.toolService.getSecureStorage("adminSim").subscribe({
+      next: (result) => {
+        this.adminSim = result;
+        console.log("adminSim: ", this.adminSim);
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo adminSim en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
   }
 
   async ionViewWillEnter() {
-    if (this.MyRole == "admin" || this.MyRole == "neighborAdmin") {
+    if (
+      this.sourcePage == "adminNewUser" ||
+      this.sourcePage == "adminNewExtrange"
+    ) {
       this.RegisterForm.get("Cpu")!.setValue("byh16");
       this.RegisterForm.get("Core")!.setValue(this.coreId!);
       this.getRoles();
@@ -551,9 +570,10 @@ export class UpdUsersPage implements OnInit {
       email: this.RegisterForm.get("Email")!.value,
       sim: this.RegisterForm.get("Sim")!.value,
       house: this.RegisterForm.get("House")!.value,
+      device: JSON.parse(this.devicePkg),
       gender: this.RegisterForm.get("Gender")!.value,
       note: this.RegisterForm.get("Comment")!.value,
-      uuid: this.toolService.getSecureStorage("deviceUuid"),
+      demoMode: this.demoMode,
     };
 
     let alert = await this.alertCtrl.create({
@@ -579,26 +599,6 @@ export class UpdUsersPage implements OnInit {
   }
 
   async sendUserReq(pkg: any): Promise<any> {
-    let adminSim = "";
-
-    this.toolService.getSecureStorage("adminSim").subscribe({
-      next: (result) => {
-        adminSim = result;
-        console.log("adminSim: ", adminSim);
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo adminSim en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
-    // adminSim = JSON.parse(adminSim);
-
-    return;
-
     this.showLoading(2500);
     this.api
       .postData("api/backstage/", pkg)
@@ -609,7 +609,7 @@ export class UpdUsersPage implements OnInit {
           "Pronto recibiras un correo",
           ["Ok"]
         );
-
+        this.modalController.dismiss();
         return true;
       })
       .catch((err) => {

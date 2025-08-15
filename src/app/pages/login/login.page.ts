@@ -157,10 +157,9 @@ export class LoginPage implements OnInit {
           });
 
         //#endregion  -------------
-
         this.device_info.uuid = this.deviceUuid;
         this.toolService.setSecureStorage(
-          "devicePkg",
+          "deviceInfo",
           JSON.stringify(this.device_info)
         );
         this.toolService.setSecureStorage(
