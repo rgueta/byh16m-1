@@ -36,7 +36,6 @@ import { arrowBackCircleOutline } from "ionicons/icons";
   imports: [
     CommonModule,
     FormsModule,
-    IonTextarea,
     ReactiveFormsModule,
     IonicModule,
     NgFor,
@@ -73,7 +72,7 @@ export class UpdUsersPage implements OnInit {
   localCore: any;
   pkgUser: any;
   devicePkg: any;
-  location: string | null = "";
+  location = "";
   locationReadonly: boolean = true;
   id: string = "";
   uuid: string = "";
@@ -84,6 +83,9 @@ export class UpdUsersPage implements OnInit {
   userId: string | null = "";
 
   codeId = "";
+  adminEmail = "";
+  selectedCpu: any = {};
+  selectedCore: any = {};
 
   constructor(
     private modalController: ModalController,
@@ -97,20 +99,6 @@ export class UpdUsersPage implements OnInit {
   ) {
     addIcons({ arrowBackCircleOutline });
 
-    this.RegisterForm = this.fb.group({
-      Cpu: [""],
-      Core: ["", [Validators.required]],
-      Name: ["", [Validators.required]],
-      UserName: ["", [Validators.required]],
-      Email: ["", [Validators.required]],
-      Sim: ["", [Validators.required]],
-      House: ["", [Validators.required]],
-      Gender: ["", [Validators.required]],
-      Roles: [[], [Validators.required]],
-      Location: [""],
-      Uuid: ["", [Validators.required]],
-    });
-
     if (this.MyRole == "admin") {
       this.RegisterForm.addControl(
         "Roles",
@@ -123,6 +111,35 @@ export class UpdUsersPage implements OnInit {
     console.log(`Entre upd-users, sourcePage: ${this.sourcePage},
       CoreName: ${this.coreName}, CoreId: ${this.coreId},
       pathLocation: ${this.pathLocation}`);
+
+    if (this.sourcePage == "login") {
+      this.RegisterForm = this.fb.group({
+        Cpu: [""],
+        Core: ["", [Validators.required]],
+        Name: ["", [Validators.required]],
+        UserName: ["", [Validators.required]],
+        Email: ["", [Validators.required]],
+        Sim: ["", [Validators.required]],
+        House: ["", [Validators.required]],
+        Gender: ["", [Validators.required]],
+        Location: [""],
+        Comment: [""],
+      });
+    } else {
+      this.RegisterForm = this.fb.group({
+        Cpu: [""],
+        Core: ["", [Validators.required]],
+        Name: ["", [Validators.required]],
+        UserName: ["", [Validators.required]],
+        Email: ["", [Validators.required]],
+        Sim: ["", [Validators.required]],
+        House: ["", [Validators.required]],
+        Gender: ["", [Validators.required]],
+        Roles: [[], [Validators.required]],
+        Location: [""],
+        Uuid: ["", [Validators.required]],
+      });
+    }
 
     //   getting userId ---------------------------
     this.toolService.getSecureStorage("userId").subscribe({
@@ -216,7 +233,9 @@ export class UpdUsersPage implements OnInit {
 
     this.toolService.getSecureStorage("location").subscribe({
       next: async (result) => {
-        this.location = result;
+        if (result) {
+          this.location = result!;
+        }
       },
       error: (err) => {
         this.toolService.toastAlert(
@@ -228,13 +247,29 @@ export class UpdUsersPage implements OnInit {
       },
     });
 
-    this.toolService.getSecureStorage("deviceUuid").subscribe({
-      next: async (result) => {
-        this.RegisterForm.get("Uuid")!.setValue(result);
+    if (this.sourcePage != "login") {
+      this.toolService.getSecureStorage("deviceUuid").subscribe({
+        next: async (result) => {
+          this.RegisterForm.get("Uuid")!.setValue(result);
+        },
+        error: (err) => {
+          this.toolService.toastAlert(
+            "error, obteniendo deviceUuid en getSecureStorage: " + err,
+            0,
+            ["Ok"],
+            "middle"
+          );
+        },
+      });
+    }
+
+    this.toolService.getSecureStorage("adminEmail").subscribe({
+      next: (result) => {
+        this.adminEmail = JSON.parse(result!)[0]["email"];
       },
       error: (err) => {
         this.toolService.toastAlert(
-          "error, obteniendo deviceUuid en getSecureStorage: " + err,
+          "error, obteniendo adminEmail en getSecureStorage: " + err,
           0,
           ["Ok"],
           "middle"
@@ -246,7 +281,7 @@ export class UpdUsersPage implements OnInit {
   async ionViewWillEnter() {
     if (this.MyRole == "admin" || this.MyRole == "neighborAdmin") {
       this.RegisterForm.get("Cpu")!.setValue("byh16");
-      this.RegisterForm.get("Core")!.setValue(this.coreId);
+      this.RegisterForm.get("Core")!.setValue(this.coreId!);
       this.getRoles();
     }
 
@@ -267,6 +302,13 @@ export class UpdUsersPage implements OnInit {
       this.RegisterForm.controls["House"].clearValidators();
       this.RegisterForm.controls["Gender"].clearValidators();
       this.RegisterForm.controls["Location"].clearValidators();
+    }
+
+    if (this.demoMode) {
+      this.RegisterForm.get("Name").setValue("Vecino");
+      this.RegisterForm.get("UserName").setValue("Vecino");
+      this.RegisterForm.get("Email").setValue(this.adminEmail);
+      this.RegisterForm.get("Sim").setValue("+52664");
     }
   }
 
@@ -320,7 +362,7 @@ export class UpdUsersPage implements OnInit {
         this.toolService.showAlertBasic(
           "Alerta",
           "Error, getCores: ",
-          JSON.stringify(error),
+          error.message,
           ["Ok"]
         );
       },
@@ -365,16 +407,16 @@ export class UpdUsersPage implements OnInit {
       });
   }
 
-  async onChangeCpu() {
-    console.log("localCpu id: ", this.localCpu["id"]);
-    this.getCores(this.localCpu["id"]);
-    this.location = this.localCpu["location"];
+  async onChangeCpu(event: any) {
+    this.selectedCpu = event.detail.value;
+    this.getCores(event.detail.value._id);
   }
 
-  async onChangeCore() {
-    console.log("Si estoy aqui...");
+  async onChangeCore(event: any) {
+    this.selectedCore = event.detail.value;
     this.location =
-      this.localCpu["location"] + "." + this.localCore["shortName"];
+      (await this.selectedCpu.location) + "." + this.selectedCore.shortName;
+
     this.RegisterForm.get("Location")!.setValue(this.location);
   }
 
@@ -392,21 +434,7 @@ export class UpdUsersPage implements OnInit {
     let email: any;
 
     if (this.demoMode) {
-      this.toolService.getSecureStorage("adminEmail").subscribe({
-        next: (result) => {
-          email = result;
-        },
-        error: (err) => {
-          this.toolService.toastAlert(
-            "error, obteniendo email en getSecureStorage: " + err,
-            0,
-            ["Ok"],
-            "middle"
-          );
-        },
-      });
-
-      email = JSON.parse(email!)[0]["email"];
+      email = this.adminEmail;
     } else {
       email = this.RegisterForm.get("Email")!.value;
     }
@@ -514,32 +542,19 @@ export class UpdUsersPage implements OnInit {
 
   async sendToDevice(sim: string) {}
 
-  async onSubmitItSelf(
-    cpu: string,
-    core: string,
-    name: string,
-    username: string,
-    email: string,
-    sim: string,
-    house: string,
-    gender: any
-  ) {
-    const comment = document.getElementById("comment")!;
-
+  async onSubmitItSelf() {
     const pkg: {} = {
-      cpu: this.localCpu["id"],
-      core: this.localCore["id"],
-      name: name,
-      username: username,
-      email: email,
-      sim: sim,
-      house: house,
-      gender: gender,
-      note: comment.textContent,
+      cpu: this.selectedCpu._id,
+      core: this.selectedCore.id,
+      name: this.RegisterForm.get("Name")!.value,
+      username: this.RegisterForm.get("UserName")!.value,
+      email: this.RegisterForm.get("Email")!.value,
+      sim: this.RegisterForm.get("Sim")!.value,
+      house: this.RegisterForm.get("House")!.value,
+      gender: this.RegisterForm.get("Gender")!.value,
+      note: this.RegisterForm.get("Comment")!.value,
       uuid: this.toolService.getSecureStorage("deviceUuid"),
     };
-
-    // >> Confirmation ------------------------------------
 
     let alert = await this.alertCtrl.create({
       message: "Mandar solicitud ?",
@@ -564,11 +579,12 @@ export class UpdUsersPage implements OnInit {
   }
 
   async sendUserReq(pkg: any): Promise<any> {
-    let adminSim: any | null = null;
+    let adminSim = "";
 
-    adminSim = this.toolService.getSecureStorage("adminSim").subscribe({
+    this.toolService.getSecureStorage("adminSim").subscribe({
       next: (result) => {
         adminSim = result;
+        console.log("adminSim: ", adminSim);
       },
       error: (err) => {
         this.toolService.toastAlert(
@@ -579,7 +595,9 @@ export class UpdUsersPage implements OnInit {
         );
       },
     });
-    adminSim = JSON.parse(adminSim);
+    // adminSim = JSON.parse(adminSim);
+
+    return;
 
     this.showLoading(2500);
     this.api
@@ -607,38 +625,22 @@ export class UpdUsersPage implements OnInit {
 
   async closeModal() {
     var empty: Boolean = true;
-
-    if (this.sourcePage == "login") {
-      const comment = document.getElementById("comment");
-      if (
-        this.cpu != "" ||
-        this.core ||
-        this.name ||
-        this.username != "" ||
-        this.email != "" ||
-        this.sim != "" ||
-        this.house != "" ||
-        this.gender != "" ||
-        comment!.textContent != ""
-      ) {
-        empty = false;
-      }
-    } else {
-      if (
-        this.name ||
-        this.username != "" ||
-        this.email != "" ||
-        this.sim != "" ||
-        this.house != "" ||
-        this.gender != ""
-      ) {
-        empty = false;
-      }
+    const comment = document.getElementById("comment");
+    if (
+      this.RegisterForm.get("Cpu").value != "" ||
+      this.RegisterForm.get("Core").value != "" ||
+      this.RegisterForm.get("Name").value != "" ||
+      this.RegisterForm.get("UserName").value != "" ||
+      this.RegisterForm.get("Email").value != "" ||
+      this.RegisterForm.get("Sim").value != "" ||
+      this.RegisterForm.get("House").value != "" ||
+      this.RegisterForm.get("Gender").value != "" ||
+      this.RegisterForm.get("Comment").value != ""
+    ) {
+      empty = false;
     }
 
     if (!empty) {
-      // >> Confirmation ------------------------------------
-
       let alert = await this.alertCtrl.create({
         subHeader: "Se perdera la informacion",
         message: "Deseas salir ?",
@@ -658,8 +660,6 @@ export class UpdUsersPage implements OnInit {
       });
 
       return await alert.present();
-
-      // << Confirmation  -----------------------------------
     } else {
       this.modalController.dismiss();
     }
@@ -743,8 +743,8 @@ export class UpdUsersPage implements OnInit {
     return await alert.present();
   }
 
-  async onChangeComment($event: any) {
-    this.localComment = $event;
+  async onChangeComment(event: any) {
+    this.localComment = event;
   }
 
   async newComment() {

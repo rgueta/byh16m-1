@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package com.bytheg.byh16m;
 
 import com.getcapacitor.BridgeActivity;
 

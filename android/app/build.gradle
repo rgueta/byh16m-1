@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "io.ionic.starter"
+    namespace "com.bytheg.byh16m"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "com.bytheg.byh16m"

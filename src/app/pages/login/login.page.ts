@@ -142,6 +142,7 @@ export class LoginPage implements OnInit {
     await Device.getInfo()
       .then(async (DeviceInfo: any) => {
         this.device_info = await JSON.parse(JSON.stringify(DeviceInfo));
+        console.log("device_info: ", this.device_info);
         //#region get device uuid  --------------------------------
         await Device.getId()
           .then(async (deviceId: any) => {

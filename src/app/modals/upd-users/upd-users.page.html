@@ -8,7 +8,9 @@
     </ion-buttons>
 
     <div class="centered-content-wrapper">
-      <ion-title *ngIf="sourcePage == 'adminNew'">Usuario Nuevo</ion-title>
+      <ion-title *ngIf="sourcePage == 'login' ||sourcePage == 'adminNew'"
+        >Usuario Nuevo</ion-title
+      >
       <ion-title *ngIf="sourcePage == 'adminNewExtrange'"
         >New extrange</ion-title
       >
@@ -55,12 +57,10 @@
           cancel-text="Cancelar"
           formControlName="localCpu"
           ok-text="Seleccionar"
-          (ionChange)="onChangeCpu()"
+          (ionChange)="onChangeCpu($event)"
           formControlName="Cpu"
         >
-          <ion-select-option
-            *ngFor="let item of CpuList"
-            [value]="{id:item._id,name:item.name,location:item.location}"
+          <ion-select-option *ngFor="let item of CpuList" [value]="item"
             >{{item.name}}
           </ion-select-option>
         </ion-select>
@@ -74,7 +74,7 @@
           placeholder="Privadas"
           cancel-text="Cancelar"
           ok-text="Seleccionar"
-          (ionChange)="onChangeCore()"
+          (ionChange)="onChangeCore($event)"
           formControlName="Core"
         >
           <ion-select-option
@@ -150,9 +150,12 @@
         ></ion-input>
       </ion-item>
 
-      <ion-item *ngIf="sourcePage == 'adminNewUser'" class="wrap-input">
+      <ion-item
+        *ngIf="sourcePage == 'login' || sourcePage == 'adminNewUser'"
+        class="wrap-input"
+      >
         <ion-input
-          *ngIf="sourcePage == 'adminNewUser' "
+          *ngIf="sourcePage == 'login' || sourcePage == 'adminNewUser' "
           class="input"
           type="text"
           name="location"
@@ -217,15 +220,7 @@
       *ngIf="sourcePage == 'login' || sourcePage == 'commentApp' "
       class="wrap-input"
     >
-      <ion-textarea
-        #mycomment
-        class="input"
-        placeholder="Comentario"
-        (ionChange)="onChangeComment(mycomment.value)"
-        value="{{comment}}"
-        aria-multiline="true"
-      >
-      </ion-textarea>
+      <ion-textarea placeholder="Comentario" autoGrow="true"></ion-textarea>
     </ion-item>
 
     <ion-item *ngIf="sourcePage == 'login'" [disabled]="RegisterForm.invalid">
@@ -233,17 +228,13 @@
         <input
           class="button-17 submit"
           type="button"
-          (click)="onSubmitItSelf(localCpu,localCore,name,
-            username,email,sim,house,gender)"
-          value="Grabar"
+          (click)="onSubmitItSelf()"
+          value="Mandar datos"
         />
       </div>
     </ion-item>
 
-    <ion-item
-      *ngIf="sourcePage == 'login' || sourcePage == 'adminNewUser'"
-      class="wrap-input"
-    >
+    <ion-item *ngIf="sourcePage == 'adminNewUser'" class="wrap-input">
       <div class="item-wripper">
         <input
           type="submit"
