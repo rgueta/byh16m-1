@@ -93,8 +93,6 @@ export class AuthenticationService {
               console.log("Error in authentication.service.ts --> ", err);
             });
 
-          console.log("roles at auth :", tokens.roles);
-
           // ------------------------------
 
           this.MyRole(tokens.roles).then(async (val_role) => {

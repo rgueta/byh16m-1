@@ -292,8 +292,6 @@ export class LoginPage implements OnInit {
             this.toolService.getSecureStorage("roles").subscribe({
               next: async (result) => {
                 roles = await result;
-                console.log("Result roles :", roles);
-
                 for (const val_myrole of JSON.parse(roles)) {
                   console.log("lockedValue: ", lockedValue);
                   if (lockedValue === "true") {

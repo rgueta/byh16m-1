@@ -609,7 +609,6 @@ export class UpdUsersPage implements OnInit {
           "Pronto recibiras un correo",
           ["Ok"]
         );
-        this.modalController.dismiss();
         return true;
       })
       .catch((err) => {

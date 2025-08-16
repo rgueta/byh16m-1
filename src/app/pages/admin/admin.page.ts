@@ -285,7 +285,7 @@ export class AdminPage implements OnInit {
   public CoresList: any;
   public myUserList: any;
   automaticClose = false;
-  public userId: any;
+  public userId = "";
   myToast: any;
   public routineOpen = false;
   localenable: boolean = true;
@@ -352,6 +352,7 @@ export class AdminPage implements OnInit {
     this.toolService.getSecureStorage("userId").subscribe({
       next: (result) => {
         this.userId = result;
+        console.log("getSecureStorage userId ngOnInit: ", this.userId);
       },
       error: (err) => {
         this.toolService.toastAlert(
@@ -411,13 +412,14 @@ export class AdminPage implements OnInit {
     });
 
     //   getting userName ---------------------------
-    this.toolService.getSecureStorage("userName").subscribe({
+    this.toolService.getSecureStorage("email").subscribe({
       next: (result) => {
         this.userName = result;
       },
       error: (err) => {
         this.toolService.toastAlert(
-          "error, obteniendo userName en getSecureStorage: " + err,
+          "error, obteniendo userName en getSecureStorage..: " +
+            JSON.stringify(err),
           0,
           ["Ok"],
           "middle"
@@ -427,7 +429,7 @@ export class AdminPage implements OnInit {
   }
 
   async ionViewWillEnter() {
-    this.getCores();
+    await this.getCores();
   }
 
   DemoMode() {
@@ -436,21 +438,30 @@ export class AdminPage implements OnInit {
   }
 
   async getCores() {
-    this.api.getData(`api/cores/admin/${this.userId}/`).subscribe({
-      next: async (result) => {
-        this.CoresList = result;
-        this.CoresList[0].open = true;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo userName en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-        console.log("Error --> ", err.message);
-      },
-    });
+    if (this.userId) {
+      this.api.getData("api/cores/admin/" + this.userId).subscribe({
+        next: async (result) => {
+          this.CoresList = result;
+          this.CoresList[0].open = true;
+        },
+        error: (err) => {
+          this.toolService.toastAlert(
+            "error, obteniendo API getCores : " + JSON.stringify(err),
+            0,
+            ["Ok"],
+            "middle"
+          );
+          console.log("Error --> ", err.message);
+        },
+      });
+    } else {
+      this.toolService.toastAlert(
+        "Falta informacion this.userId para API getData(api/cores/admin",
+        0,
+        ["Ok"],
+        "middle"
+      );
+    }
   }
 
   async getRoles() {
