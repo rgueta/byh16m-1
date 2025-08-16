@@ -98,23 +98,29 @@ export class UsersPage implements OnInit {
     });
   }
 
-  async ionViewWillEnter() {
-    let value: any | null = null;
-    value = this.toolService.getSecureStorage("myRole");
-    this.soyAdmin = value === "admin" ? true : false;
-
-    let valueRole: any | null = null;
-    valueRole = this.toolService.getSecureStorage("myRole");
-    this.soyNeighborAdmin = valueRole == "neighborAdmin" ? true : false;
-    this.getUsers();
-    this.getRoles();
-  }
-
   async ngOnInit() {
+    //   getting myRole ---------------------------
+    this.toolService.getSecureStorage("myRole").subscribe({
+      next: (result) => {
+        this.soyAdmin = result === "admin" ? true : false;
+        this.soyNeighborAdmin = result == "neighborAdmin" ? true : false;
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, obteniendo myRole en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
+
     //   getting userId ---------------------------
     this.toolService.getSecureStorage("userId").subscribe({
       next: (result) => {
         this.userId = result;
+        this.getRoles();
+        this.getUsers();
       },
       error: (err) => {
         this.toolService.toastAlert(
@@ -152,12 +158,10 @@ export class UsersPage implements OnInit {
       url = "api/users/coreNeighbor/";
     }
 
-    console.log("url user: ", url + this.coreId + "/" + this.userId);
     this.api.getData(url + this.coreId + "/" + this.userId).subscribe({
       next: async (result: any) => {
         if (result) this.users = result;
         this.users[0].open = true;
-        console.log("users:", result);
       },
       error: (error: any) => {
         console.log("Error call api: ", error);

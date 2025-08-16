@@ -146,6 +146,14 @@ export class UpdUsersPage implements OnInit {
     this.toolService.getSecureStorage("userId").subscribe({
       next: (result) => {
         this.userId = result;
+        if (
+          this.sourcePage == "adminNewUser" ||
+          this.sourcePage == "adminNewExtrange"
+        ) {
+          this.RegisterForm.get("Cpu")!.setValue("byh16");
+          this.RegisterForm.get("Core")!.setValue(this.coreId!);
+          this.getRoles();
+        }
       },
       error: (err) => {
         this.toolService.toastAlert(
@@ -292,26 +300,30 @@ export class UpdUsersPage implements OnInit {
         );
       },
     });
-  }
 
-  async ionViewWillEnter() {
-    if (
-      this.sourcePage == "adminNewUser" ||
-      this.sourcePage == "adminNewExtrange"
-    ) {
-      this.RegisterForm.get("Cpu")!.setValue("byh16");
-      this.RegisterForm.get("Core")!.setValue(this.coreId!);
-      this.getRoles();
-    }
-
+    // getCpus -------
     if (
       this.sourcePage == "login" ||
       this.sourcePage == "adminNew" ||
       this.sourcePage == "adminNewExtrange"
     ) {
-      this.getCpus();
+      this.api.getData("api/cpus/").subscribe({
+        next: async (result) => {
+          this.CpuList = result;
+        },
+        error: (error: any) => {
+          this.toolService.showAlertBasic(
+            "Alerta",
+            "Error, getCpus: ",
+            JSON.stringify(error),
+            ["Ok"]
+          );
+        },
+      });
     }
+  }
 
+  async ionViewWillEnter() {
     if (this.sourcePage == "adminNewExtrange") {
       this.RegisterForm.get("House")!.setValue("NA");
       this.RegisterForm.controls["Cpu"].clearValidators();
@@ -353,22 +365,6 @@ export class UpdUsersPage implements OnInit {
     this.RegisterForm.get("Gender")!.setValue(this.gender);
     this.RegisterForm.get("Location")!.setValue(this.location);
     this.RegisterForm.get("Uuid")!.setValue(this.pkgUser["uuid"]);
-  }
-
-  async getCpus() {
-    this.api.getData("api/cpus/").subscribe({
-      next: async (result) => {
-        this.CpuList = result;
-      },
-      error: (error: any) => {
-        this.toolService.showAlertBasic(
-          "Alerta",
-          "Error, getCpus: ",
-          JSON.stringify(error),
-          ["Ok"]
-        );
-      },
-    });
   }
 
   async getCores(cpu: string) {

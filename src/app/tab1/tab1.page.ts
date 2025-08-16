@@ -163,7 +163,7 @@ export class Tab1Page implements OnInit {
     });
   }
 
-  async ionViewWillEnter() {
+  async ngOnInit() {
     this.version = environment.app.version;
     if (isPlatform("cordova") || isPlatform("ios")) {
       this.lockToPortrait();
@@ -171,14 +171,6 @@ export class Tab1Page implements OnInit {
       this.isAndroid = true;
     }
 
-    if (!this.remote) {
-      document
-        .getElementById("infoSection")!
-        .style.setProperty("margin-top", "15px", "important");
-    }
-  }
-
-  async ngOnInit() {
     //   getting myRole ---------------------------
     this.toolService.getSecureStorage("myRole").subscribe({
       next: (result) => {
@@ -229,6 +221,11 @@ export class Tab1Page implements OnInit {
     this.toolService.getSecureStorage("remote").subscribe({
       next: async (result) => {
         this.remote = await result;
+        if (!this.remote) {
+          document
+            .getElementById("infoSection")!
+            .style.setProperty("margin-top", "15px", "important");
+        }
       },
       error: (err) => {
         this.toolService.toastAlert(

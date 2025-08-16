@@ -139,6 +139,7 @@ export class InfoPage implements OnInit {
     this.toolService.getSecureStorage("userId").subscribe({
       next: (result) => {
         this.userId = result;
+        this.collectCountries();
       },
       error: (err) => {
         this.toolService.toastAlert(
@@ -149,10 +150,7 @@ export class InfoPage implements OnInit {
         );
       },
     });
-  }
 
-  async ionViewWillEnter() {
-    this.collectCountries();
     this.collectInfo();
   }
 

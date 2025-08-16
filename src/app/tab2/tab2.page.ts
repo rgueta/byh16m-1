@@ -89,9 +89,7 @@ export class Tab2Page implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.convertDate("Oninit", new Date(Date.now()));
-  }
 
-  async ionViewWillEnter() {
     this.toolService.getSecureStorage("userId").subscribe({
       next: (result) => {
         this.myUserId = result;

@@ -78,7 +78,8 @@ export class BackstagePage implements OnInit {
     });
   }
 
-  async ionViewWillEnter() {
+  ngOnInit() {
+    this.sourcePage = this.navParams.data["SourcePage"];
     this.toolService.getSecureStorage("myRole").subscribe({
       next: async (result) => {
         this.MyRole = await result;
@@ -92,10 +93,6 @@ export class BackstagePage implements OnInit {
         );
       },
     });
-  }
-
-  ngOnInit() {
-    this.sourcePage = this.navParams.data["SourcePage"];
     this.getBackstage();
   }
 
@@ -104,6 +101,31 @@ export class BackstagePage implements OnInit {
     this.toolService.getSecureStorage("userId").subscribe({
       next: async (result) => {
         userId = await result;
+
+        this.api.getData("api/backstage/" + userId).subscribe({
+          next: async (result: any) => {
+            this.backstageList = await result;
+            if (this.backstageList.length > 0) {
+              this.backstageList[0].open = true;
+            } else {
+              this.toolService.showAlertBasic(
+                "",
+                "No hay usuarios por agregar",
+                "",
+                ["Ok"]
+              );
+              this.modalController.dismiss("no refresh");
+            }
+          },
+          error: (err: any) => {
+            this.toolService.showAlertBasic(
+              "Alerta",
+              "Fallo obteniendo backstage: ",
+              JSON.stringify(err),
+              ["Ok"]
+            );
+          },
+        });
       },
       error: (err) => {
         this.toolService.toastAlert(
@@ -111,31 +133,6 @@ export class BackstagePage implements OnInit {
           0,
           ["Ok"],
           "middle"
-        );
-      },
-    });
-
-    this.api.getData("api/backstage/" + userId).subscribe({
-      next: async (result: any) => {
-        this.backstageList = await result;
-        if (this.backstageList.length > 0) {
-          this.backstageList[0].open = true;
-        } else {
-          this.toolService.showAlertBasic(
-            "",
-            "No hay usuarios por agregar",
-            "",
-            ["Ok"]
-          );
-          this.modalController.dismiss("no refresh");
-        }
-      },
-      error: (err: any) => {
-        this.toolService.showAlertBasic(
-          "Alerta",
-          "Fallo obteniendo backstage: ",
-          JSON.stringify(err),
-          ["Ok"]
         );
       },
     });

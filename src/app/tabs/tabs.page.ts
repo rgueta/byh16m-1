@@ -1,4 +1,4 @@
-import { Component, EnvironmentInjector, inject } from "@angular/core";
+import { Component, EnvironmentInjector, inject, OnInit } from "@angular/core";
 import {
   IonTabs,
   IonTabBar,
@@ -21,7 +21,7 @@ import { ToolsService } from "../services/tools.service";
   styleUrls: ["tabs.page.scss"],
   imports: [IonTabs, IonTabBar, IonTabButton, IonIcon],
 })
-export class TabsPage {
+export class TabsPage implements OnInit {
   MyRole: any | null = "visitor";
   public environmentInjector = inject(EnvironmentInjector);
 
@@ -35,7 +35,7 @@ export class TabsPage {
     });
   }
 
-  async ionViewWillEnter() {
+  async ngOnInit() {
     this.toolService.getSecureStorage("myRole").subscribe({
       next: (result) => {
         this.MyRole = result || "visitor";
