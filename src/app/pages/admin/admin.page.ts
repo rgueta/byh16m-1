@@ -348,11 +348,11 @@ export class AdminPage implements OnInit {
       },
     });
 
-    //   getting userId ---------------------------
+    // getting userId ---------------------------
     this.toolService.getSecureStorage("userId").subscribe({
       next: (result) => {
         this.userId = result;
-        console.log("getSecureStorage userId ngOnInit: ", this.userId);
+        this.getCores();
       },
       error: (err) => {
         this.toolService.toastAlert(
@@ -426,10 +426,6 @@ export class AdminPage implements OnInit {
         );
       },
     });
-  }
-
-  async ionViewWillEnter() {
-    await this.getCores();
   }
 
   DemoMode() {
