@@ -465,7 +465,6 @@ export class InfoPage implements OnInit {
     if (await this.toolService.getSecureBoolean("netStatus")) {
       this.api.getData("api/info/all/" + this.userId).subscribe({
         next: async (result) => {
-          console.log("info --> ", result);
           this.localInfo = result;
         },
         error: (err: any) => {
