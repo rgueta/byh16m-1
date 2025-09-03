@@ -5,6 +5,7 @@ const config: CapacitorConfig = {
   appName: "byh16m",
   webDir: "www",
   server: {
+    url: "http://192.168.1.185:8101",
     cleartext: true,
   },
 };

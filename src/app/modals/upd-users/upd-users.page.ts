@@ -60,6 +60,7 @@ export class UpdUsersPage implements OnInit {
   @Input() coreId!: any;
   @Input() coreName!: any;
   @Input() pathLocation!: any;
+  @Input() pkg!: any;
 
   RoleList: any = [];
   CpuList: any = [];
@@ -109,6 +110,10 @@ export class UpdUsersPage implements OnInit {
   }
 
   async ngOnInit() {
+    if (this.pkg) {
+      console.log("Trae pkg --> ", this.pkg);
+    }
+
     console.log(`Entre upd-users, sourcePage: ${this.sourcePage},
       CoreName: ${this.coreName}, CoreId: ${this.coreId},
       pathLocation: ${this.pathLocation}`);

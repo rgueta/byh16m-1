@@ -1,23 +1,19 @@
 import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { ModalController, NavParams, AlertController } from "@ionic/angular";
 import {
-  IonButtons,
-  IonContent,
-  IonFab,
-  IonFabButton,
-  IonHeader,
-  IonIcon,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonRefresher,
-  IonRefresherContent,
-  IonTitle,
-  IonToolbar,
-} from "@ionic/angular/standalone";
+  ModalController,
+  NavParams,
+  AlertController,
+  IonicModule,
+} from "@ionic/angular";
 
+import {
+  IonSelect,
+  IonSelectOption,
+  IonText,
+  IonTextarea,
+} from "@ionic/angular/standalone";
 import { DatabaseService } from "../../services/database.service";
 import { UpdUsersPage } from "../../modals/upd-users/upd-users.page";
 
@@ -36,25 +32,7 @@ import {
   templateUrl: "./backstage.page.html",
   styleUrls: ["./backstage.page.scss"],
   standalone: true,
-  imports: [
-    IonContent,
-    IonHeader,
-    IonTitle,
-    IonToolbar,
-    CommonModule,
-    FormsModule,
-    IonItem,
-    IonLabel,
-    IonFab,
-    IonLabel,
-    IonIcon,
-    IonList,
-    IonButtons,
-    IonRefresherContent,
-    IonRefresher,
-    IonFabButton,
-    ReactiveFormsModule,
-  ],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, IonicModule],
 })
 export class BackstagePage implements OnInit {
   backstageList: any;
@@ -78,7 +56,7 @@ export class BackstagePage implements OnInit {
     });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.sourcePage = this.navParams.data["SourcePage"];
     this.toolService.getSecureStorage("myRole").subscribe({
       next: async (result) => {
@@ -200,7 +178,7 @@ export class BackstagePage implements OnInit {
     const modal = await this.modalController.create({
       component: UpdUsersPage,
       componentProps: {
-        SourcePage: page,
+        sourcePage: page,
         pkg: pkg,
       },
     });
