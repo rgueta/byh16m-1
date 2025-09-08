@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from "@angular/core";
 import { Router } from "@angular/router";
-import { AuthenticationService } from "./../../services/authentication.service";
+import { AuthService } from "../../services/auth.service";
 import {
   FormBuilder,
   FormControl,
@@ -62,7 +62,7 @@ import { tap, switchMap } from "rxjs/operators";
 export class LoginPage implements OnInit {
   // #region injection ----
   private fb = inject(FormBuilder);
-  private authService = inject(AuthenticationService);
+  private authService = inject(AuthService);
   private orientation = inject(ScreenOrientation);
   private loadingController = inject(LoadingController);
   private router = inject(Router);
@@ -263,6 +263,7 @@ export class LoginPage implements OnInit {
     let roles: any | null = null;
 
     try {
+      //Check internet connection
       const netStatus = await this.networkService.checkInternetConnection();
       if (!netStatus) {
         await this.toolService.toastAlert(
@@ -280,14 +281,12 @@ export class LoginPage implements OnInit {
         this.authService.login(this.credentials.value).subscribe({
           next: async (res) => {
             await loading.dismiss();
-
             // Check Locked --------------------
             this.toolService.getSecureStorage("locked").subscribe({
               next: async (result) => {
                 lockedValue = result;
               },
             });
-
             // In your component
             this.toolService.getSecureStorage("roles").subscribe({
               next: async (result) => {

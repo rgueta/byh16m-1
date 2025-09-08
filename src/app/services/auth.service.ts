@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { inject, Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { take, map, tap, switchMap, subscribeOn } from "rxjs/operators";
 import {
@@ -13,7 +13,7 @@ import { environment } from "../../environments/environment";
 import { Router } from "@angular/router";
 import { JwtHelperService } from "@auth0/angular-jwt";
 import { tokens } from "../tools/data.model";
-import { ToolsService } from "../services/tools.service";
+import { ToolsService } from "./tools.service";
 
 // #region constants ----------------------------------
 const helper = new JwtHelperService();
@@ -22,7 +22,7 @@ const helper = new JwtHelperService();
 @Injectable({
   providedIn: "root",
 })
-export class AuthenticationService {
+export class AuthService {
   public user!: Observable<any>;
   private userData = new BehaviorSubject(null);
   Tokens!: tokens;
@@ -32,9 +32,12 @@ export class AuthenticationService {
   isAuthenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
     false
   );
-  currentAuthToken: any;
+  // currentAuthToken: any;
   userId = "";
-  // public roles:any;
+
+  private currentAuthToken = new BehaviorSubject<string | null>(null);
+  private refreshToken = "";
+  private httpClient = inject(HttpClient);
 
   constructor(
     private http: HttpClient,
@@ -46,14 +49,26 @@ export class AuthenticationService {
   }
 
   async loadToken() {
-    const token = this.toolService.getSecureStorage("authToken");
+    // const token = this.toolService.getSecureStorage("authToken");
 
-    if (token) {
-      this.currentAuthToken = token;
-      this.isAuthenticated.next(true);
-    } else {
-      this.isAuthenticated.next(false);
-    }
+    this.toolService.getSecureStorage("authToken").subscribe({
+      next: (token) => {
+        if (token) {
+          this.currentAuthToken.next(token);
+          this.isAuthenticated.next(true);
+        } else {
+          this.isAuthenticated.next(false);
+        }
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, authToken role en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+      },
+    });
   }
 
   login(credentials: { email: string; pwd: string }): Observable<any> {
@@ -61,8 +76,12 @@ export class AuthenticationService {
     return this.http
       .post(`${this.REST_API_SERVER}api/auth/signin`, credentials)
       .pipe(
-        switchMap(async (tokens: any) => {
-          this.currentAuthToken = await tokens.authToken;
+        map(async (tokens: any) => {
+          this.currentAuthToken = await tokens.authToken!;
+          this.refreshToken = await tokens.refreshToken;
+
+          console.log("auth token service:  ", this.currentAuthToken);
+          console.log("refresh token service:  ", this.refreshToken);
 
           // --------   secure storege  -------------
           let authToken: string | null = null;
@@ -132,6 +151,35 @@ export class AuthenticationService {
       );
   }
 
+  logout() {
+    return this.http
+      .post(`${this.REST_API_SERVER}api/auth/logout`, {})
+      .pipe(
+        switchMap((_) => {
+          this.currentAuthToken = null!;
+          // Remove all stored tokens
+          const deleteAccess =
+            this.toolService.removeSecureStorage("authToken");
+          const deleteRefresh =
+            this.toolService.removeSecureStorage("refreshToken");
+          return from(Promise.all([deleteAccess, deleteRefresh]));
+        }),
+        tap((_) => {
+          this.isAuthenticated.next(false);
+          this.router.navigateByUrl("", { replaceUrl: true });
+        })
+      )
+      .subscribe();
+  }
+
+  applyRefreshToken() {
+    const refreshToken = this.getRefreshToken();
+    console.log("REfresh TOKEN -->", refreshToken);
+    return this.httpClient.post(`${this.REST_API_SERVER}api/auth/refresh`, {
+      refreshToken,
+    });
+  }
+
   async MyRole(roles: any[]) {
     //--- check for admin role
     let myrole = "";
@@ -180,34 +228,67 @@ export class AuthenticationService {
     return this.userData.getValue();
   }
 
+  getAccessToken(): string | void {
+    let accToken: string | null;
+    this.toolService.getSecureStorage("authToken").subscribe({
+      next: (token) => {
+        return (accToken = token!);
+      },
+      error: (err) => {
+        this.toolService.toastAlert(
+          "error, authToken role en getSecureStorage: " + err,
+          0,
+          ["Ok"],
+          "middle"
+        );
+        return accToken!;
+      },
+    });
+  }
+
+  useRefreshToken(): Observable<any> {
+    const refreshToken = localStorage.getItem("refresh_token");
+    return this.http
+      .post(`${this.REST_API_SERVER}/refresh`, { refreshToken })
+      .pipe(
+        tap((response: any) => {
+          localStorage.setItem("access_token", response.accessToken);
+          // Si el servidor devuelve un nuevo refresh token, actualizarlo
+          if (response.refreshToken) {
+            localStorage.setItem("refresh_token", response.refreshToken);
+          }
+        })
+      );
+  }
+
   // Load the refresh token from storage
   // then attach it as the header for one specific API call
-  getNewAccessToken() {
-    // commented for migration removed from
-    const refreshToken = from(
-      this.toolService.getSecureStorage("refreshToken") ?? ""
-    );
+  // getNewAccessToken() {
+  //   // commented for migration removed from
+  //   const refreshToken = from(
+  //     this.toolService.getSecureStorage("refreshToken") ?? ""
+  //   );
 
-    return refreshToken.pipe(
-      switchMap((token) => {
-        if (token) {
-          const httpOptions = {
-            headers: new HttpHeaders({
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            }),
-          };
-          return this.http.get(
-            `${this.REST_API_SERVER}/api/auth/refresh`,
-            httpOptions
-          );
-        } else {
-          // No stored refresh token
-          return of(null);
-        }
-      })
-    );
-  }
+  //   return refreshToken.pipe(
+  //     switchMap((token) => {
+  //       if (token) {
+  //         const httpOptions = {
+  //           headers: new HttpHeaders({
+  //             "Content-Type": "application/json",
+  //             Authorization: `Bearer ${token}`,
+  //           }),
+  //         };
+  //         return this.http.get(
+  //           `${this.REST_API_SERVER}/api/auth/refresh`,
+  //           httpOptions
+  //         );
+  //       } else {
+  //         // No stored refresh token
+  //         return of(null);
+  //       }
+  //     })
+  //   );
+  // }
 
   // Store a new access token
   storeAccessToken(authToken: any) {
@@ -217,5 +298,13 @@ export class AuthenticationService {
       return this.toolService.setSecureStorage("authToken", authToken);
     });
     // return from(this.storage.set(TOKEN, authToken));
+  }
+
+  getRefreshToken(): string | "" {
+    return this.refreshToken || "";
+  }
+
+  getAuthToken(): string {
+    return this.currentAuthToken.value || "";
   }
 }
