@@ -76,19 +76,20 @@ export class Tab4Page implements OnInit {
   }
 
   async ngOnInit() {
-    this.toolService.getSecureStorage("userId").subscribe({
-      next: async (result) => {
-        this.userId = await result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo userId en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.userId = await this.toolService.getSecureStorage("userId");
+    // this.toolService.getSecureStorage("userId").subscribe({
+    //   next: async (result) => {
+    //     this.userId = await result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo userId en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     this.getVisitors();
   }
@@ -106,10 +107,9 @@ export class Tab4Page implements OnInit {
   }
 
   async getVisitors() {
-    this.toolService.getSecureStorage("visitors").subscribe({
-      next: async (result) => {
-        if (result) {
-          this.VisitorsList = JSON.parse(result);
+    this.VisitorsList = await this.toolService.getSecureStorage("visitors");
+      if (this.VisitorsList) {
+          // this.VisitorsList = JSON.parse(result);
           //Sort Visitors by name
           if (this.VisitorsList !== null && this.VisitorsList.length > 0) {
             console.log("this.VisitorsList:", this.VisitorsList);
@@ -123,16 +123,34 @@ export class Tab4Page implements OnInit {
             this.VisitorsList[0].open = true;
           }
         }
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo remote en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+
+    // this.toolService.getSecureStorage("visitors").subscribe({
+    //   next: async (result) => {
+    //     if (result) {
+    //       this.VisitorsList = JSON.parse(result);
+    //       //Sort Visitors by name
+    //       if (this.VisitorsList !== null && this.VisitorsList.length > 0) {
+    //         console.log("this.VisitorsList:", this.VisitorsList);
+    //         if ((this, this.VisitorsList))
+    //           this.VisitorsList = await this.toolService.sortJsonVisitors(
+    //             this.VisitorsList,
+    //             "name",
+    //             true
+    //           );
+
+    //         this.VisitorsList[0].open = true;
+    //       }
+    //     }
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo remote en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
   }
 
   async removeVisitor(index: number, name: string) {

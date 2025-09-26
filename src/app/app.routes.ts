@@ -101,4 +101,8 @@ export const routes: Routes = [
     loadComponent: () =>
       import("./modals/users/users.page").then((m) => m.UsersPage),
   },
+  {
+    path: 'store',
+    loadComponent: () => import('./pages/store/store.page').then( m => m.StorePage)
+  },
 ];

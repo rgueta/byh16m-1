@@ -74,6 +74,7 @@ import {
 } from "ionicons/icons";
 import { catchError, throwError, from, Observable, of } from "rxjs";
 import { tap, switchMap } from "rxjs/operators";
+import { Preferences } from "@capacitor/preferences";
 
 @Component({
   selector: "app-tab1",
@@ -116,14 +117,14 @@ export class Tab1Page implements OnInit {
   @Input() sim: string = "";
   myToast: any;
   myRoles: any;
-  public MyRole: string | "" = "admin";
+  public MyRole: any | "" = "admin";
   isAndroid: any;
   currentUser = "";
   public version = "";
-  public coreName: string | null = "";
-  public coreId: string | null = "";
+  public coreName: any | null = "";
+  public coreId: any | null = "";
   twilio_client: any;
-  userId: string = "";
+  userId: any = "";
   id: number = 0;
   btnVisible: boolean = true;
   titleMenuButtons = "Ocultar botones";
@@ -133,8 +134,9 @@ export class Tab1Page implements OnInit {
   myName: any | null = "";
   REST_API_SERVER = environment.cloud.server_url;
   iosOrAndroid: boolean = false;
-  demoMode: boolean = false;
-  remote: any = false;
+  demoMode: any;
+  remoteCtrl:any;
+
   // #endregion -----
   constructor(
     private sms: SMS,
@@ -165,159 +167,35 @@ export class Tab1Page implements OnInit {
 
   async ngOnInit() {
     this.version = environment.app.version;
+
     if (isPlatform("cordova") || isPlatform("ios")) {
       this.lockToPortrait();
     } else if (isPlatform("android")) {
       this.isAndroid = true;
     }
 
-    //   getting myRole ---------------------------
-    this.toolService.getSecureStorage("myRole").subscribe({
-      next: (result) => {
-        this.MyRole = result || "visitor";
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo myRole en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.MyRole = await this.toolService.getSecureStorage("myRole");
 
-    //   getting email ---------------------------
-    this.toolService.getSecureStorage("email").subscribe({
-      next: async (result) => {
-        this.myEmail = await result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo email en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.myEmail = await this.toolService.getSecureStorage("email");    
 
-    // this.myName = this.toolService.getSecureStorage("name");
-    //   getting name ---------------------------
-    this.toolService.getSecureStorage("name").subscribe({
-      next: async (result) => {
-        this.myName = await result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo name en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.myName = await this.toolService.getSecureStorage("name");
 
     //   getting remote ---------------------------
-    this.toolService.getSecureStorage("remote").subscribe({
-      next: async (result) => {
-        this.remote = await result;
-        if (!this.remote) {
-          document
-            .getElementById("infoSection")!
-            .style.setProperty("margin-top", "15px", "important");
-        }
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo remote en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.remoteCtrl = await this.toolService.getSecureStorage("remote");
 
-    var sim = "";
-    // getting coreSim ---------------------------
-    this.toolService.getSecureStorage("coreSim").subscribe({
-      next: (result) => {
-        sim = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo coreSim en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    var sim = await this.toolService.getSecureStorage("coreSim");
 
-    //   getting userId ---------------------------
-    this.toolService.getSecureStorage("userId").subscribe({
-      next: (result) => {
-        this.userId = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo userId en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.userId = await this.toolService.getSecureStorage("userId");
 
-    //   getting coreId ---------------------------
-    this.toolService.getSecureStorage("coreId").subscribe({
-      next: (result) => {
-        this.coreId = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo coreId en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.coreId = await this.toolService.getSecureStorage("coreId");
 
-    //   getting coreName ---------------------------
-    this.toolService.getSecureStorage("coreName").subscribe({
-      next: (result) => {
-        this.coreName = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo coreName en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.coreName = await this.toolService.getSecureStorage("coreName");
 
     //   getting demoMode ---------------------------
     await this.getDemoMode();
 
     // -----------------firebase Push notification
-    //
-    let devicePlatform: any | null = null;
-    devicePlatform = this.toolService.getSecureStorage("devicePlatform");
-    this.toolService.getSecureStorage("devicePlatform").subscribe({
-      next: (result) => {
-        devicePlatform = result || "visitor";
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo myRole en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    let  devicePlatform: any = await this.toolService.getSecureStorage("devicePlatform");
 
     if (["android", "ios"].includes(devicePlatform)) {
       PushNotifications.requestPermissions().then((resul) => {
@@ -488,22 +366,7 @@ export class Tab1Page implements OnInit {
   }
 
   async modalBackstage() {
-    let coreName = "";
-
-    //   getting coreName ---------------------------
-    this.toolService.getSecureStorage("coreName").subscribe({
-      next: async (result) => {
-        coreName = await result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo coreName en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    let coreName = await this.toolService.getSecureStorage("coreName");
 
     const modal = await this.modalController.create({
       component: BackstagePage,
@@ -516,53 +379,27 @@ export class Tab1Page implements OnInit {
   }
 
   async collectInfo() {
-    let timestamp: string = "";
+    let timestamp:any;
 
     if (await this.networkService.checkInternetConnection()) {
-      let timestamp: any;
-      // get last api call variable
+      timestamp = await this.toolService.getSecureStorage("lastInfoUpdated");
 
-      //   getting lastInfoUpdated ---------------------------
-      this.toolService.getSecureStorage("lastInfoUpdated").subscribe({
-        next: (result) => {
-          if (!result) {
-            timestamp = this.toolService.convDate(new Date());
-          } else {
-            timestamp = result;
-            // timestamp = '2024-01-29T00:49:49.857Z'
+      if (timestamp.value === null) {
+            timestamp = await this.toolService.convDate(new Date());
           }
-        },
-        error: (err) => {
-          this.toolService.toastAlert(
-            "error, obteniendo lastInfoUpdated en getSecureStorage: " + err,
-            0,
-            ["Ok"],
-            "middle"
-          );
-        },
-      });
 
-      this.toolService.getSecureStorage("info").subscribe({
-        next: (result) => {
-          if (this.localInfo.length == 0 && !result) {
+      const info  = await this.toolService.getSecureStorage("info");
+
+       if (this.localInfo.length == 0 && !info ) {
             let d = new Date();
             d.setDate(d.getDate() - 180);
             timestamp = this.toolService.convDate(d);
           }
 
-          if (this.localInfo.length == 0 && result) {
-            this.localInfo = result;
-          }
-        },
-        error: (err) => {
-          this.toolService.toastAlert(
-            "error, obteniendo info en getSecureStorage: " + err,
-            0,
-            ["Ok"],
-            "middle"
-          );
-        },
-      });
+      if (this.localInfo.length == 0 && info) {
+        this.localInfo = info;
+      }
+
 
       try {
         this.api
@@ -577,7 +414,7 @@ export class Tab1Page implements OnInit {
                     this.localInfo = [...this.localInfo, item];
                   });
                 } else {
-                  this.localInfo = result;
+                  this.localInfo = await result;
                 }
 
                 this.localInfo = await this.toolService.sortJsonVisitors(
@@ -591,10 +428,7 @@ export class Tab1Page implements OnInit {
                   this.localInfo.splice(1000);
                 }
 
-                this.toolService.setSecureStorage(
-                  "info",
-                  JSON.stringify(this.localInfo)
-                );
+                this.toolService.setSecureStorage("info",this.localInfo);
               }
             },
             error: (error: any) => {
@@ -606,6 +440,7 @@ export class Tab1Page implements OnInit {
           "lastInfoUpdated",
           this.toolService.convDate(new Date())
         );
+
       } catch (e) {
         this.toolService.toastAlert(
           "Error api/info/ call: " + e,
@@ -616,19 +451,7 @@ export class Tab1Page implements OnInit {
       }
     } else {
       if (this.localInfo.length == 0 && this.localInfo) {
-        this.toolService.getSecureStorage("info").subscribe({
-          next: (result) => {
-            this.localInfo = result;
-          },
-          error: (err) => {
-            this.toolService.toastAlert(
-              "error, obteniendo info en getSecureStorage: " + err,
-              0,
-              ["Ok"],
-              "middle"
-            );
-          },
-        });
+        this.localInfo = await this.toolService.getSecureStorage("info")
       }
       this.toolService.toastAlert(
         "No hay acceso a internet",
@@ -653,20 +476,7 @@ export class Tab1Page implements OnInit {
   }
 
   async getDemoMode() {
-    this.toolService.getSecureStorage("demoMode").subscribe({
-      next: (result) => {
-        this.demoMode = result == "true" ? true : false;
-        console.log("getDemoMode tab1: ", this.demoMode);
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo demoMode en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.demoMode = await this.toolService.getSecureStorage("demoMode");
   }
 
   async openUrl(url: string) {
@@ -696,50 +506,11 @@ export class Tab1Page implements OnInit {
       },
     };
 
-    let local_sim = "";
-    this.toolService.getSecureStorage("coreSim").subscribe({
-      next: (result) => {
-        local_sim = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo coreSim en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    let local_sim = await this.toolService.getSecureStorage("coreSim");
 
-    let use_twilio = "";
-    this.toolService.getSecureStorage("twilio").subscribe({
-      next: (result) => {
-        use_twilio = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo twilio en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    let use_twilio = await this.toolService.getSecureStorage("twilio")
 
-    let uuid = "";
-    this.toolService.getSecureStorage("deviceUuid").subscribe({
-      next: (result) => {
-        uuid = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo deviceUuid en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    let uuid = await this.toolService.getSecureStorage("deviceUuid");
 
     // const local_sim =  await this.storage.get('coreSim');
 

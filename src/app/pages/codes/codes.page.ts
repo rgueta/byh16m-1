@@ -103,94 +103,103 @@ export class CodesPage implements OnInit {
 
   async ngOnInit() {
     //   getting role ---------------------------
-    this.toolsService.getSecureStorage("role").subscribe({
-      next: (result) => {
-        this.MyRole = result;
-      },
-      error: (err) => {
-        this.toolsService.toastAlert(
-          "error, obteniendo role en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.MyRole = await this.toolsService.getSecureStorage("role");
+    // this.toolsService.getSecureStorage("role").subscribe({
+    //   next: (result) => {
+    //     this.MyRole = result;
+    //   },
+    //   error: (err) => {
+    //     this.toolsService.toastAlert(
+    //       "error, obteniendo role en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     //   getting authToken ---------------------------
-    this.toolsService.getSecureStorage("authToken").subscribe({
-      next: (result) => {
-        this.myToken = result;
-      },
-      error: (err) => {
-        this.toolsService.toastAlert(
-          "error, obteniendo authToken en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.myToken = await this.toolsService.getSecureStorage("authToken");
+
+    // this.toolsService.getSecureStorage("authToken").subscribe({
+    //   next: (result) => {
+    //     this.myToken = result;
+    //   },
+    //   error: (err) => {
+    //     this.toolsService.toastAlert(
+    //       "error, obteniendo authToken en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     //   getting userId ---------------------------
-    this.toolsService.getSecureStorage("userId").subscribe({
-      next: (result) => {
-        this.userId = result;
-      },
-      error: (err) => {
-        this.toolsService.toastAlert(
-          "error, obteniendo userId en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.userId = await this.toolsService.getSecureStorage("userId");
+
+    // this.toolsService.getSecureStorage("userId").subscribe({
+    //   next: (result) => {
+    //     this.userId = result;
+    //   },
+    //   error: (err) => {
+    //     this.toolsService.toastAlert(
+    //       "error, obteniendo userId en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     //   getting roles ---------------------------
-    this.toolsService.getSecureStorage("roles").subscribe({
-      next: (result) => {
-        this.myRoles = result;
-      },
-      error: (err) => {
-        this.toolsService.toastAlert(
-          "error, obteniendo roles en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this,this.myRoles = await this.toolsService.getSecureStorage("roles");
+
+    // this.toolsService.getSecureStorage("roles").subscribe({
+    //   next: (result) => {
+    //     this.myRoles = result;
+    //   },
+    //   error: (err) => {
+    //     this.toolsService.toastAlert(
+    //       "error, obteniendo roles en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     //   getting codeExpiry ---------------------------
-    this.toolsService.getSecureStorage("codeExpiry").subscribe({
-      next: (result) => {
-        this.code_expiry = Number(result);
-      },
-      error: (err) => {
-        this.toolsService.toastAlert(
-          "error, obteniendo codeExpiry en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.code_expiry = await this.toolsService.getSecureStorage("codeExpiry");
+    // this.toolsService.getSecureStorage("codeExpiry").subscribe({
+    //   next: (result) => {
+    //     this.code_expiry = Number(result);
+    //   },
+    //   error: (err) => {
+    //     this.toolsService.toastAlert(
+    //       "error, obteniendo codeExpiry en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     //   getting coreSim ---------------------------
-    this.toolsService.getSecureStorage("coreSim").subscribe({
-      next: (result) => {
-        this.coreSim = result;
-      },
-      error: (err) => {
-        this.toolsService.toastAlert(
-          "error, obteniendo coreSim en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.coreSim = await this.toolsService.getSecureStorage("coreSim"); 
+    // this.toolsService.getSecureStorage("coreSim").subscribe({
+    //   next: (result) => {
+    //     this.coreSim = result;
+    //   },
+    //   error: (err) => {
+    //     this.toolsService.toastAlert(
+    //       "error, obteniendo coreSim en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     this.initial = new Date();
     this.expiry = new Date(

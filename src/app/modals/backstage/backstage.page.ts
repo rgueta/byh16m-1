@@ -58,27 +58,29 @@ export class BackstagePage implements OnInit {
 
   async ngOnInit() {
     this.sourcePage = this.navParams.data["SourcePage"];
-    this.toolService.getSecureStorage("myRole").subscribe({
-      next: async (result) => {
-        this.MyRole = await result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo myRole en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.MyRole = await this.toolService.getSecureStorage("myRole");
+    // this.toolService.getSecureStorage("myRole").subscribe({
+    //   next: async (result) => {
+    //     this.MyRole = await result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo myRole en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
     this.getBackstage();
   }
 
   async getBackstage() {
     let userId = "";
-    this.toolService.getSecureStorage("userId").subscribe({
-      next: async (result) => {
-        userId = await result;
+    userId = await this.toolService.getSecureStorage("userId");
+    // this.toolService.getSecureStorage("userId").subscribe({
+    //   next: async (result) => {
+    //     userId = await result;
 
         this.api.getData("api/backstage/" + userId).subscribe({
           next: async (result: any) => {
@@ -104,16 +106,18 @@ export class BackstagePage implements OnInit {
             );
           },
         });
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo userId en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+
+      // }
+      //,
+      // error: (err) => {
+      //   this.toolService.toastAlert(
+      //     "error, obteniendo userId en getSecureStorage: " + err,
+      //     0,
+      //     ["Ok"],
+      //     "middle"
+      //   );
+      // },
+    // });
   }
 
   async getRoles() {
@@ -122,20 +126,20 @@ export class BackstagePage implements OnInit {
       url = "api/roles/neiAdmin/";
     }
 
-    let userId = "";
-    this.toolService.getSecureStorage("userId").subscribe({
-      next: async (result) => {
-        userId = await result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo userId en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    let userId = await this.toolService.getSecureStorage("userId");
+    // this.toolService.getSecureStorage("userId").subscribe({
+    //   next: async (result) => {
+    //     userId = await result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo userId en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     this.api.getData(url + userId).subscribe({
       next: async (result: any) => {

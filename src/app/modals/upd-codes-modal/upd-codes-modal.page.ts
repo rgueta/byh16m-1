@@ -118,33 +118,38 @@ export class UpdCodesModalPage implements OnInit {
   }
 
   async ngOnInit() {
-    this.toolService.getSecureStorage("userId").subscribe({
-      next: (result) => {
-        this.userId = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo userId en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
 
-    this.toolService.getSecureStorage("codeExpiry").subscribe({
-      next: (result) => {
-        this.code_expiry = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo codeExpiry en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.userId = await this.toolService.getSecureStorage("userId");
+
+    // this.toolService.getSecureStorage("userId").subscribe({
+    //   next: (result) => {
+    //     this.userId = result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo userId en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
+
+    this.code_expiry = await this.toolService.getSecureStorage("codeExpiry");
+
+    // this.toolService.getSecureStorage("codeExpiry").subscribe({
+    //   next: (result) => {
+    //     this.code_expiry = result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo codeExpiry en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     this.code = this.genCode(7);
     this.getVisitors();
@@ -205,27 +210,36 @@ export class UpdCodesModalPage implements OnInit {
   }
 
   async getVisitors() {
-    this.toolService.getSecureStorage("visitors").subscribe({
-      next: async (result) => {
-        if (result.length > 0) {
-          this.myVisitors = JSON.parse(result);
-          //Sort Visitors by name
-          this.myVisitors = await this.toolService.sortJsonVisitors(
+
+    this.myVisitors = await this.toolService.getSecureStorage("visitors");
+    this.myVisitors = await this.toolService.sortJsonVisitors(
             this.myVisitors,
             "name",
             true
           );
-        }
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo visitors en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+
+
+    // this.toolService.getSecureStorage("visitors").subscribe({
+    //   next: async (result) => {
+    //     if (result.length > 0) {
+    //       this.myVisitors = JSON.parse(result);
+    //       //Sort Visitors by name
+    //       this.myVisitors = await this.toolService.sortJsonVisitors(
+    //         this.myVisitors,
+    //         "name",
+    //         true
+    //       );
+    //     }
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo visitors en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
   }
 
   async setupCode(event: any) {
@@ -275,50 +289,57 @@ export class UpdCodesModalPage implements OnInit {
     var dateFinal = "";
     this.codeCreated = true;
 
-    let coreSim: any | null = null;
-    this.toolService.getSecureStorage("coreSim").subscribe({
-      next: async (result) => {
-        coreSim = await result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo coreSim en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    // let coreSim: any | null = null;
+    // this.toolService.getSecureStorage("coreSim").subscribe({
+    //   next: async (result) => {
+    //     coreSim = await result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo coreSim en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
-    let userSim: string;
-    this.toolService.getSecureStorage("sim").subscribe({
-      next: async (result) => {
-        userSim = await result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo sim en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    const coreSim = await this.toolService.getSecureStorage("coreSim");
 
-    let coreName: string;
-    this.toolService.getSecureStorage("coreName").subscribe({
-      next: async (result) => {
-        coreName = await result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo coreName en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    // let userSim: string;
+    // this.toolService.getSecureStorage("sim").subscribe({
+    //   next: async (result) => {
+    //     userSim = await result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo sim en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
+
+    const userSim = await this.toolService.getSecureStorage("sim");
+
+    // let coreName: string;
+    // this.toolService.getSecureStorage("coreName").subscribe({
+    //   next: async (result) => {
+    //     coreName = await result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo coreName en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
+
+    const coreName = await this.toolService.getSecureStorage("coreName");
+
     const expire = (
       (new Date(this.expiry).getTime() - new Date().getTime()) /
       3600000
@@ -431,20 +452,23 @@ export class UpdCodesModalPage implements OnInit {
       },
     };
 
-    let use_twilio = "";
-    this.toolService.getSecureStorage("twilio").subscribe({
-      next: (result) => {
-        use_twilio = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo twilio en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    // let use_twilio = "";
+    // this.toolService.getSecureStorage("twilio").subscribe({
+    //   next: (result) => {
+    //     use_twilio = result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo twilio en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
+
+
+    const use_twilio = await this.toolService.getSecureStorage("twilio");
 
     try {
       if (use_twilio == "false") {

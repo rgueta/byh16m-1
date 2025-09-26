@@ -333,99 +333,115 @@ export class AdminPage implements OnInit {
   }
 
   async ngOnInit() {
+
+
     //   getting coreSim ---------------------------
-    this.toolService.getSecureStorage("coreSim").subscribe({
-      next: async (result) => {
-        this.coreSim = await result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo coreSim en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.coreSim = await this.toolService.getSecureStorage("coreSim");
+    // this.toolService.getSecureStorage("coreSim").subscribe({
+    //   next: async (result) => {
+    //     this.coreSim = await result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo coreSim en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     // getting userId ---------------------------
-    this.toolService.getSecureStorage("userId").subscribe({
-      next: (result) => {
-        this.userId = result;
-        this.getCores();
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo userId en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.userId = await this.toolService.getSecureStorage("userId");
+    this.getCores();
+
+    // this.toolService.getSecureStorage("userId").subscribe({
+    //   next: (result) => {
+    //     this.userId = result;
+    //     this.getCores();
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo userId en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     //   getting demoMode ---------------------------
-    this.toolService.getSecureStorage("demoMode").subscribe({
-      next: (result) => {
-        this.demoMode = result == "true" ? true : false;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo demoMode en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this,this.demoMode = await this.toolService.getSecureStorage("demoMode");
+    // this.toolService.getSecureStorage("demoMode").subscribe({
+    //   next: (result) => {
+    //     this.demoMode = result == "true" ? true : false;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo demoMode en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     //   getting emailToVisitor ---------------------------
-    this.toolService.getSecureStorage("emailToVisitor").subscribe({
-      next: (result) => {
-        this.emailToVisitor = result == "true" ? true : false;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo emailToVisitor en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.emailToVisitor = await this.toolService.getSecureStorage("emailToVisitor");
+    // this.toolService.getSecureStorage("emailToVisitor").subscribe({
+    //   next: (result) => {
+    //     this.emailToVisitor = result == "true" ? true : false;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo emailToVisitor en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     //   getting roles ---------------------------
-    this.toolService.getSecureStorage("roles").subscribe({
-      next: (result) => {
-        if (result) {
+    const roles = await this.toolService.getSecureStorage("roles");
+
+    if (roles) {
           this.getRoles();
         }
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo roles en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+
+    // this.toolService.getSecureStorage("roles").subscribe({
+    //   next: (result) => {
+    //     if (result) {
+    //       this.getRoles();
+    //     }
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo roles en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     //   getting userName ---------------------------
-    this.toolService.getSecureStorage("email").subscribe({
-      next: (result) => {
-        this.userName = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo userName en getSecureStorage..: " +
-            JSON.stringify(err),
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.userName = await this.toolService.getSecureStorage("email");
+    // this.toolService.getSecureStorage("email").subscribe({
+    //   next: (result) => {
+    //     this.userName = result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo userName en getSecureStorage..: " +
+    //         JSON.stringify(err),
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
+
   }
 
   DemoMode() {

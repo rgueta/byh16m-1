@@ -60,21 +60,23 @@ export class VisitorListPage implements OnInit {
     addIcons({ trashOutline, addOutline, arrowBackCircleOutline });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     //   getting visitors ---------------------------
-    this.toolService.getSecureStorage("visitors").subscribe({
-      next: (result) => {
-        this.myVisitors = JSON.parse(result);
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo visitors en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.myVisitors = await this.toolService.getSecureStorage("visitors");
+
+    // this.toolService.getSecureStorage("visitors").subscribe({
+    //   next: (result) => {
+    //     this.myVisitors = JSON.parse(result);
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo visitors en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     this.getVisitors();
     // this.getContacts();

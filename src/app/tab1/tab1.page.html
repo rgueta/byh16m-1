@@ -107,7 +107,7 @@
               id="logout1-alert"
               [button]="true"
               [detail]="false"
-              *ngIf="remote"
+              *ngIf="remoteCtrl"
               (click)="toggleButtons()"
               >{{titleMenuButtons}}
               <ion-icon
@@ -155,7 +155,7 @@
   <!-- --------------------------------------------  -->
 
   <!-- Bi-color -->
-  <div slot="fixed" class="aperturas" *ngIf="btnVisible && remote">
+  <div slot="fixed" class="aperturas" *ngIf="btnVisible && remoteCtrl">
     <ion-button
       class="doorsButton-green"
       (click)="sendSMS('peatonal')"

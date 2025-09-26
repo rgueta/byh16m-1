@@ -111,34 +111,43 @@ export class UpdCpusPage implements OnInit {
   }
 
   async getCpus() {
-    this.toolService.getSecureStorage("userId").subscribe({
-      next: (result) => {
-        this.userId = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo userId en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+
+    this.userId = await this.toolService.getSecureStorage("userId");
+
+    // this.toolService.getSecureStorage("userId").subscribe({
+    //   next: (result) => {
+    //     this.userId = result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo userId en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     let location: any;
-    this.toolService.getSecureStorage("location").subscribe({
-      next: async (result) => {
-        location = await result.split(".");
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo location en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    // this.toolService.getSecureStorage("location").subscribe({
+    //   next: async (result) => {
+    //     location = await result.split(".");
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo location en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
+
+    location = this.toolService.getSecureStorage("location");
+    location = location.split(".");
+
+
+
 
     this.api
       .getData(

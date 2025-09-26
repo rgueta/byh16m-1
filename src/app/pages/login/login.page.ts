@@ -230,22 +230,31 @@ export class LoginPage implements OnInit {
     if (this.device_info.platform != "web") {
       await this.SIM.hasReadPermission()
         .then(async (allowed: any) => {
-          if (!allowed) {
+          if (allowed) {
             await this.SIM.requestReadPermission()
-              .then()
-              .catch((err: any) => {
-                console.error("Sim Permission denied: " + err);
-              });
-          } else {
-            await this.SIM.getSimInfo()
-              .then((info: any) => {
-                console.log("Si estoy en init() allowed :", allowed);
-                console.log("Sim info: ", info);
+              .then(async PermissionStatus =>{
+                if (PermissionStatus === 'granted'){
+                  await this.SIM.getSimInfo()
+                  .then((info: any) => {
+                    console.log("Si estoy en init() allowed :", allowed);
+                    console.log("Sim info: ", info);
               })
               .catch((err: any) =>
                 console.error("Unable to get sim info: " + err)
               );
-          }
+                }
+              })
+              .catch((err: any) => {
+                console.error("Sim Permission denied: " + err);
+              });
+          } else {
+             this.toolService.toastAlert(
+              "error,falta permisos para leer datos del sim",
+              0,
+              ["Ok"],
+              "middle"
+            );
+              }
         })
         .catch((err: any) => {
           console.error("Sim Permission denied, " + err);
@@ -282,17 +291,17 @@ export class LoginPage implements OnInit {
             await loading.dismiss();
 
             // Check Locked --------------------
-            this.toolService.getSecureStorage("locked").subscribe({
-              next: async (result) => {
-                lockedValue = result;
-              },
-            });
+            // this.toolService.getSecureStorage("locked").subscribe({
+            //   next: async (result) => {
+            //     lockedValue = result;
+            //   },
+            // });
+
+            const lockedValue = await this.toolService.getSecureStorage("locked");
 
             // In your component
-            this.toolService.getSecureStorage("roles").subscribe({
-              next: async (result) => {
-                roles = await result;
-                for (const val_myrole of JSON.parse(roles)) {
+            const roles = await this.toolService.getSecureStorage("roles");
+             for (const val_myrole of roles) {
                   console.log("lockedValue: ", lockedValue);
                   if (lockedValue === "true") {
                     console.log("Usuario Locked...");
@@ -311,9 +320,32 @@ export class LoginPage implements OnInit {
                 }
                 // get config info
                 this.getConfigApp();
-              },
-              error: (err) => {},
-            });
+
+            // this.toolService.getSecureStorage("roles").subscribe({
+            //   next: async (result) => {
+            //     roles = await result;
+            //     for (const val_myrole of roles) {
+            //       console.log("lockedValue: ", lockedValue);
+            //       if (lockedValue === "true") {
+            //         console.log("Usuario Locked...");
+            //         await this.lockedUser("Usuario bloqueado !");
+            //         return;
+            //       }
+            //       if (
+            //         val_myrole.name === "admin" ||
+            //         val_myrole.name === "neighbor" ||
+            //         val_myrole.name === "neighborAdmin"
+            //       ) {
+            //         this.router.navigateByUrl("/tabs", { replaceUrl: true });
+            //       } else {
+            //         this.router.navigateByUrl("/store", { replaceUrl: true });
+            //       }
+            //     }
+            //     // get config info
+            //     this.getConfigApp();
+            //   },
+            //   error: (err) => {},
+            // });
           },
           error: async (err) => {
             if (err.error.errId == 1) {

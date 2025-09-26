@@ -81,19 +81,20 @@ export class ContactsPage implements OnInit {
   }
 
   async loadContacts() {
-    this.toolService.getSecureStorage("lista").subscribe({
-      next: (result) => {
-        this.contacts = JSON.parse(result);
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo contact lista en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.contacts = await this.toolService.getSecureStorage("lista");
+    // this.toolService.getSecureStorage("lista").subscribe({
+    //   next: (result) => {
+    //     this.contacts = JSON.parse(result);
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo contact lista en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     try {
       await Contacts.getContacts({

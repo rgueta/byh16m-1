@@ -1,0 +1,38 @@
+ion-header{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.modalcloseButton{
+    margin-right: 20px;
+}
+
+.title{
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    padding-left: 20px;
+  }
+
+  .column {
+    float: left;
+    padding:.3rem 0 .3rem .2rem;
+  }
+
+  .left{
+    width: 25%;
+    padding: .3rem 0 .3rem .4rem;
+    // background-color: beige;
+  }
+  
+  .middle {
+    padding: 1rem 0 0.5rem 0;
+    
+    width: 50%;
+    ion-title{
+        font-size: 5vw;
+        text-align: center;
+    }
+
+  }

@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { environment } from "../../environments/environment";
 import { BehaviorSubject, from, of, Observable, throwError } from "rxjs";
-import { tap, switchMap } from "rxjs/operators";
+import { tap, switchMap, catchError } from "rxjs/operators";
 import {
   HttpClient,
   HttpHandler,
@@ -45,22 +45,21 @@ export class DatabaseService {
 
   // Load authToken on startup
   async loadToken() {
-    let token = "";
-    this.toolService.getSecureStorage("authToken");
+    let token = await this.toolService.getSecureStorage("authToken");
     //   getting role ---------------------------
-    this.toolService.getSecureStorage("authToken").subscribe({
-      next: (result) => {
-        token = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo authToken en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    // this.toolService.getSecureStorage("authToken").subscribe({
+    //   next: (result) => {
+    //     token = result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo authToken en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     if (token) {
       this.currentAuthToken = token;
@@ -95,22 +94,22 @@ export class DatabaseService {
 
   // Load the refresh token from storage
   // then attach it as the header for one specific API call
-  getNewAccessToken() {
-    let refreshToken = "";
+  async getNewAccessToken() {
+    let refreshToken = await this.toolService.getSecureStorage("refreshToken");
     //   getting role ---------------------------
-    this.toolService.getSecureStorage("refreshToken").subscribe({
-      next: (result) => {
-        refreshToken = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, refreshToken role en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    // this.toolService.getSecureStorage("refreshToken").subscribe({
+    //   next: (result) => {
+    //     refreshToken = result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, refreshToken role en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     if (refreshToken != "") {
       const httpOptions = {
@@ -154,22 +153,23 @@ export class DatabaseService {
   //---- GET data from server  ------
   getData_key(collection: String, data: any) {
     // secure storage --------------
-    let token = "";
+    let token = this.toolService.getSecureStorage("authToken");
+    
 
     //   getting authToken ---------------------------
-    this.toolService.getSecureStorage("authToken").subscribe({
-      next: (result) => {
-        token = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo authToken en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    // this.toolService.getSecureStorage("authToken").subscribe({
+    //   next: (result) => {
+    //     token = result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo authToken en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     let options = {
       headers: {
@@ -186,17 +186,27 @@ export class DatabaseService {
   }
 
   getData<T>(path: string): Observable<T> {
-    return this.toolService.getSecureStorage("authToken").pipe(
-      switchMap((token) => {
-        let headers = new HttpHeaders();
-        if (token) {
+    // Convertir la Promise de getSecureStorage a un Observable
+    console.log('El path en getData: ', path);
+    return from(this.toolService.getSecureStorage("authToken"))
+      .pipe(
+        // switchMap se suscribe al Observable de `from` y luego al nuevo Observable del `http.get`
+        switchMap((token: any) => {
+          let headers = new HttpHeaders();
           headers = headers.set("Authorization", `Bearer ${token}`);
-        }
-
-        return this.http.get<T>(`${this.REST_API_SERVER}${path}`, { headers });
-      })
-    );
-  }
+          
+          return this.http.get<T>(`${this.REST_API_SERVER}${path}`, { headers });
+        }),
+        // Manejo de errores
+        catchError((err) => {
+          console.error('Error fetching data:', err);
+          if(err.expired){
+            console.log('Esta chingadera expiro!');
+          }
+          return throwError(() => err);
+        })
+      );
+}
 
   //--- POST data to server
 
@@ -227,22 +237,22 @@ export class DatabaseService {
 
   async postData(collection: String, data: any) {
     // secure storage ------------------
-    let token = "";
+    let token = await this.toolService.getSecureStorage("authToken");
 
     //   getting authToken ---------------------------
-    this.toolService.getSecureStorage("authToken").subscribe({
-      next: (result) => {
-        token = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo authToken en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    // this.toolService.getSecureStorage("authToken").subscribe({
+    //   next: (result) => {
+    //     token = result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo authToken en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     let options = {
       headers: {
@@ -267,22 +277,22 @@ export class DatabaseService {
 
   async postDataInfo(collection: String, data: any, params: {}) {
     // secure storage ------------------
-    let token = "";
+    let token = await this.toolService.getSecureStorage("authToken");
 
     //   getting authToken ---------------------------
-    this.toolService.getSecureStorage("authToken").subscribe({
-      next: (result) => {
-        token = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo authToken en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    // this.toolService.getSecureStorage("authToken").subscribe({
+    //   next: (result) => {
+    //     token = result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo authToken en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     let options = {
       headers: {
@@ -308,22 +318,22 @@ export class DatabaseService {
 
   async postRegisterData(url: String, data: any) {
     // secure storage ------------------
-    let token = "";
+    let token = await this.toolService.getSecureStorage("authToken")
 
     //   getting authToken ---------------------------
-    this.toolService.getSecureStorage("authToken").subscribe({
-      next: (result) => {
-        token = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo authToken en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    // this.toolService.getSecureStorage("authToken").subscribe({
+    //   next: (result) => {
+    //     token = result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo authToken en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     let options = {
       headers: {
@@ -364,22 +374,22 @@ export class DatabaseService {
   async putData(collecion: String, data: any) {
     // secure storage ------------------
 
-    let token = "";
+    let token = await this.toolService.getSecureStorage("authToken");
 
     //   getting authToken ---------------------------
-    this.toolService.getSecureStorage("authToken").subscribe({
-      next: (result) => {
-        token = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo authToken en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    // this.toolService.getSecureStorage("authToken").subscribe({
+    //   next: (result) => {
+    //     token = result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo authToken en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     let options = {
       headers: {
@@ -403,22 +413,22 @@ export class DatabaseService {
   //--- DELETE data to server
   async deleteData(collection: String) {
     // secure storage ------------------
-    let token = "";
+    let token = await this.toolService.getSecureStorage("authToken");
 
     //   getting authToken ---------------------------
-    this.toolService.getSecureStorage("authToken").subscribe({
-      next: (result) => {
-        token = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo authToken en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    // this.toolService.getSecureStorage("authToken").subscribe({
+    //   next: (result) => {
+    //     token = result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo authToken en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     let options = {
       headers: {
@@ -439,3 +449,7 @@ export class DatabaseService {
     });
   }
 }
+function then(arg0: (Token: any) => void) {
+  throw new Error("Function not implemented.");
+}
+

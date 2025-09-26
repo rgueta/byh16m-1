@@ -135,21 +135,24 @@ export class InfoPage implements OnInit {
   }
 
   async ngOnInit() {
-    this.localTitle = "Aqui va el titulo..";
-    this.toolService.getSecureStorage("userId").subscribe({
-      next: (result) => {
-        this.userId = result;
-        this.collectCountries();
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo userId en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    // this.localTitle = "Aqui va el titulo..";
+    this.userId = await this.toolService.getSecureStorage("userId");
+    this.collectCountries();
+
+    // this.toolService.getSecureStorage("userId").subscribe({
+    //   next: (result) => {
+    //     this.userId = result;
+    //     this.collectCountries();
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo userId en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     this.collectInfo();
   }

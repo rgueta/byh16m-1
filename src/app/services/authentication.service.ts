@@ -15,8 +15,34 @@ import { JwtHelperService } from "@auth0/angular-jwt";
 import { tokens } from "../tools/data.model";
 import { ToolsService } from "../services/tools.service";
 
-// #region constants ----------------------------------
+// #region constants and interfaces  -------------------
+
+export interface User {
+  id: number;
+  email: string;
+  name: string;
+}
 const helper = new JwtHelperService();
+
+export interface TokenResponse {
+  success: boolean;
+  data: {
+    accessToken: string;
+  }
+}
+
+export interface AuthResponse {
+  success: boolean;
+  message: string;
+  data: {
+    user: User;
+    tokens: {
+      accessToken: string;
+      refreshToken: string;
+    }
+  }
+}
+
 // #endregion
 
 @Injectable({
@@ -34,7 +60,8 @@ export class AuthenticationService {
   );
   currentAuthToken: any;
   userId = "";
-  // public roles:any;
+  private isRefreshing = false;
+  private currentUserSubject = new BehaviorSubject<User | null>(null);
 
   constructor(
     private http: HttpClient,
@@ -56,12 +83,12 @@ export class AuthenticationService {
     }
   }
 
-  login(credentials: { email: string; pwd: string }): Observable<any> {
+  login(credentials: { email: string; pwd: string }): Observable<AuthResponse> {
     tokens: this.Tokens;
     return this.http
-      .post(`${this.REST_API_SERVER}api/auth/signin`, credentials)
+      .post<AuthResponse>(`${this.REST_API_SERVER}api/auth/signin`, credentials)
       .pipe(
-        switchMap(async (tokens: any) => {
+        tap(async (tokens: any) => {
           this.currentAuthToken = await tokens.authToken;
 
           // --------   secure storege  -------------
@@ -96,7 +123,6 @@ export class AuthenticationService {
           // ------------------------------
 
           this.MyRole(tokens.roles).then(async (val_role) => {
-            console.log("MyRole at auth: ", val_role);
             this.toolService.setSecureStorage("myRole", val_role);
           });
 
@@ -104,32 +130,95 @@ export class AuthenticationService {
 
           this.toolService.setSecureStorage("userId", tokens.userId);
           this.toolService.setSecureStorage("name", tokens.userName);
-          this.toolService.setSecureStorage(
-            "roles",
-            JSON.stringify(tokens.roles)
-          );
+          // this.toolService.setSecureStorage(
+          //   "roles",
+          //   JSON.stringify(tokens.roles)
+          // );
+
+          this.toolService.setSecureStorage("roles",tokens.roles);
+
+          this.toolService.setSecureStorage("remote", tokens.remote);
           this.toolService.setSecureStorage("coreSim", tokens.coreSim);
           this.toolService.setSecureStorage("sim", tokens.sim);
           this.toolService.setSecureStorage("coreId", tokens.coreId);
           this.toolService.setSecureStorage("coreName", tokens.coreName);
           this.toolService.setSecureStorage("location", tokens.location);
-          this.toolService.setSecureStorage("twilio", "false");
+          this.toolService.setSecureStorage("twilio", false);
           this.toolService.setSecureStorage("codeExpiry", tokens.code_expiry);
 
           this.toolService.setSecureStorage("tokenIAT", tokens.iatDate);
           this.toolService.setSecureStorage("tokenEXP", tokens.expDate);
           this.toolService.setSecureStorage("locked", tokens.locked);
-          this.toolService.setSecureStorage("emailToVisitor", "true");
-          this.toolService.setSecureStorage("emailToCore", "true");
-          this.toolService.setSecureStorage("remote", tokens.remote);
-          // );
-          //
+          this.toolService.setSecureStorage("emailToVisitor", true);
+          this.toolService.setSecureStorage("emailToCore", true);
+          
           return from(Promise.all([authToken, refreshToken]));
         }),
         tap((_) => {
           this.isAuthenticated.next(true);
         })
       );
+  }
+
+
+    // Refresh token
+  async refreshToken(): Promise<boolean> {
+    try {
+      const refreshToken = await this.getRefreshToken();
+      
+      if (!refreshToken) {
+        throw new Error('No refresh token available');
+      }
+
+      const response = await this.http.post<any>(
+        `${this.REST_API_SERVER}api/auth/refresh`,
+        { refreshToken }
+      ).toPromise();
+
+      console.log('response for Refresh: ', response);
+
+      if (response?.success) {
+        await this.toolService.setSecureStorage('authToken',response.authToken);
+        return true;
+      }
+      return false;
+    } catch (error) {
+        console.error('Token refresh failed:', error);
+      await this.logout();
+      return false;
+    }
+  }
+
+
+    // Obtener access token
+  async getAccessToken(): Promise<string | null> {
+    const result = await this.toolService.getSecureStorage('authToken');
+    return result;
+  }
+
+    // Obtener refresh token
+  async getRefreshToken(): Promise<string | null> {
+    const result = await this.toolService.getSecureStorage('refreshToken');
+    return result;
+  }
+
+    // Logout
+  async logout(): Promise<void> {
+    try {
+      const refreshToken = await this.getRefreshToken();
+      
+      if (refreshToken) {
+        await this.http.post(`${this.REST_API_SERVER}/logout`, { refreshToken }).toPromise();
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      // Limpiar storage siempre
+      await this.toolService.removeSecureStorage('authToken');
+      await this.toolService.removeSecureStorage('refreshToken');
+      await this.toolService.removeSecureStorage('user');
+      this.currentUserSubject.next(null);
+    }
   }
 
   async MyRole(roles: any[]) {

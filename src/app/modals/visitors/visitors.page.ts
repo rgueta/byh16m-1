@@ -96,34 +96,38 @@ export class VisitorsPage implements OnInit {
     });
 
     //   getting userId ---------------------------
-    this.toolService.getSecureStorage("userId").subscribe({
-      next: (result) => {
-        this.userId = result;
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo userId en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+
+    this.userId = await this.toolService.getSecureStorage("userId");
+
+    // this.toolService.getSecureStorage("userId").subscribe({
+    //   next: (result) => {
+    //     this.userId = result;
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo userId en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
 
     //   getting visitors ---------------------------
-    this.toolService.getSecureStorage("visitors").subscribe({
-      next: (result) => {
-        this.visitors = JSON.parse(result);
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo visitors en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+    this.visitors = await this.toolService.getSecureStorage("visitors");
+  //   this.toolService.getSecureStorage("visitors").subscribe({
+  //     next: (result) => {
+  //       this.visitors = JSON.parse(result);
+  //     },
+  //     error: (err) => {
+  //       this.toolService.toastAlert(
+  //         "error, obteniendo visitors en getSecureStorage: " + err,
+  //         0,
+  //         ["Ok"],
+  //         "middle"
+  //       );
+  //     },
+  //   });
   }
 
   async appendVisitor(pkg: any) {

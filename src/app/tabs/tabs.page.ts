@@ -36,18 +36,20 @@ export class TabsPage implements OnInit {
   }
 
   async ngOnInit() {
-    this.toolService.getSecureStorage("myRole").subscribe({
-      next: (result) => {
-        this.MyRole = result || "visitor";
-      },
-      error: (err) => {
-        this.toolService.toastAlert(
-          "error, obteniendo myRole en getSecureStorage: " + err,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      },
-    });
+
+    this.MyRole = await this.toolService.getSecureStorage("myRole");
+    // this.toolService.getSecureStorage("myRole").subscribe({
+    //   next: (result) => {
+    //     this.MyRole = result || "visitor";
+    //   },
+    //   error: (err) => {
+    //     this.toolService.toastAlert(
+    //       "error, obteniendo myRole en getSecureStorage: " + err,
+    //       0,
+    //       ["Ok"],
+    //       "middle"
+    //     );
+    //   },
+    // });
   }
 }
