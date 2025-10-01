@@ -492,13 +492,7 @@ export class Tab1Page implements OnInit {
     return withoutOffset;
   }
 
-  // Send a text message using default options
-
   async sendSMS(door: string) {
-    if (this.msg == "") {
-      this.toolService.toastAlert("Message empty !", 0, ["Ok"], "bottom");
-      return;
-    }
     var options: SmsOptions = {
       replaceLineBreaks: false,
       android: {
@@ -512,6 +506,8 @@ export class Tab1Page implements OnInit {
 
     let uuid = await this.toolService.getSecureStorage("deviceUuid");
 
+    
+
     // const local_sim =  await this.storage.get('coreSim');
 
     // create milliseconds block  for local timestamp -------
@@ -520,11 +516,9 @@ export class Tab1Page implements OnInit {
 
     this.sim = local_sim ?? "";
     this.msg = "open," + (await this.getTimestamp()) + "," + door + "," + uuid;
-
     // --------------------------------
 
     if (!local_sim) {
-      // this.toolService.toastAlert('Privada sin Sim ',0, ['Ok'], 'bottom');
       this.toolService.showAlertBasic("Alerta", "Privada no tiene Sim", "", [
         "Ok",
       ]);
@@ -539,7 +533,7 @@ export class Tab1Page implements OnInit {
         })
         .then(async (res) => {
           res.present();
-          if (use_twilio == "false") {
+          if (!use_twilio) {
             // Check if user is locked
             this.api.getData("api/users/notLocked/" + this.userId).subscribe({
               next: async (res) => {

@@ -21,7 +21,6 @@ export class AuthInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     // No interceptar requests de auth
-    console.log('si entre al interceptor..!!!');
     if (req.url.includes('api/auth/signin') || 
         req.url.includes('api/auth/signup') || 
         req.url.includes('api/auth/pwdResetReq') ||
@@ -32,8 +31,7 @@ export class AuthInterceptor implements HttpInterceptor {
     return from(this.addTokenToRequest(req)).pipe(
       switchMap(authReq => next.handle(authReq)),
       catchError((error: HttpErrorResponse) => {
-        // if (error.status === 401 && error.error?.code === 'TOKEN_EXPIRED') {
-        if (error.status === 401) {
+        if (error.status === 401 && error.error.expired) {
           return this.handle401Error(req, next);
         }
         return throwError(error);

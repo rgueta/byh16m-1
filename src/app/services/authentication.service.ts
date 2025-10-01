@@ -179,6 +179,8 @@ export class AuthenticationService {
 
       if (response?.success) {
         await this.toolService.setSecureStorage('authToken',response.authToken);
+        await this.toolService.setSecureStorage("tokenIAT", response.iatDate);
+        await this.toolService.setSecureStorage("tokenEXP", response.expDate);
         return true;
       }
       return false;
@@ -208,7 +210,7 @@ export class AuthenticationService {
       const refreshToken = await this.getRefreshToken();
       
       if (refreshToken) {
-        await this.http.post(`${this.REST_API_SERVER}/logout`, { refreshToken }).toPromise();
+        await this.http.post(`${this.REST_API_SERVER}logout`, { refreshToken }).toPromise();
       }
     } catch (error) {
       console.error('Logout error:', error);
