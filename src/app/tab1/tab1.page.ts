@@ -135,7 +135,8 @@ export class Tab1Page implements OnInit {
   REST_API_SERVER = environment.cloud.server_url;
   iosOrAndroid: boolean = false;
   demoMode: any;
-  remoteCtrl:any;
+  remoteCtrl: any;
+  ws: WebSocket | any;
 
   // #endregion -----
   constructor(
@@ -176,7 +177,7 @@ export class Tab1Page implements OnInit {
 
     this.MyRole = await this.toolService.getSecureStorage("myRole");
 
-    this.myEmail = await this.toolService.getSecureStorage("email");    
+    this.myEmail = await this.toolService.getSecureStorage("email");
 
     this.myName = await this.toolService.getSecureStorage("name");
 
@@ -195,7 +196,9 @@ export class Tab1Page implements OnInit {
     await this.getDemoMode();
 
     // -----------------firebase Push notification
-    let  devicePlatform: any = await this.toolService.getSecureStorage("devicePlatform");
+    let devicePlatform: any = await this.toolService.getSecureStorage(
+      "devicePlatform"
+    );
 
     if (["android", "ios"].includes(devicePlatform)) {
       PushNotifications.requestPermissions().then((resul) => {
@@ -261,6 +264,36 @@ export class Tab1Page implements OnInit {
 
     this.infoPanel = document.getElementById("infoSection");
     this.infoPanel.style.marginTop = "115px";
+
+    this.WSconnect();
+  }
+
+  WSconnect() {
+    this.ws = new WebSocket("ws://127.0.0.1:9000");
+
+    this.ws.onopen = () => {
+      console.log("✅ Conectado");
+    };
+
+    this.ws.onmessage = (e: any) => {
+      console.log("📩 Respuesta:", e.data);
+    };
+
+    this.ws.onerror = (e: any) => {
+      console.error("❌ Error WS", e);
+    };
+  }
+
+  // Version WebSocket  -------------------------
+  async sendSMS(door: string) {
+    let local_sim = await this.toolService.getSecureStorage("coreSim");
+    const cmd = JSON.stringify({
+      action: "send_sms",
+      number: local_sim,
+      text: door,
+    });
+
+    this.ws.send(cmd);
   }
 
   toggleButtons() {
@@ -379,27 +412,26 @@ export class Tab1Page implements OnInit {
   }
 
   async collectInfo() {
-    let timestamp:any;
+    let timestamp: any;
 
     if (await this.networkService.checkInternetConnection()) {
       timestamp = await this.toolService.getSecureStorage("lastInfoUpdated");
 
       if (timestamp.value === null) {
-            timestamp = await this.toolService.convDate(new Date());
-          }
+        timestamp = await this.toolService.convDate(new Date());
+      }
 
-      const info  = await this.toolService.getSecureStorage("info");
+      const info = await this.toolService.getSecureStorage("info");
 
-       if (this.localInfo.length == 0 && !info ) {
-            let d = new Date();
-            d.setDate(d.getDate() - 180);
-            timestamp = this.toolService.convDate(d);
-          }
+      if (this.localInfo.length == 0 && !info) {
+        let d = new Date();
+        d.setDate(d.getDate() - 180);
+        timestamp = this.toolService.convDate(d);
+      }
 
       if (this.localInfo.length == 0 && info) {
         this.localInfo = info;
       }
-
 
       try {
         this.api
@@ -428,7 +460,7 @@ export class Tab1Page implements OnInit {
                   this.localInfo.splice(1000);
                 }
 
-                this.toolService.setSecureStorage("info",this.localInfo);
+                this.toolService.setSecureStorage("info", this.localInfo);
               }
             },
             error: (error: any) => {
@@ -440,7 +472,6 @@ export class Tab1Page implements OnInit {
           "lastInfoUpdated",
           this.toolService.convDate(new Date())
         );
-
       } catch (e) {
         this.toolService.toastAlert(
           "Error api/info/ call: " + e,
@@ -451,7 +482,7 @@ export class Tab1Page implements OnInit {
       }
     } else {
       if (this.localInfo.length == 0 && this.localInfo) {
-        this.localInfo = await this.toolService.getSecureStorage("info")
+        this.localInfo = await this.toolService.getSecureStorage("info");
       }
       this.toolService.toastAlert(
         "No hay acceso a internet",
@@ -492,7 +523,8 @@ export class Tab1Page implements OnInit {
     return withoutOffset;
   }
 
-  async sendSMS(door: string) {
+  // Version SMS  --------------------------------
+  async sendSMS_(door: string) {
     var options: SmsOptions = {
       replaceLineBreaks: false,
       android: {
@@ -502,11 +534,9 @@ export class Tab1Page implements OnInit {
 
     let local_sim = await this.toolService.getSecureStorage("coreSim");
 
-    let use_twilio = await this.toolService.getSecureStorage("twilio")
+    let use_twilio = await this.toolService.getSecureStorage("twilio");
 
     let uuid = await this.toolService.getSecureStorage("deviceUuid");
-
-    
 
     // const local_sim =  await this.storage.get('coreSim');
 
