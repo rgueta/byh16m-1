@@ -75,6 +75,7 @@ import {
 import { catchError, throwError, from, Observable, of } from "rxjs";
 import { tap, switchMap } from "rxjs/operators";
 import { Preferences } from "@capacitor/preferences";
+import { WsService } from "../services/ws.service";
 
 @Component({
   selector: "app-tab1",
@@ -136,7 +137,6 @@ export class Tab1Page implements OnInit {
   iosOrAndroid: boolean = false;
   demoMode: any;
   remoteCtrl: any;
-  ws: WebSocket | any;
 
   // #endregion -----
   constructor(
@@ -148,7 +148,8 @@ export class Tab1Page implements OnInit {
     private toolService: ToolsService,
     private loadingController: LoadingController,
     private screenOrientation: ScreenOrientation,
-    public networkService: NetworkService
+    public networkService: NetworkService,
+    private ws: WsService
   ) {
     addIcons({
       ellipsisVerticalOutline,
@@ -265,32 +266,21 @@ export class Tab1Page implements OnInit {
     this.infoPanel = document.getElementById("infoSection");
     this.infoPanel.style.marginTop = "115px";
 
-    this.WSconnect();
-  }
-
-  WSconnect() {
-    this.ws = new WebSocket("ws://127.0.0.1:9000");
-
-    this.ws.onopen = () => {
-      console.log("✅ Conectado");
-    };
-
-    this.ws.onmessage = (e: any) => {
-      console.log("📩 Respuesta:", e.data);
-    };
-
-    this.ws.onerror = (e: any) => {
-      console.error("❌ Error WS", e);
-    };
+    this.ws.connect();
   }
 
   // Version WebSocket  -------------------------
   async sendSMS(door: string) {
+    // if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+    //   console.error("❌ WS no conectado", this.ws?.readyState);
+    //   return;
+    // }
+
     let local_sim = await this.toolService.getSecureStorage("coreSim");
     const cmd = JSON.stringify({
-      action: "send_sms",
-      number: local_sim,
-      text: door,
+      action: "open",
+      sim: local_sim,
+      device: door,
     });
 
     this.ws.send(cmd);
