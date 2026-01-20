@@ -1,0 +1,24 @@
+meta {
+  name: sim/send remote
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://100.24.58.74/sim/send
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+        "action":"open",
+        "sim":"6641752182",
+        "device":"peatonal"
+      }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

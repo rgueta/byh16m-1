@@ -75,7 +75,8 @@ import {
 import { catchError, throwError, from, Observable, of } from "rxjs";
 import { tap, switchMap } from "rxjs/operators";
 import { Preferences } from "@capacitor/preferences";
-import { WsService } from "../services/ws.service";
+// import { WsService } from "../services/ws.service";
+import { HttpClient } from "@angular/common/http";
 
 @Component({
   selector: "app-tab1",
@@ -149,7 +150,7 @@ export class Tab1Page implements OnInit {
     private loadingController: LoadingController,
     private screenOrientation: ScreenOrientation,
     public networkService: NetworkService,
-    private ws: WsService
+    private http: HttpClient // private ws: WsService
   ) {
     addIcons({
       ellipsisVerticalOutline,
@@ -266,24 +267,21 @@ export class Tab1Page implements OnInit {
     this.infoPanel = document.getElementById("infoSection");
     this.infoPanel.style.marginTop = "115px";
 
-    this.ws.connect();
+    // this.ws.connect();
   }
 
   // Version WebSocket  -------------------------
   async sendSMS(door: string) {
-    // if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
-    //   console.error("❌ WS no conectado", this.ws?.readyState);
-    //   return;
-    // }
-
     let local_sim = await this.toolService.getSecureStorage("coreSim");
-    const cmd = JSON.stringify({
+    const API = this.REST_API_SERVER + "sim/send";
+    let pkg = JSON.stringify({
       action: "open",
       sim: local_sim,
       device: door,
     });
+    console.log("API: ", API, pkg);
 
-    this.ws.send(cmd);
+    return this.api.postData("sim/send", pkg);
   }
 
   toggleButtons() {
