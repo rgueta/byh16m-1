@@ -148,7 +148,7 @@ export class LoginPage implements OnInit {
         //#region get device uuid  --------------------------------
         await Device.getId()
           .then(async (deviceId: any) => {
-            console.log('deviceId: ', deviceId);
+            console.log("deviceId: ", deviceId);
             this.toolService.setSecureStorage(
               "deviceUuid",
               deviceId["identifier"]
@@ -204,11 +204,12 @@ export class LoginPage implements OnInit {
 
   // get Config App ----
   async getConfigApp() {
-    this.api.getData("api/config/").subscribe({
+    this.api.getData("api/config").subscribe({
       next: async (result: any) => {
         this.adminDevice = result[0].admin_device;
         this.adminSim = result[0].admin_sim;
         this.adminEmail = result[0].admin_email;
+        console.log("admin_device: ", this.adminDevice);
 
         // secure storage ----------------
         this.toolService.setSecureStorage(
@@ -235,29 +236,29 @@ export class LoginPage implements OnInit {
         .then(async (allowed: any) => {
           if (allowed) {
             await this.SIM.requestReadPermission()
-              .then(async PermissionStatus =>{
-                if (PermissionStatus === 'granted'){
+              .then(async (PermissionStatus) => {
+                if (PermissionStatus === "granted") {
                   await this.SIM.getSimInfo()
-                  .then((info: any) => {
-                    console.log("Si estoy en init() allowed :", allowed);
-                    console.log("Sim info: ", info);
-              })
-              .catch((err: any) =>
-                console.error("Unable to get sim info: " + err)
-              );
+                    .then((info: any) => {
+                      console.log("Si estoy en init() allowed :", allowed);
+                      console.log("Sim info: ", info);
+                    })
+                    .catch((err: any) =>
+                      console.error("Unable to get sim info: " + err)
+                    );
                 }
               })
               .catch((err: any) => {
                 console.error("Sim Permission denied: " + err);
               });
           } else {
-             this.toolService.toastAlert(
+            this.toolService.toastAlert(
               "error,falta permisos para leer datos del sim",
               0,
               ["Ok"],
               "middle"
             );
-              }
+          }
         })
         .catch((err: any) => {
           console.error("Sim Permission denied, " + err);
@@ -300,29 +301,31 @@ export class LoginPage implements OnInit {
             //   },
             // });
 
-            const lockedValue = await this.toolService.getSecureStorage("locked");
+            const lockedValue = await this.toolService.getSecureStorage(
+              "locked"
+            );
 
             // In your component
             const roles = await this.toolService.getSecureStorage("roles");
-             for (const val_myrole of roles) {
-                  console.log("lockedValue: ", lockedValue);
-                  if (lockedValue === "true") {
-                    console.log("Usuario Locked...");
-                    await this.lockedUser("Usuario bloqueado !");
-                    return;
-                  }
-                  if (
-                    val_myrole.name === "admin" ||
-                    val_myrole.name === "neighbor" ||
-                    val_myrole.name === "neighborAdmin"
-                  ) {
-                    this.router.navigateByUrl("/tabs", { replaceUrl: true });
-                  } else {
-                    this.router.navigateByUrl("/store", { replaceUrl: true });
-                  }
-                }
-                // get config info
-                this.getConfigApp();
+            for (const val_myrole of roles) {
+              console.log("lockedValue: ", lockedValue);
+              if (lockedValue === "true") {
+                console.log("Usuario Locked...");
+                await this.lockedUser("Usuario bloqueado !");
+                return;
+              }
+              if (
+                val_myrole.name === "admin" ||
+                val_myrole.name === "neighbor" ||
+                val_myrole.name === "neighborAdmin"
+              ) {
+                this.router.navigateByUrl("/tabs", { replaceUrl: true });
+              } else {
+                this.router.navigateByUrl("/store", { replaceUrl: true });
+              }
+            }
+            // get config info
+            this.getConfigApp();
 
             // this.toolService.getSecureStorage("roles").subscribe({
             //   next: async (result) => {

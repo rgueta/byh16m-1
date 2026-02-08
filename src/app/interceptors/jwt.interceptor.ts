@@ -4,32 +4,43 @@
 //   return next(req);
 // };
 
-
-import { Injectable } from '@angular/core';
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError, from, BehaviorSubject } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
-import { AuthenticationService } from '../services/authentication.service';
+import { Injectable } from "@angular/core";
+import {
+  HttpInterceptor,
+  HttpRequest,
+  HttpHandler,
+  HttpEvent,
+  HttpErrorResponse,
+} from "@angular/common/http";
+import { Observable, throwError, from, BehaviorSubject } from "rxjs";
+import { catchError, switchMap } from "rxjs/operators";
+import { AuthenticationService } from "../services/authentication.service";
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   private isRefreshing = false;
-  private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
-
+  private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(
+    null
+  );
 
   constructor(private authService: AuthenticationService) {}
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  intercept(
+    req: HttpRequest<any>,
+    next: HttpHandler
+  ): Observable<HttpEvent<any>> {
     // No interceptar requests de auth
-    if (req.url.includes('api/auth/signin') || 
-        req.url.includes('api/auth/signup') || 
-        req.url.includes('api/auth/pwdResetReq') ||
-        req.url.includes('api/auth/register/')) {
+    if (
+      req.url.includes("api/auth/signin") ||
+      req.url.includes("api/auth/signup") ||
+      req.url.includes("api/auth/pwdResetReq") ||
+      req.url.includes("api/auth/register/")
+    ) {
       return next.handle(req);
     }
 
     return from(this.addTokenToRequest(req)).pipe(
-      switchMap(authReq => next.handle(authReq)),
+      switchMap((authReq) => next.handle(authReq)),
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401 && error.error.expired) {
           return this.handle401Error(req, next);
@@ -39,34 +50,39 @@ export class AuthInterceptor implements HttpInterceptor {
     );
   }
 
-  private async addTokenToRequest(req: HttpRequest<any>): Promise<HttpRequest<any>> {
+  private async addTokenToRequest(
+    req: HttpRequest<any>
+  ): Promise<HttpRequest<any>> {
     const token = await this.authService.getAccessToken();
-    
+
     if (token) {
       return req.clone({
         setHeaders: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
     }
-    
+
     return req;
   }
 
-  private handle401Error(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    console.log('si entre al 401 handler..!!!');
+  private handle401Error(
+    req: HttpRequest<any>,
+    next: HttpHandler
+  ): Observable<HttpEvent<any>> {
+    console.log("si entre al 401 handler..!!!");
     return from(this.authService.refreshToken()).pipe(
-      switchMap(success => {
+      switchMap((success) => {
         if (success) {
           return from(this.addTokenToRequest(req)).pipe(
-            switchMap(newReq => next.handle(newReq))
+            switchMap((newReq) => next.handle(newReq))
           );
         } else {
           this.authService.logout();
-          return throwError('Authentication failed');
+          return throwError("Authentication failed");
         }
       }),
-      catchError(error => {
+      catchError((error) => {
         this.authService.logout();
         return throwError(error);
       })

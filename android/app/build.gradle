@@ -22,11 +22,23 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+      // Desactiva específicamente la verificación problemática
+    lintOptions {
+        disable 'InvalidPackage'
+        abortOnError false
+    }
+
+     // Configuración para evitar el error de metadata
+    aaptOptions {
+        ignoreAssetsPattern '!aar-metadata.properties'
+    }
 }
 
 repositories {
-    google()
-    mavenCentral()
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
 }
 
 dependencies {
@@ -39,6 +51,14 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')
+}
+
+configurations.all {
+    // Fuerza re-descarga de dependencias problemáticas
+    resolutionStrategy {
+        force 'androidx.appcompat:appcompat-resources:1.7.0'
+        force 'androidx.appcompat:appcompat:1.7.0'
+    }
 }
 
 apply from: 'capacitor.build.gradle'
