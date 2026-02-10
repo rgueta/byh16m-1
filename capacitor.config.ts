@@ -5,14 +5,14 @@ const config: CapacitorConfig = {
   appName: "byh16m",
   webDir: "www",
   // server: {
-  //   url: "http://localhost:8100", //  <-- pc Ip address
+  //   url: "http://192.168.1.170:8100", //  <-- pc Ip address
   //   cleartext: true,
   // },
 
-  server: {
-    androidScheme: "https",
-    cleartext: true, // Solo para desarrollo
-  },
+  // server: {
+  //   androidScheme: "https",
+  //   cleartext: true, // Solo para desarrollo
+  // },
   plugins: {
     CapacitorHttp: {
       enabled: true,

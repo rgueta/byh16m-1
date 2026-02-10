@@ -7,6 +7,7 @@ import {
   HttpHandler,
   HttpHeaders,
   HttpParams,
+  HttpErrorResponse,
 } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { ToolsService } from "../services/tools.service";
@@ -154,7 +155,6 @@ export class DatabaseService {
   getData_key(collection: String, data: any) {
     // secure storage --------------
     let token = this.toolService.getSecureStorage("authToken");
-    
 
     //   getting authToken ---------------------------
     // this.toolService.getSecureStorage("authToken").subscribe({
@@ -187,28 +187,121 @@ export class DatabaseService {
 
   getData<T>(path: string): Observable<T> {
     // Convertir la Promise de getSecureStorage a un Observable
-    console.log('El path en getData: ', path);
-    return from(this.toolService.getSecureStorage("authToken"))
-      .pipe(
-        // switchMap se suscribe al Observable de `from` y luego al nuevo Observable del `http.get`
-        switchMap((token: any) => {
-          let headers = new HttpHeaders();
+    console.log("El path en getData: ", path);
+    return from(this.toolService.getSecureStorage("authToken")).pipe(
+      // switchMap se suscribe al Observable de `from` y luego al nuevo Observable del `http.get`
+      switchMap((token: any) => {
+        let headers = new HttpHeaders();
+        if (!this.toolService.isPublicEndpoint(path)) {
+          console.log("EndPoint seguro");
           headers = headers.set("Authorization", `Bearer ${token}`);
-          
-          return this.http.get<T>(`${this.REST_API_SERVER}${path}`, { headers });
-        }),
-        // Manejo de errores
-        catchError((err) => {
-          console.error('Error fetching data:', err);
-          if(err.expired){
-            console.log('Esta chingadera expiro!');
-          }
-          return throwError(() => err);
-        })
-      );
-}
+        } else {
+          console.log("EndPoint publico..");
+        }
 
-  //--- POST data to server
+        return this.http.get<T>(`${this.REST_API_SERVER}${path}`, { headers });
+      }),
+      // Manejo de errores
+      catchError((err) => {
+        console.error("Error fetching data:", err);
+        if (err.expired) {
+          console.log("Esta chingadera expiro!");
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+  // #region ---- new endpoint request ---------------------------------------
+
+  getData_new<T>(path: string): Observable<T> {
+    console.log("El path en getData: ", path);
+
+    // isPublicEndpoint ahora devuelve una Promise, así que usamos from
+    return from(this.toolService.isPublicEndpoint(path)).pipe(
+      switchMap((isPublic: boolean) => {
+        console.log(isPublic ? "EndPoint público" : "EndPoint seguro");
+
+        if (isPublic) {
+          // Endpoint público - no necesita token
+          return this.handlePublicRequest<T>(path);
+        } else {
+          // Endpoint privado - necesita token
+          return this.handlePrivateRequest<T>(path);
+        }
+      }),
+      catchError((error: any) => {
+        console.error("Error al determinar si el endpoint es público:", error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  private handlePublicRequest<T>(path: string): Observable<T> {
+    console.log(`URL --> ${this.REST_API_SERVER}${path}`);
+    return this.http.get<T>(`${this.REST_API_SERVER}${path}`).pipe(
+      catchError((error: HttpErrorResponse) => {
+        console.error("Error en endpoint público:", error);
+        return this.handleError(error);
+      })
+    );
+  }
+
+  private handlePrivateRequest<T>(path: string): Observable<T> {
+    return from(this.toolService.getSecureStorage("authToken")).pipe(
+      switchMap((token: string | null) => {
+        if (!token) {
+          console.error("No hay token disponible para endpoint privado");
+          return throwError(() => new Error("No autenticado"));
+        }
+
+        const headers = new HttpHeaders().set(
+          "Authorization",
+          `Bearer ${token}`
+        );
+        return this.http.get<T>(`${this.REST_API_SERVER}${path}`, { headers });
+      }),
+      catchError((error: HttpErrorResponse | Error) => {
+        console.error("Error en endpoint privado:", error);
+
+        if (error instanceof HttpErrorResponse && error.status === 401) {
+          console.log("Token expirado!");
+          this.handleTokenExpiration();
+        }
+
+        return this.handleError(error);
+      })
+    );
+  }
+
+  private handleError(error: HttpErrorResponse | Error): Observable<never> {
+    let errorMessage = "Ocurrió un error";
+
+    if (error instanceof HttpErrorResponse) {
+      errorMessage = `Error HTTP ${error.status}: ${error.message}`;
+    } else if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+
+    console.error(errorMessage);
+    return throwError(() => new Error(errorMessage));
+  }
+
+  private handleTokenExpiration(): void {
+    console.warn("Manejando expiración del token");
+    // Implementa tu lógica aquí
+  }
+  // }
+
+  // Interface actualizada para ToolService
+  // interface ToolService {
+  //   isPublicEndpoint(path: string): Promise<boolean>;  // Ahora devuelve Promise
+  //   getSecureStorage<T>(key: string): Promise<T | null>;
+  // }
+
+  // #endregion ---- end new endpoint request ---------------------------------------
+
+  // --- POST data to server
 
   async postData_noToken(collection: String, data: any) {
     let options = {
@@ -318,7 +411,7 @@ export class DatabaseService {
 
   async postRegisterData(url: String, data: any) {
     // secure storage ------------------
-    let token = await this.toolService.getSecureStorage("authToken")
+    let token = await this.toolService.getSecureStorage("authToken");
 
     //   getting authToken ---------------------------
     // this.toolService.getSecureStorage("authToken").subscribe({
@@ -449,7 +542,7 @@ export class DatabaseService {
     });
   }
 }
+
 function then(arg0: (Token: any) => void) {
   throw new Error("Function not implemented.");
 }
-

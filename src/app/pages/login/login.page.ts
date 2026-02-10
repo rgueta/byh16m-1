@@ -97,8 +97,8 @@ export class LoginPage implements OnInit {
   net_status: any;
   deviceUuid: string = "";
   adminDevice: any;
-  adminSim: [] = [];
-  adminEmail: [] = [];
+  adminSim: any;
+  adminEmail: any;
 
   public myToast: any;
 
@@ -206,20 +206,20 @@ export class LoginPage implements OnInit {
   async getConfigApp() {
     this.api.getData("api/config").subscribe({
       next: async (result: any) => {
-        this.adminDevice = result[0].admin_device;
-        this.adminSim = result[0].admin_sim;
-        this.adminEmail = result[0].admin_email;
-        console.log("admin_device: ", this.adminDevice);
+        this.adminDevice = result.admin_device[0];
+        this.adminSim = result.admin_sim[0];
+        this.adminEmail = result.admin_email[0];
+        console.log("admin_device: ", await this.adminDevice);
 
         // secure storage ----------------
         this.toolService.setSecureStorage(
           "adminSim",
-          JSON.stringify(result[0].admin_sim)
+          JSON.stringify(result.admin_sim[0])
         );
         this.toolService.setSecureStorage("adminDevice", this.adminDevice);
         this.toolService.setSecureStorage(
           "adminEmail",
-          JSON.stringify(result[0].admin_email)
+          JSON.stringify(result.admin_email[0])
         );
       },
       error: (error) => {

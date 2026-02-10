@@ -15,33 +15,87 @@ export class ToolsService {
     public toast: ToastController
   ) {}
 
+  // Función básica para verificar si es público
+  async isPublicEndpoint(endpoint: string) {
+    const lowerEndpoint = endpoint.toLowerCase();
+
+    // Verificar por palabras clave en la ruta
+    const publicKeywords = [
+      "public",
+      "auth",
+      "login",
+      "register",
+      "logout",
+      "signin",
+      "signup",
+      "forgot-pwd",
+      "reset-pwd",
+      "verify",
+      "confirm",
+      "health",
+      "status",
+      "config",
+      "catalog",
+      "products",
+      "categories",
+    ];
+
+    // Dividir la ruta en segmentos
+    const segments = endpoint
+      .split("/")
+      .filter((segment) => segment.length > 0);
+
+    // Verificar cada segmento
+    for (const segment of segments) {
+      const lowerSegment = segment.toLowerCase();
+
+      // Verificar si el segmento contiene palabra clave
+      for (const keyword of publicKeywords) {
+        if (lowerSegment.includes(keyword)) {
+          return true;
+        }
+      }
+
+      // Verificar patrones específicos
+      if (
+        lowerSegment.startsWith("public-") ||
+        lowerSegment.endsWith("-public") ||
+        lowerSegment === "pub"
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   // -------- secure storage  ---------------------------
   // Guardar authToken
   async setSecureStorage(key: string, value: any): Promise<string | null> {
     let errorMessage = "An unknown error occurred.";
-    try{
-        const serializedValue = this.serialize(key, value);
-        await Preferences.set({
-          key: key,
-          value: serializedValue
-        });
+    try {
+      const serializedValue = this.serialize(key, value);
+      await Preferences.set({
+        key: key,
+        value: serializedValue,
+      });
 
-        return serializedValue;
-      }catch(error){
-        console.error('setSecureStorage error:', error);
+      return serializedValue;
+    } catch (error) {
+      console.error("setSecureStorage error:", error);
 
-        if (error instanceof Error) {
-            // Standard Error object has a `message` property
-            errorMessage = error.message;
-          } else if (typeof error === 'string') {
-            // The thrown value is a string
-            errorMessage = error;
-          } else {
-            // The thrown value is an object or another type, convert it to a string
-            errorMessage = JSON.stringify(error, null, 2);
-          }
-        return errorMessage;
+      if (error instanceof Error) {
+        // Standard Error object has a `message` property
+        errorMessage = error.message;
+      } else if (typeof error === "string") {
+        // The thrown value is a string
+        errorMessage = error;
+      } else {
+        // The thrown value is an object or another type, convert it to a string
+        errorMessage = JSON.stringify(error, null, 2);
       }
+      return errorMessage;
+    }
   }
 
   // Obtener token Promise
@@ -53,17 +107,15 @@ export class ToolsService {
   }
 
   // Obtener token Single
-   async getSecureStorageS(key: string): Promise<string | null> {
+  async getSecureStorageS(key: string): Promise<string | null> {
     try {
       const { value } = await Preferences.get({ key });
       return value;
     } catch (error) {
-      console.error('Error al obtener la preferencia:', error);
+      console.error("Error al obtener la preferencia:", error);
       return null;
     }
   }
-
-
 
   // async getSecureStorageS(key: string) {
   //   let storedValue: string | null = null;
@@ -91,24 +143,24 @@ export class ToolsService {
   //   );
   // }
 
-   async getSecureStorage(key: string): Promise<any> {
+  async getSecureStorage(key: string): Promise<any> {
     try {
       const result = await Preferences.get({ key: key });
-      
+
       if (!result || result.value === null) {
         return result;
       }
-      
+
       return this.deserialize(result.value);
     } catch (error) {
-      console.error('Error obteniendo dato:', error);
+      console.error("Error obteniendo dato:", error);
       return error;
     }
   }
 
   async getSecureBoolean(key: string): Promise<boolean> {
     const { value } = await Preferences.get({ key: key });
-    const result = value === "true" ? true: false;
+    const result = value === "true" ? true : false;
     console.log(`Valor obtenido para la clave '${key}': ${result}`);
     return result;
   }
@@ -125,134 +177,132 @@ export class ToolsService {
     await Preferences.clear();
   }
 
-
-    /**
+  /**
    * Detecta el tipo de dato para serialización especial
    */
   private detectType(value: any): string {
-    if (value instanceof Date) return 'date';
-    if (value?.constructor?.name === 'ObjectId') return 'objectid';
-    if (value instanceof RegExp) return 'regexp';
-    if (value instanceof Map) return 'map';
-    if (value instanceof Set) return 'set';
-    if (value instanceof ArrayBuffer) return 'buffer';
-    if (typeof value === 'bigint') return 'bigint';
-    if (value === null) return 'null';
-    
+    if (value instanceof Date) return "date";
+    if (value?.constructor?.name === "ObjectId") return "objectid";
+    if (value instanceof RegExp) return "regexp";
+    if (value instanceof Map) return "map";
+    if (value instanceof Set) return "set";
+    if (value instanceof ArrayBuffer) return "buffer";
+    if (typeof value === "bigint") return "bigint";
+    if (value === null) return "null";
+
     return typeof value;
   }
 
-   /**
+  /**
    * Serializa cualquier tipo de dato a string
    */
-  private serialize(key:string, value: any): string {
+  private serialize(key: string, value: any): string {
     // Manejo especial para tipos complejos
     if (value === undefined || value === null) {
-      return JSON.stringify({ type: 'null', value: null });
+      return JSON.stringify({ type: "null", value: null });
     }
-    
+
     // Detectar tipo y serializar apropiadamente
     const type = this.detectType(value);
-    
+
     switch (type) {
-      case 'date':
-        return JSON.stringify({ 
-          type: 'date', 
-          value: value.toISOString() 
+      case "date":
+        return JSON.stringify({
+          type: "date",
+          value: value.toISOString(),
         });
-        
-      case 'objectid':
-        return JSON.stringify({ 
-          type: 'objectid', 
-          value: value.toString() 
+
+      case "objectid":
+        return JSON.stringify({
+          type: "objectid",
+          value: value.toString(),
         });
-        
-      case 'regexp':
-        return JSON.stringify({ 
-          type: 'regexp', 
-          value: { 
-            pattern: value.source, 
-            flags: value.flags 
-          } 
+
+      case "regexp":
+        return JSON.stringify({
+          type: "regexp",
+          value: {
+            pattern: value.source,
+            flags: value.flags,
+          },
         });
-        
-      case 'map':
-        return JSON.stringify({ 
-          type: 'map', 
-          value: Array.from(value.entries()) 
+
+      case "map":
+        return JSON.stringify({
+          type: "map",
+          value: Array.from(value.entries()),
         });
-        
-      case 'set':
-        return JSON.stringify({ 
-          type: 'set', 
-          value: Array.from(value) 
+
+      case "set":
+        return JSON.stringify({
+          type: "set",
+          value: Array.from(value),
         });
-        
-      case 'buffer':
-        return JSON.stringify({ 
-          type: 'buffer', 
-          value: Array.from(new Uint8Array(value)) 
+
+      case "buffer":
+        return JSON.stringify({
+          type: "buffer",
+          value: Array.from(new Uint8Array(value)),
         });
-        
-      case 'bigint':
-        return JSON.stringify({ 
-          type: 'bigint', 
-          value: value.toString() 
+
+      case "bigint":
+        return JSON.stringify({
+          type: "bigint",
+          value: value.toString(),
         });
-        
+
       default:
-        return JSON.stringify({ 
-          type: typeof value, 
-          value: value 
+        return JSON.stringify({
+          type: typeof value,
+          value: value,
         });
     }
   }
 
-
-    /**
+  /**
    * Deserializa el string al tipo original
    */
   private deserialize<T>(serializedValue: string): T {
     try {
       const parsed = JSON.parse(serializedValue);
-      
-      if (!parsed || typeof parsed !== 'object') {
+
+      if (!parsed || typeof parsed !== "object") {
         return parsed as T;
       }
-      
+
       // Reconstruir tipos especiales
       switch (parsed.type) {
-        case 'date':
+        case "date":
           return new Date(parsed.value) as T;
-          
-        case 'objectid':
+
+        case "objectid":
           // Si usas MongoDB ObjectId en el frontend
           // return new ObjectId(parsed.value) as T;
           return parsed.value as T; // o mantener como string
-          
-        case 'regexp':
+
+        case "regexp":
           return new RegExp(parsed.value.pattern, parsed.value.flags) as T;
-          
-        case 'map':
+
+        case "map":
           return new Map(parsed.value) as T;
-          
-        case 'set':
+
+        case "set":
           return new Set(parsed.value) as T;
-          
-        case 'buffer':
+
+        case "buffer":
           return new Uint8Array(parsed.value).buffer as T;
-          
-        case 'bigint':
+
+        case "bigint":
           return BigInt(parsed.value) as T;
-          
-        case 'null':
+
+        case "null":
           return null as T;
-          
+
         default:
           return parsed.value as T;
       }
     } catch (error) {
-      console.error('Error deserializando:', error);
+      console.error("Error deserializando:", error);
       return serializedValue as T; // Fallback: devolver como string
     }
   }
@@ -361,7 +411,6 @@ export class ToolsService {
     //     );
     //   },
     // });
-
 
     refreshToken = await this.getSecureStorage("refreshToken");
     // this.getSecureStorage("refreshToken").subscribe({
