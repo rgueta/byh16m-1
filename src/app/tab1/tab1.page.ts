@@ -535,6 +535,7 @@ export class Tab1Page implements OnInit {
             // Check if user is locked
             this.api.getData("api/users/notLocked/" + this.userId).subscribe({
               next: async (res) => {
+                console.log("notLocked res -->", res);
                 await this.sms
                   .send(this.sim, this.msg, options)
                   .then(() => this.loadingController.dismiss())
