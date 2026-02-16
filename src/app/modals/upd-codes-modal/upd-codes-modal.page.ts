@@ -45,7 +45,7 @@ import { Share } from "@capacitor/share";
 import { QrCodeComponent } from "ng-qrcode";
 import { addIcons } from "ionicons";
 import { arrowBackCircleOutline } from "ionicons/icons";
-
+import { Contacts } from "@capacitor-community/contacts";
 const USERID = "userId";
 
 @Component({
@@ -149,6 +149,8 @@ export class UpdCodesModalPage implements OnInit {
     //     );
     //   },
     // });
+    //
+    this.openVisitorModal();
 
     this.code = this.genCode(7);
     this.getVisitors();
@@ -487,6 +489,42 @@ export class UpdCodesModalPage implements OnInit {
   async shareImage(canvas: HTMLCanvasElement) {
     let base64 = canvas.toDataURL();
     let path = "qr.png";
+
+    const loading = await this.loadingController.create({
+      message: "Preparando envío...",
+      translucent: true,
+    });
+    await loading.present();
+
+    try {
+      const res = await Filesystem.writeFile({
+        path,
+        data: base64,
+        directory: Directory.Cache,
+      });
+
+      // Abrimos la hoja de compartir.
+      // El usuario elegirá WhatsApp/SMS y buscará el nombre (que ya sabe quién es)
+      await Share.share({
+        title: "Tu Código de Acceso",
+        text: `Hola ${this.visitorCode}, aquí tienes tu código: ${this.code}`,
+        url: res.uri,
+        dialogTitle: "Enviar QR a Visitante",
+      });
+
+      // IMPORTANTE: Una vez que regresa de compartir, guardamos en MongoDB
+      // Aquí es donde vinculamos el QR generado con el número de la agenda
+      await this.onSubmitTemplate(false);
+    } catch (err) {
+      console.error("Error al compartir:", err);
+    } finally {
+      loading.dismiss();
+    }
+  }
+
+  async shareImage_(canvas: HTMLCanvasElement) {
+    let base64 = canvas.toDataURL();
+    let path = "qr.png";
     console.log("entre a shareImage 1");
     const loading = await this.loadingController.create({
       translucent: true,
@@ -561,6 +599,91 @@ export class UpdCodesModalPage implements OnInit {
   }
 
   async openVisitorModal() {
+    const alert = await this.alertController.create({
+      header: "Seleccionar Contacto",
+      buttons: [
+        {
+          text: "Agenda del Teléfono",
+          handler: () => {
+            this.pickNativeContact();
+          },
+        },
+        {
+          text: "Lista de Visitantes",
+          handler: () => {
+            this.openInternalVisitorList();
+          },
+        },
+        {
+          text: "Cancelar",
+          role: "cancel",
+        },
+      ],
+    });
+
+    await alert.present();
+  }
+
+  // Nueva función para abrir la agenda nativa
+  async pickNativeContact() {
+    try {
+      const permission = await Contacts.requestPermissions();
+
+      if (permission.contacts !== "granted") {
+        const request = await Contacts.requestPermissions();
+        if (request.contacts !== "granted") return;
+      }
+
+      const result = await Contacts.pickContact({
+        projection: {
+          name: true,
+          phones: true,
+        },
+      });
+
+      if (result.contact) {
+        // Guardamos el nombre y el número (limpiando espacios)
+        this.selectedVisitor = {
+          name: result.contact.name?.display || "Visitante",
+          sim:
+            (result.contact.phones?.[0]?.number ?? "").replace(/\s+/g, "") ||
+            "",
+        };
+
+        // Actualizamos las variables que usa tu formulario y el QR
+        this.visitorCode = this.selectedVisitor.name;
+        this.visitorSim = this.selectedVisitor.sim;
+
+        this.toolService.toastAlert(
+          "Contacto cargado: " + this.visitorSim,
+          1500,
+          ["Ok"],
+          "bottom"
+        );
+      }
+    } catch (error) {
+      console.error("Error seleccionando contacto:", error);
+    }
+  }
+
+  // Tu lógica original movida a una función aparte
+  async openInternalVisitorList() {
+    const modal = await this.modalController.create({
+      component: VisitorListPage,
+    });
+
+    modal.onDidDismiss().then(async (item) => {
+      if (item.data) {
+        this.selectedVisitor = item.data;
+        this.visitorCode = item.data["name"] ? item.data["name"] : "";
+        this.visitorSim = item.data["sim"] ? item.data["sim"] : "";
+      }
+    });
+
+    return await modal.present();
+  }
+
+  async openVisitorModal_() {
     console.log("entre a openVisitorModal");
     const modal = await this.modalController.create({
       component: VisitorListPage,
