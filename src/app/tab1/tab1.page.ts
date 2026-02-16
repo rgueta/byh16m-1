@@ -531,48 +531,35 @@ export class Tab1Page implements OnInit {
         })
         .then(async (res) => {
           res.present();
-          if (!use_twilio) {
-            // Check if user is locked
-            this.api.getData("api/users/notLocked/" + this.userId).subscribe({
-              next: async (res) => {
-                console.log("notLocked res -->", res);
-                await this.sms
-                  .send(this.sim, this.msg, options)
-                  .then(() => this.loadingController.dismiss())
-                  .catch((e: any) => {
-                    this.loadingController.dismiss();
-                    this.toolService.showAlertBasic(
-                      "Alerta",
-                      "Error",
-                      "Falla conexion a red telefonica",
-                      ["Ok"]
-                    );
-                  });
-              },
-              error: async (err) => {
-                this.loadingController.dismiss();
-                await this.showAlert(
-                  "",
-                  "",
-                  "Usuario bloqueado",
-                  "btns",
-                  "Ok",
-                  ""
-                );
-              },
-            });
-          } else {
-            this.api.postData(
-              "api/twilio/open/" +
-                this.userId +
-                "/" +
-                this.msg +
-                "/" +
-                this.sim,
-              ""
-            );
-            this.loadingController.dismiss();
-          }
+          // Check if user is locked
+          this.api.getData("api/users/notLocked/" + this.userId).subscribe({
+            next: async (res) => {
+              console.log("notLocked res -->", res);
+              await this.sms
+                .send(this.sim, this.msg, options)
+                .then(() => this.loadingController.dismiss())
+                .catch((e: any) => {
+                  this.loadingController.dismiss();
+                  this.toolService.showAlertBasic(
+                    "Alerta",
+                    "Error",
+                    "Falla conexion a red telefonica",
+                    ["Ok"]
+                  );
+                });
+            },
+            error: async (err) => {
+              this.loadingController.dismiss();
+              await this.showAlert(
+                "",
+                "",
+                "Usuario bloqueado",
+                "btns",
+                "Ok",
+                ""
+              );
+            },
+          });
         });
     } catch (e) {
       this.toolService.showAlertBasic(

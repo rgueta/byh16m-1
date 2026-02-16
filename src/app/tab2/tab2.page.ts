@@ -137,11 +137,13 @@ export class Tab2Page implements OnInit {
   }
 
   async getEventsInitial(event: any) {
-    await this.convertDate("initial", new Date(event.detail.value));
+    // await this.convertDate("initial", new Date(event.detail.value));
+    this.Initial = event.detail.value;
   }
 
   async getEventsFinal(event: any) {
-    await this.convertDate("final", new Date(event.detail.value));
+    // await this.convertDate("final", new Date(event.detail.value));
+    this.Final = event.detail.value;
   }
 
   async convertDate(pos: string, fecha: Date) {
@@ -171,6 +173,10 @@ export class Tab2Page implements OnInit {
     ).toISOString();
   }
 
+  toSqliteDatetime(iso: string): string {
+    return iso.replace("T", " ").slice(0, 19);
+  }
+
   async getEvents() {
     if (!(await this.networkService.checkInternetConnection())) {
       this.toolService.toastAlert(
@@ -188,18 +194,14 @@ export class Tab2Page implements OnInit {
           "api/codeEvent/" +
             this.myUserId +
             "/" +
-            this.Initial +
+            this.toSqliteDatetime(this.Initial) +
             "/" +
-            this.Final
+            this.toSqliteDatetime(this.Final)
         )
         .subscribe({
-          next: async (result) => {
-            this.EventsList = result;
-
+          next: async (result: any) => {
+            this.EventsList = result.results;
             if (this.EventsList.length > 0) {
-              console.log("Initial: ", this.Initial);
-              console.log("Final: ", this.Final);
-              console.log("codeEvents: ", result);
               this.EventsList.forEach(async (item: any) => {
                 let d = new Date(item.createdAt.replace("Z", ""));
                 item.createdAt = new Date(

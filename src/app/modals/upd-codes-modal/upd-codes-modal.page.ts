@@ -118,7 +118,6 @@ export class UpdCodesModalPage implements OnInit {
   }
 
   async ngOnInit() {
-
     this.userId = await this.toolService.getSecureStorage("userId");
 
     // this.toolService.getSecureStorage("userId").subscribe({
@@ -210,14 +209,12 @@ export class UpdCodesModalPage implements OnInit {
   }
 
   async getVisitors() {
-
     this.myVisitors = await this.toolService.getSecureStorage("visitors");
     this.myVisitors = await this.toolService.sortJsonVisitors(
-            this.myVisitors,
-            "name",
-            true
-          );
-
+      this.myVisitors,
+      "name",
+      true
+    );
 
     // this.toolService.getSecureStorage("visitors").subscribe({
     //   next: async (result) => {
@@ -363,11 +360,8 @@ export class UpdCodesModalPage implements OnInit {
               visitorSim: "n/a",
               visitorName: "n/a",
               comment: this.localComment,
-              source: {
-                user: this.userId,
-                platform: this.StrPlatform,
-                id: userSim,
-              },
+              userId: this.userId,
+              device_plaform: this.StrPlatform,
             })
             .then(
               async (resp: any) => {
@@ -452,33 +446,10 @@ export class UpdCodesModalPage implements OnInit {
       },
     };
 
-    // let use_twilio = "";
-    // this.toolService.getSecureStorage("twilio").subscribe({
-    //   next: (result) => {
-    //     use_twilio = result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo twilio en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
-
-
     const use_twilio = await this.toolService.getSecureStorage("twilio");
 
     try {
-      if (use_twilio == "false") {
-        await this.sms.send(sim, text);
-      } else {
-        this.api.postData(
-          "api/twilio/open/" + this.userId + "/" + text + "/" + sim,
-          ""
-        );
-      }
+      await this.sms.send(sim, text);
     } catch (e) {
       // alert('Text was not sent !')
       const toast = await this.toast.create({
@@ -516,13 +487,17 @@ export class UpdCodesModalPage implements OnInit {
   async shareImage(canvas: HTMLCanvasElement) {
     let base64 = canvas.toDataURL();
     let path = "qr.png";
-
+    console.log("entre a shareImage 1");
     const loading = await this.loadingController.create({
       translucent: true,
       spinner: "crescent",
     });
 
+    console.log("entre a shareImage 2 antes del loading.present()");
+
     await loading.present();
+
+    console.log("entre a shareImage 3 despues del loading.present()");
 
     await Filesystem.writeFile({
       path,
@@ -586,6 +561,7 @@ export class UpdCodesModalPage implements OnInit {
   }
 
   async openVisitorModal() {
+    console.log("entre a openVisitorModal");
     const modal = await this.modalController.create({
       component: VisitorListPage,
     });

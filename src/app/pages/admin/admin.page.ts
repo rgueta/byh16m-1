@@ -333,8 +333,6 @@ export class AdminPage implements OnInit {
   }
 
   async ngOnInit() {
-
-
     //   getting coreSim ---------------------------
     this.coreSim = await this.toolService.getSecureStorage("coreSim");
     // this.toolService.getSecureStorage("coreSim").subscribe({
@@ -371,7 +369,7 @@ export class AdminPage implements OnInit {
     // });
 
     //   getting demoMode ---------------------------
-    this,this.demoMode = await this.toolService.getSecureStorage("demoMode");
+    this, (this.demoMode = await this.toolService.getSecureStorage("demoMode"));
     // this.toolService.getSecureStorage("demoMode").subscribe({
     //   next: (result) => {
     //     this.demoMode = result == "true" ? true : false;
@@ -387,7 +385,9 @@ export class AdminPage implements OnInit {
     // });
 
     //   getting emailToVisitor ---------------------------
-    this.emailToVisitor = await this.toolService.getSecureStorage("emailToVisitor");
+    this.emailToVisitor = await this.toolService.getSecureStorage(
+      "emailToVisitor"
+    );
     // this.toolService.getSecureStorage("emailToVisitor").subscribe({
     //   next: (result) => {
     //     this.emailToVisitor = result == "true" ? true : false;
@@ -406,8 +406,8 @@ export class AdminPage implements OnInit {
     const roles = await this.toolService.getSecureStorage("roles");
 
     if (roles) {
-          this.getRoles();
-        }
+      this.getRoles();
+    }
 
     // this.toolService.getSecureStorage("roles").subscribe({
     //   next: (result) => {
@@ -441,7 +441,6 @@ export class AdminPage implements OnInit {
     //     );
     //   },
     // });
-
   }
 
   DemoMode() {
@@ -452,9 +451,10 @@ export class AdminPage implements OnInit {
   async getCores() {
     if (this.userId) {
       this.api.getData("api/cores/admin/" + this.userId).subscribe({
-        next: async (result) => {
-          this.CoresList = result;
+        next: async (result: any) => {
+          this.CoresList = result.results;
           this.CoresList[0].open = true;
+          console.log("cores-->", this.CoresList);
         },
         error: (err) => {
           this.toolService.toastAlert(

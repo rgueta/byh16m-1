@@ -153,7 +153,7 @@ export class CodesPage implements OnInit {
     // });
 
     //   getting roles ---------------------------
-    this,this.myRoles = await this.toolsService.getSecureStorage("roles");
+    this, (this.myRoles = await this.toolsService.getSecureStorage("roles"));
 
     // this.toolsService.getSecureStorage("roles").subscribe({
     //   next: (result) => {
@@ -186,7 +186,7 @@ export class CodesPage implements OnInit {
     // });
 
     //   getting coreSim ---------------------------
-    this.coreSim = await this.toolsService.getSecureStorage("coreSim"); 
+    this.coreSim = await this.toolsService.getSecureStorage("coreSim");
     // this.toolsService.getSecureStorage("coreSim").subscribe({
     //   next: (result) => {
     //     this.coreSim = result;
@@ -214,22 +214,23 @@ export class CodesPage implements OnInit {
 
   async collectCodes() {
     this.api
-      .getData_key("api/codes/user/" + this.userId, this.myToken)
-      .subscribe(async (result) => {
-        Object.entries(result).forEach(async ([key, item]) => {
-          if (new Date(item.expiry) < new Date()) {
-            item.expired = true;
+      .getData("api/codes/user/" + this.userId)
+      .subscribe(async (result: any) => {
+        Object.entries(result.results).forEach(async ([_, item]) => {
+          const code = item as any;
+          if (new Date(code.expiry) < new Date()) {
+            code.expired = true;
           } else {
-            item.expired = false;
+            code.expired = false;
           }
 
-          item.range = (
-            (new Date(item.expiry).getTime() - new Date().getTime()) /
+          code.range = (
+            (new Date(code.expiry).getTime() - new Date().getTime()) /
             3600000
           ).toFixed(1);
         });
 
-        this.CodeList = result;
+        this.CodeList = result.results;
         this.CodeList[0].open = true;
         this.initial = this.CodeList[0].initial;
         this.expiry = this.CodeList[0].expiry;
