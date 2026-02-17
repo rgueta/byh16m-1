@@ -46,6 +46,8 @@ import { QrCodeComponent } from "ng-qrcode";
 import { addIcons } from "ionicons";
 import { arrowBackCircleOutline } from "ionicons/icons";
 import { Contacts } from "@capacitor-community/contacts";
+import { SocialSharing } from "@awesome-cordova-plugins/social-sharing/ngx";
+
 const USERID = "userId";
 
 @Component({
@@ -70,6 +72,7 @@ const USERID = "userId";
     IonIcon,
     IonButtons,
   ],
+  providers: [SocialSharing],
 })
 export class UpdCodesModalPage implements OnInit {
   RegisterForm: FormGroup | any;
@@ -104,7 +107,8 @@ export class UpdCodesModalPage implements OnInit {
     public toast: ToastController,
     private alertController: AlertController,
     private loadingController: LoadingController,
-    private toolService: ToolsService
+    private toolService: ToolsService,
+    private socialSharing: SocialSharing
   ) {
     addIcons({ arrowBackCircleOutline });
     this.validateControls();
@@ -150,7 +154,9 @@ export class UpdCodesModalPage implements OnInit {
     //   },
     // });
     //
-    this.openVisitorModal();
+
+    // Comentado para evitar que se abra la lista de contactos
+    // this.openVisitorModal();
 
     this.code = this.genCode(7);
     this.getVisitors();
@@ -486,7 +492,64 @@ export class UpdCodesModalPage implements OnInit {
     });
   }
 
-  async shareImage(canvas: HTMLCanvasElement) {
+  async shareImage_New_repetida(canvas: HTMLCanvasElement) {
+    const base64 = canvas.toDataURL(); // Imagen del QR
+    const mensaje = `Hola ${this.visitorCode}, tu código de acceso es: ${this.code}`;
+
+    // En Android, el nombre del paquete de SMS suele ser 'com.google.android.apps.messaging'
+    // o 'com.android.mms'. Para WhatsApp es 'com.whatsapp'.
+
+    const appName = this.platform.is("android")
+      ? "com.google.android.apps.messaging"
+      : "sms";
+
+    this.socialSharing
+      .shareVia(
+        appName,
+        mensaje,
+        "subject se puede personalizar", // Subject
+        base64, // AQUÍ SÍ VA LA IMAGEN
+        "uri se puede personalizar" // URL
+      )
+      .then(async () => {
+        await this.onSubmitTemplate(false);
+      })
+      .catch(async (err) => {
+        // Si falla por el nombre del paquete, usamos el share general pero con los datos listos
+        console.log("Error con app específica, intentando share general");
+        this.socialSharing.share(
+          mensaje,
+          "se puede personalizar",
+          base64,
+          "se piuede personalizar"
+        );
+      });
+  }
+
+  async shareImage_New_soloTexto(canvas: HTMLCanvasElement) {
+    console.log("Llegue hasta shareImage...");
+    const base64 = canvas.toDataURL(); // Imagen del QR
+    const mensaje = `Hola ${this.visitorCode}, tu código de acceso es: ${this.code}`;
+
+    // La función espera: shareViaSMS(message, phoneNumber)
+    this.socialSharing
+      .shareViaSMS(mensaje, this.visitorSim)
+      .then(async () => {
+        console.log("SMS App abierta con éxito");
+        await this.onSubmitTemplate(false);
+      })
+      .catch((err) => {
+        this.toolService.toastAlert(
+          "Error al abrir SMS: " + err,
+          2000,
+          ["Ok"],
+          "bottom"
+        );
+      });
+  }
+
+  // Pruebas para obtener el numero de celular
+  async shareImage_Pruebas(canvas: HTMLCanvasElement) {
     let base64 = canvas.toDataURL();
     let path = "qr.png";
 
@@ -502,6 +565,8 @@ export class UpdCodesModalPage implements OnInit {
         data: base64,
         directory: Directory.Cache,
       });
+
+      console.log("this.visitorCode: ", this.visitorCode);
 
       // Abrimos la hoja de compartir.
       // El usuario elegirá WhatsApp/SMS y buscará el nombre (que ya sabe quién es)
@@ -522,7 +587,7 @@ export class UpdCodesModalPage implements OnInit {
     }
   }
 
-  async shareImage_(canvas: HTMLCanvasElement) {
+  async shareImage(canvas: HTMLCanvasElement) {
     let base64 = canvas.toDataURL();
     let path = "qr.png";
     console.log("entre a shareImage 1");
@@ -531,11 +596,7 @@ export class UpdCodesModalPage implements OnInit {
       spinner: "crescent",
     });
 
-    console.log("entre a shareImage 2 antes del loading.present()");
-
     await loading.present();
-
-    console.log("entre a shareImage 3 despues del loading.present()");
 
     await Filesystem.writeFile({
       path,
@@ -555,6 +616,7 @@ export class UpdCodesModalPage implements OnInit {
 
             // send code to mongo and core device
             this.onSubmitTemplate(false);
+            this.modalController.dismiss(true);
           })
           .catch((err: any) => {
             console.log("error sharing, " + err.message);

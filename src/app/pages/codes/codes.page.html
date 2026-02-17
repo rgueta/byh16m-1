@@ -87,10 +87,10 @@
 
       <!-- Initial   ----------------------------------------------------------------------- -->
       <!-- <ion-list class="lstInitial"> -->
-      <ion-item id="open-modalInitial" class="itemFilter">
+      <ion-item id="open-modalInitialToAvoid" class="itemFilter">
         <ion-label class="lblFilterDate">Inicio :</ion-label>
         <ion-note class="filterDate" slot="end"
-          >{{item.initial | date:'dd MMM YYYY hh:mm a'}}</ion-note
+          >{{item.initial | date:'dd MMM yyyy hh:mm a'}}</ion-note
         >
         <ion-icon color="white" slot="end" name="calendar-outline"></ion-icon>
       </ion-item>
@@ -116,10 +116,10 @@
 
       <!--  Expiry -------------------------------------------------------------------------------- -->
 
-      <ion-item id="open-modalExpiry" class="itemFilter">
+      <ion-item id="open-modalExpiryToAvoid" class="itemFilter">
         <ion-label class="lblFilterDate">Fin :</ion-label>
         <ion-note class="filterDate" slot="end"
-          >{{item.expiry | date:'dd MMM YYYY hh:mm a'}}</ion-note
+          >{{item.expiry | date:'dd MMM yyyy hh:mm a'}}</ion-note
         >
         <ion-icon color="white" slot="end" name="calendar-outline"></ion-icon>
       </ion-item>
