@@ -170,7 +170,6 @@ export class AuthenticationService {
   async refreshToken(): Promise<boolean> {
     // Evitar múltiples llamadas simultáneas
     if (this.refreshTokenInProgress) {
-      console.log("⏳ Refresh token ya en progreso...");
       return false;
     }
 
@@ -190,26 +189,20 @@ export class AuthenticationService {
         tokenString = refresherToken;
       } else if (refresherToken && typeof refresherToken === "object") {
         // Si es un objeto, intentar extraer el token
-        console.log("Token es objeto:", refresherToken);
         // Intenta con las propiedades más comunes
         tokenString =
           refresherToken.token ||
           refresherToken.accessToken ||
           refresherToken.value ||
           JSON.stringify(refresherToken);
-        console.log("Token extraído:", tokenString);
       } else {
         tokenString = String(refresherToken);
       }
 
       const refreshToken = tokenString;
-
-      console.log("🔄 Solicitando nuevo access token...");
       const response = await this.http
         .post<any>(`${this.REST_API_SERVER}api/auth/refresh`, { refreshToken })
         .toPromise();
-
-      console.log("📩 Respuesta de refresh:", response);
 
       if (response?.success) {
         // Guardar nuevo access token
