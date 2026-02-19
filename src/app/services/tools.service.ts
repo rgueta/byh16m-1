@@ -16,7 +16,7 @@ export class ToolsService {
   ) {}
 
   // Función básica para verificar si es público
-  async isPublicEndpoint(endpoint: string) {
+  isPublicEndpoint(endpoint: string) {
     const lowerEndpoint = endpoint.toLowerCase();
 
     // Verificar por palabras clave en la ruta

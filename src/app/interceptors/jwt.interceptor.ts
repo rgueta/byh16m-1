@@ -1,9 +1,3 @@
-// import { HttpInterceptorFn } from '@angular/common/http';
-
-// export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
-//   return next(req);
-// };
-
 import { Injectable } from "@angular/core";
 import {
   HttpInterceptor,
@@ -13,79 +7,102 @@ import {
   HttpErrorResponse,
 } from "@angular/common/http";
 import { Observable, throwError, from, BehaviorSubject } from "rxjs";
-import { catchError, switchMap } from "rxjs/operators";
+import { catchError, switchMap, filter, take, finalize } from "rxjs/operators";
 import { AuthenticationService } from "../services/authentication.service";
 
-@Injectable()
+@Injectable({ providedIn: "root" })
 export class AuthInterceptor implements HttpInterceptor {
   private isRefreshing = false;
   private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(
     null
   );
 
+  token: any = null;
   constructor(private authService: AuthenticationService) {}
 
   intercept(
     req: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    // No interceptar requests de auth
-    if (
-      req.url.includes("api/auth/signin") ||
-      req.url.includes("api/auth/signup") ||
-      req.url.includes("api/auth/pwdResetReq") ||
-      req.url.includes("api/auth/register/")
-    ) {
+    // No interceptar peticiones de refresh para evitar ciclos
+    if (req.url.includes("/api/auth/refresh")) {
       return next.handle(req);
     }
 
-    return from(this.addTokenToRequest(req)).pipe(
-      switchMap((authReq) => next.handle(authReq)),
-      catchError((error: HttpErrorResponse) => {
-        if (error.status === 401 && error.error.expired) {
-          return this.handle401Error(req, next);
+    return from(this.authService.getAccessToken()).pipe(
+      switchMap((token) => {
+        let authReq = req;
+        if (token) {
+          authReq = req.clone({
+            setHeaders: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
         }
-        return throwError(error);
+
+        return next.handle(authReq).pipe(
+          catchError((error) => {
+            if (error instanceof HttpErrorResponse && error.status === 401) {
+              return this.handle401Error(authReq, next);
+            }
+            return throwError(() => error);
+          })
+        );
       })
     );
-  }
-
-  private async addTokenToRequest(
-    req: HttpRequest<any>
-  ): Promise<HttpRequest<any>> {
-    const token = await this.authService.getAccessToken();
-
-    if (token) {
-      return req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-    }
-
-    return req;
   }
 
   private handle401Error(
     req: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    console.log("si entre al 401 handler..!!!");
-    return from(this.authService.refreshToken()).pipe(
-      switchMap((success) => {
-        if (success) {
-          return from(this.addTokenToRequest(req)).pipe(
-            switchMap((newReq) => next.handle(newReq))
-          );
-        } else {
-          this.authService.logout();
-          return throwError("Authentication failed");
-        }
-      }),
-      catchError((error) => {
-        this.authService.logout();
-        return throwError(error);
-      })
-    );
+    if (!this.isRefreshing) {
+      this.isRefreshing = true;
+      this.refreshTokenSubject.next(null);
+
+      return from(this.authService.refreshToken()).pipe(
+        switchMap((success: boolean) => {
+          if (success) {
+            return from(this.authService.getAccessToken()).pipe(
+              switchMap((newToken) => {
+                this.refreshTokenSubject.next(newToken);
+
+                const newReq = req.clone({
+                  setHeaders: {
+                    Authorization: `Bearer ${newToken}`,
+                  },
+                });
+
+                return next.handle(newReq);
+              })
+            );
+          } else {
+            console.log(
+              "⚠️ Refresh token falló, pero NO hacemos logout automático"
+            );
+            // NO hacemos logout - solo notificamos que no se pudo refrescar
+            this.refreshTokenSubject.next(null);
+            return throwError(() => new Error("No se pudo refrescar el token"));
+          }
+        }),
+        finalize(() => {
+          this.isRefreshing = false;
+        })
+      );
+    } else {
+      // Esperar mientras se refresca el token
+      return this.refreshTokenSubject.pipe(
+        filter((token) => token !== null),
+        take(1),
+        switchMap((token) => {
+          const newReq = req.clone({
+            setHeaders: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          return next.handle(newReq);
+        })
+      );
+    }
   }
 }

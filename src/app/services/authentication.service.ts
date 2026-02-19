@@ -1,5 +1,9 @@
 import { Injectable } from "@angular/core";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpErrorResponse,
+} from "@angular/common/http";
 import { take, map, tap, switchMap, subscribeOn } from "rxjs/operators";
 import {
   BehaviorSubject,
@@ -28,7 +32,7 @@ export interface TokenResponse {
   success: boolean;
   data: {
     accessToken: string;
-  }
+  };
 }
 
 export interface AuthResponse {
@@ -39,8 +43,8 @@ export interface AuthResponse {
     tokens: {
       accessToken: string;
       refreshToken: string;
-    }
-  }
+    };
+  };
 }
 
 // #endregion
@@ -60,8 +64,9 @@ export class AuthenticationService {
   );
   currentAuthToken: any;
   userId = "";
-  private isRefreshing = false;
+
   private currentUserSubject = new BehaviorSubject<User | null>(null);
+  private refreshTokenInProgress = false;
 
   constructor(
     private http: HttpClient,
@@ -95,15 +100,16 @@ export class AuthenticationService {
           let authToken: string | null = null;
           let refreshToken: string | null = null;
 
-          await this.toolService
-            .setSecureStorage("authToken", tokens.authToken)
-            .then((value) => {
-              authToken = value;
-            })
-            .catch((err) => {
-              console.log("Error in authentication.service.ts --> ", err);
-            });
-
+          if (tokens.authToken != "" && tokens.authToken != null) {
+            await this.toolService
+              .setSecureStorage("authToken", tokens.authToken)
+              .then((value) => {
+                authToken = value;
+              })
+              .catch((err) => {
+                console.log("Error in authentication.service.ts --> ", err);
+              });
+          }
           await this.toolService
             .setSecureStorage("refreshToken", tokens.refreshToken)
             .then((value) => {
@@ -135,7 +141,7 @@ export class AuthenticationService {
           //   JSON.stringify(tokens.roles)
           // );
 
-          this.toolService.setSecureStorage("roles",tokens.roles);
+          this.toolService.setSecureStorage("roles", tokens.roles);
 
           this.toolService.setSecureStorage("remote", tokens.remote);
           this.toolService.setSecureStorage("coreSim", tokens.coreSim);
@@ -151,7 +157,7 @@ export class AuthenticationService {
           this.toolService.setSecureStorage("locked", tokens.locked);
           this.toolService.setSecureStorage("emailToVisitor", true);
           this.toolService.setSecureStorage("emailToCore", true);
-          
+
           return from(Promise.all([authToken, refreshToken]));
         }),
         tap((_) => {
@@ -160,66 +166,116 @@ export class AuthenticationService {
       );
   }
 
-
-    // Refresh token
+  // Refresh token
   async refreshToken(): Promise<boolean> {
+    // Evitar múltiples llamadas simultáneas
+    if (this.refreshTokenInProgress) {
+      console.log("⏳ Refresh token ya en progreso...");
+      return false;
+    }
+
+    this.refreshTokenInProgress = true;
+
     try {
-      const refreshToken = await this.getRefreshToken();
-      
-      if (!refreshToken) {
-        throw new Error('No refresh token available');
+      const refresherToken: any = await this.getRefreshToken();
+      if (!refresherToken) {
+        console.log("⚠️ No hay refresh token disponible");
+        return false;
       }
 
-      const response = await this.http.post<any>(
-        `${this.REST_API_SERVER}api/auth/refresh`,
-        { refreshToken }
-      ).toPromise();
+      // Asegurarse de que token sea un string
+      let tokenString = "";
 
-      console.log('response for Refresh: ', response);
+      if (typeof refresherToken === "string") {
+        tokenString = refresherToken;
+      } else if (refresherToken && typeof refresherToken === "object") {
+        // Si es un objeto, intentar extraer el token
+        console.log("Token es objeto:", refresherToken);
+        // Intenta con las propiedades más comunes
+        tokenString =
+          refresherToken.token ||
+          refresherToken.accessToken ||
+          refresherToken.value ||
+          JSON.stringify(refresherToken);
+        console.log("Token extraído:", tokenString);
+      } else {
+        tokenString = String(refresherToken);
+      }
+
+      const refreshToken = tokenString;
+
+      console.log("🔄 Solicitando nuevo access token...");
+      const response = await this.http
+        .post<any>(`${this.REST_API_SERVER}api/auth/refresh`, { refreshToken })
+        .toPromise();
+
+      console.log("📩 Respuesta de refresh:", response);
 
       if (response?.success) {
-        await this.toolService.setSecureStorage('authToken',response.authToken);
+        // Guardar nuevo access token
+        await this.toolService.setSecureStorage(
+          "authToken",
+          response.authToken
+        );
+
         await this.toolService.setSecureStorage("tokenIAT", response.iatDate);
         await this.toolService.setSecureStorage("tokenEXP", response.expDate);
+
         return true;
       }
+
+      console.log("❌ Respuesta inválida del servidor");
       return false;
     } catch (error) {
-        console.error('Token refresh failed:', error);
-      await this.logout();
+      console.error("❌ Error en refreshToken:", error);
+
+      // Solo hacer logout si el refresh token es inválido (opcional)
+      // Puedes verificar el código de error del backend
+      if (error instanceof HttpErrorResponse) {
+        if (error.status === 401) {
+          // Refresh token inválido o expirado - aquí SÍ hacemos logout
+          console.log("⚠️ Refresh token inválido - sesión expirada");
+          await this.logout();
+        }
+      }
+
       return false;
+    } finally {
+      this.refreshTokenInProgress = false;
     }
   }
 
-
-    // Obtener access token
+  // Obtener access token
   async getAccessToken(): Promise<string | null> {
-    const result = await this.toolService.getSecureStorage('authToken');
+    const result = await this.toolService.getSecureStorage("authToken");
     return result;
   }
 
-    // Obtener refresh token
+  // Obtener refresh token
   async getRefreshToken(): Promise<string | null> {
-    const result = await this.toolService.getSecureStorage('refreshToken');
+    const result = await this.toolService.getSecureStorage("refreshToken");
     return result;
   }
 
-    // Logout
+  // Logout
   async logout(): Promise<void> {
     try {
       const refreshToken = await this.getRefreshToken();
-      
+
       if (refreshToken) {
-        await this.http.post(`${this.REST_API_SERVER}logout`, { refreshToken }).toPromise();
+        await this.http
+          .post(`${this.REST_API_SERVER}api/logout`, { refreshToken })
+          .toPromise();
       }
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     } finally {
-      // Limpiar storage siempre
-      await this.toolService.removeSecureStorage('authToken');
-      await this.toolService.removeSecureStorage('refreshToken');
-      await this.toolService.removeSecureStorage('user');
-      this.currentUserSubject.next(null);
+      // console.log("Logout, limpia en SecureStorage:");
+      // // Limpiar storage siempre
+      // await this.toolService.removeSecureStorage("authToken");
+      // await this.toolService.removeSecureStorage("refreshToken");
+      // await this.toolService.removeSecureStorage("user");
+      // this.currentUserSubject.next(null);
     }
   }
 
@@ -305,7 +361,11 @@ export class AuthenticationService {
     this.currentAuthToken = authToken;
     throwError(() => {
       // secure storage ---------
-      return this.toolService.setSecureStorage("authToken", authToken);
+      if (authToken != "" && authToken != null) {
+        return this.toolService.setSecureStorage("authToken", authToken);
+      } else {
+        return "";
+      }
     });
     // return from(this.storage.set(TOKEN, authToken));
   }

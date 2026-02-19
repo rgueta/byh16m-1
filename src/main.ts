@@ -27,7 +27,7 @@ bootstrapApplication(AppComponent, {
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules)),
-    provideHttpClient(),
+    // provideHttpClient(),
     // Provee las funcionalidades de HTTP con soporte para interceptores
     provideHttpClient(withInterceptorsFromDi()),
     // Provee el servicio del interceptor

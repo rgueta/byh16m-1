@@ -11,6 +11,7 @@ import {
 } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { ToolsService } from "../services/tools.service";
+import { options } from "ionicons/icons";
 
 const REFRESH_TOKEN = "refreshToken";
 const TOKEN = "authToken";
@@ -74,16 +75,19 @@ export class DatabaseService {
   // or simply remove all local tokens and navigate to login
   logout() {
     return this.http
-      .post(`${this.REST_API_SERVER}api/auth/logout`, {})
+      .post(`${this.REST_API_SERVER}api/logout`, {})
       .pipe(
         switchMap((_) => {
           this.currentAuthToken = null;
+          console.log("Estoy en database.service logout..");
           // Remove all stored tokens
-          const deleteAccess =
-            this.toolService.removeSecureStorage("authToken");
-          const deleteRefresh =
-            this.toolService.removeSecureStorage("refreshToken");
-          return from(Promise.all([deleteAccess, deleteRefresh]));
+          // const deleteAccess =
+          //   this.toolService.removeSecureStorage("authToken");
+          // const deleteRefresh =
+          //   this.toolService.removeSecureStorage("refreshToken");
+          // return from(Promise.all([deleteAccess, deleteRefresh]));
+          //
+          return Promise.all([]);
         }),
         tap((_) => {
           this.isAuthenticated.next(false);
@@ -138,10 +142,12 @@ export class DatabaseService {
     this.currentAuthToken = token.authToken;
 
     // secure storage ----------
-    this.toolService.setSecureStorage("authToken", token.authToken);
+    if (token.authToken != "" && token.authToken != null) {
+      this.toolService.setSecureStorage("authToken", token.authToken);
 
-    this.toolService.setSecureStorage("tokenIAT", token.iatDate);
-    this.toolService.setSecureStorage("tokenEXP", token.expDate);
+      this.toolService.setSecureStorage("tokenIAT", token.iatDate);
+      this.toolService.setSecureStorage("tokenEXP", token.expDate);
+    }
 
     // get new refresh token-------------
     if (token.refreshToken !== "")
@@ -187,16 +193,33 @@ export class DatabaseService {
 
   getData<T>(path: string): Observable<T> {
     // Convertir la Promise de getSecureStorage a un Observable
-    console.log("El path en getData: ", path);
     return from(this.toolService.getSecureStorage("authToken")).pipe(
       // switchMap se suscribe al Observable de `from` y luego al nuevo Observable del `http.get`
       switchMap((token: any) => {
         let headers = new HttpHeaders();
         if (!this.toolService.isPublicEndpoint(path)) {
-          console.log("EndPoint seguro");
-          headers = headers.set("Authorization", `Bearer ${token}`);
+          // headers = headers.set("Authorization", `Bearer ${token}`);
+          // Asegurarse de que token sea un string
+          let tokenString = "";
+          if (typeof token === "string") {
+            tokenString = token;
+          } else if (token && typeof token === "object") {
+            // Si es un objeto, intentar extraer el token
+            console.log("Token es objeto:", token);
+            // Intenta con las propiedades más comunes
+            tokenString =
+              token.token ||
+              token.accessToken ||
+              token.value ||
+              JSON.stringify(token);
+            console.log("Token extraído:", tokenString);
+          } else {
+            tokenString = String(token);
+          }
+
+          headers = headers.set("Authorization", `Bearer ${tokenString}`);
         } else {
-          console.log("EndPoint publico..");
+          console.log("EndPoint publico...");
         }
 
         return this.http.get<T>(`${this.REST_API_SERVER}${path}`, { headers });
