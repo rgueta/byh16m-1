@@ -144,6 +144,7 @@ export class LoginPage implements OnInit {
       .then(async (DeviceInfo: any) => {
         // this.device_info = await JSON.parse(JSON.stringify(DeviceInfo));
         this.device_info = await DeviceInfo;
+
         //#region get device uuid  --------------------------------
         await Device.getId()
           .then(async (deviceId: any) => {
@@ -163,10 +164,6 @@ export class LoginPage implements OnInit {
 
         //#endregion  -------------
         this.device_info.uuid = this.deviceUuid;
-        this.toolService.setSecureStorage(
-          "deviceInfo",
-          JSON.stringify(this.device_info)
-        );
         this.toolService.setSecureStorage(
           "devicePlatform",
           this.device_info.platform

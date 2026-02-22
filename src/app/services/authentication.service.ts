@@ -88,7 +88,10 @@ export class AuthenticationService {
     }
   }
 
-  login(credentials: { email: string; pwd: string }): Observable<AuthResponse> {
+  login_Old(credentials: {
+    email: string;
+    pwd: string;
+  }): Observable<AuthResponse> {
     tokens: this.Tokens;
     return this.http
       .post<AuthResponse>(`${this.REST_API_SERVER}api/auth/signin`, credentials)
@@ -166,6 +169,104 @@ export class AuthenticationService {
       );
   }
 
+  login(credentials: { email: string; pwd: string }): Observable<AuthResponse> {
+    tokens: this.Tokens;
+
+    // Obtener el UUID del dispositivo del SecureStorage
+    return from(this.toolService.getSecureStorage("deviceUuid")).pipe(
+      switchMap((deviceUuid) => {
+        // Crear el payload con el deviceUuid
+        const loginPayload = {
+          email: credentials.email,
+          pwd: credentials.pwd,
+          deviceId: deviceUuid,
+        };
+
+        return this.http
+          .post<AuthResponse>(
+            `${this.REST_API_SERVER}api/auth/signin`,
+            loginPayload
+          )
+          .pipe(
+            tap(async (tokens: any) => {
+              this.currentAuthToken = await tokens.authToken;
+
+              // --------   secure storege  -------------
+              let authToken: string | null = null;
+              let refreshToken: string | null = null;
+
+              // Si no existía device_uuid, guardar el que posiblemente nos devuelva el servidor
+              if (!deviceUuid && tokens.deviceId) {
+                await this.toolService.setSecureStorage(
+                  "device_uuid",
+                  tokens.deviceId
+                );
+              }
+
+              if (tokens.authToken != "" && tokens.authToken != null) {
+                await this.toolService
+                  .setSecureStorage("authToken", tokens.authToken)
+                  .then((value) => {
+                    authToken = value;
+                  })
+                  .catch((err) => {
+                    console.log("Error in authentication.service.ts --> ", err);
+                  });
+              }
+
+              await this.toolService
+                .setSecureStorage("refreshToken", tokens.refreshToken)
+                .then((value) => {
+                  refreshToken = value;
+                })
+                .catch((err) => {
+                  console.log("Error in authentication.service.ts --> ", err);
+                });
+
+              await this.toolService
+                .setSecureStorage("token_px", tokens.pwd)
+                .then((value) => {})
+                .catch((err) => {
+                  console.log("Error in authentication.service.ts --> ", err);
+                });
+
+              // ------------------------------
+
+              this.MyRole(tokens.roles).then(async (val_role) => {
+                this.toolService.setSecureStorage("myRole", val_role);
+              });
+
+              this.toolService.setSecureStorage("email", tokens.email);
+              this.toolService.setSecureStorage("userId", tokens.userId);
+              this.toolService.setSecureStorage("name", tokens.userName);
+              this.toolService.setSecureStorage("roles", tokens.roles);
+              this.toolService.setSecureStorage("remote", tokens.remote);
+              this.toolService.setSecureStorage("coreSim", tokens.coreSim);
+              this.toolService.setSecureStorage("sim", tokens.sim);
+              this.toolService.setSecureStorage("coreId", tokens.coreId);
+              this.toolService.setSecureStorage("coreName", tokens.coreName);
+              this.toolService.setSecureStorage("location", tokens.location);
+              this.toolService.setSecureStorage("twilio", false);
+              this.toolService.setSecureStorage(
+                "codeExpiry",
+                tokens.code_expiry
+              );
+              this.toolService.setSecureStorage("tokenIAT", tokens.iatDate);
+              this.toolService.setSecureStorage("tokenEXP", tokens.expDate);
+              this.toolService.setSecureStorage("locked", tokens.locked);
+              this.toolService.setSecureStorage("emailToVisitor", true);
+              this.toolService.setSecureStorage("emailToCore", true);
+
+              return from(Promise.all([authToken, refreshToken]));
+            }),
+            tap((_) => {
+              this.isAuthenticated.next(true);
+            })
+          );
+      })
+    );
+  }
+
   // Refresh token
   async refreshToken(): Promise<boolean> {
     // Evitar múltiples llamadas simultáneas
@@ -210,6 +311,14 @@ export class AuthenticationService {
           "authToken",
           response.authToken
         );
+
+        if (response.refreshToken) {
+          console.log("nuevo refreshToken..!", response.refreshToken);
+          await this.toolService.setSecureStorage(
+            "refreshToken",
+            response.refreshToken
+          );
+        }
 
         await this.toolService.setSecureStorage("tokenIAT", response.iatDate);
         await this.toolService.setSecureStorage("tokenEXP", response.expDate);

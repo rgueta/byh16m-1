@@ -177,6 +177,22 @@ export class Tab2Page implements OnInit {
     return iso.replace("T", " ").slice(0, 19);
   }
 
+  // async getEvents() {
+  //   this.api.getData("api/auth/info").subscribe({
+  //     next: async (result: any) => {
+  //       // this.EventsList = result.results;
+  //     },
+  //     error: (error) => {
+  //       this.toolService.showAlertBasic(
+  //         "Aviso",
+  //         "Fallo al obtener codeEvents: ",
+  //         error,
+  //         ["Cerrar"]
+  //       );
+  //     },
+  //   });
+  // }
+
   async getEvents() {
     if (!(await this.networkService.checkInternetConnection())) {
       this.toolService.toastAlert(
