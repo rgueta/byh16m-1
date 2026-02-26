@@ -100,50 +100,19 @@ export class UsersPage implements OnInit {
 
   async ngOnInit() {
     //   getting myRole ---------------------------
-    this.soyAdmin  = await this.toolService.getSecureStorage("myRole");
+    this.soyAdmin = await this.toolService.getSecureStorage("myRole");
     this.soyNeighborAdmin = this.soyAdmin == "neighborAdmin" ? true : false;
-
-    // this.toolService.getSecureStorage("myRole").subscribe({
-    //   next: (result) => {
-    //     this.soyAdmin = result === "admin" ? true : false;
-    //     this.soyNeighborAdmin = result == "neighborAdmin" ? true : false;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo myRole en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
 
     //   getting userId ---------------------------
     this.userId = await this.toolService.getSecureStorage("userId");
     this.getRoles();
     this.getUsers();
-
-  //   this.toolService.getSecureStorage("userId").subscribe({
-  //     next: (result) => {
-  //       this.userId = result;
-  //       this.getRoles();
-  //       this.getUsers();
-  //     },
-  //     error: (err) => {
-  //       this.toolService.toastAlert(
-  //         "error, obteniendo userId en getSecureStorage: " + err,
-  //         0,
-  //         ["Ok"],
-  //         "middle"
-  //       );
-  //     },
-  //   });
   }
 
   async getRoles() {
     this.api.getData("api/roles/" + this.userId).subscribe({
       next: async (result: any) => {
-        this.RoleList = await result;
+        this.RoleList = await result.results;
       },
       error: (error: any) => {
         this.toolService.showAlertBasic(
@@ -183,19 +152,6 @@ export class UsersPage implements OnInit {
   async simChange(neighborId: string, actualSim: string) {
     const coreSim = await this.toolService.getSecureStorage("coreSim");
     //   getting coreSim ---------------------------
-    // this.toolService.getSecureStorage("coreSim").subscribe({
-    //   next: (result) => {
-    //     coreSim = result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo coreSim en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
 
     var options: SmsOptions = {
       replaceLineBreaks: false,

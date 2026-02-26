@@ -148,201 +148,38 @@ export class UpdUsersPage implements OnInit {
     }
 
     //   getting userId ---------------------------
-    // this.toolService.getSecureStorage("userId").subscribe({
-    //   next: (result) => {
-    //     this.userId = result;
-    //     if (
-    //       this.sourcePage == "adminNewUser" ||
-    //       this.sourcePage == "adminNewExtrange"
-    //     ) {
-    //       this.RegisterForm.get("Cpu")!.setValue("byh16");
-    //       this.RegisterForm.get("Core")!.setValue(this.coreId!);
-    //       this.getRoles();
-    //     }
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo userId en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
-
     this.userId = await this.toolService.getSecureStorage("userId");
 
-     if (
-          this.sourcePage == "adminNewUser" ||
-          this.sourcePage == "adminNewExtrange"
-        ) {
-          this.RegisterForm.get("Cpu")!.setValue("byh16");
-          this.RegisterForm.get("Core")!.setValue(this.coreId!);
-          this.getRoles();
-        }
-
-
-
-    //   getting demoMode ---------------------------
-    // this.toolService.getSecureStorage("demoMode").subscribe({
-    //   next: (result) => {
-    //     this.demoMode = result == "true" ? true : false;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo demoMode en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    if (
+      this.sourcePage == "adminNewUser" ||
+      this.sourcePage == "adminNewExtrange"
+    ) {
+      this.RegisterForm.get("Cpu")!.setValue("byh16");
+      this.RegisterForm.get("Core")!.setValue(this.coreId!);
+      this.getRoles();
+    }
 
     this.demoMode = await this.toolService.getSecureStorage("demoMode");
 
-    // this.toolService.getSecureStorage("coreId").subscribe({
-    //   next: (result) => {
-    //     this.coreId = result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo coreId en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
-
     this.coreId = this.toolService.getSecureStorage("coreId");
 
-
-
-    // this.toolService.getSecureStorage("myRole").subscribe({
-    //   next: async (result) => {
-    //     this.MyRole = result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo myRole en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
-
     this.MyRole = await this.toolService.getSecureStorage("myRole");
-
-    // this.toolService.getSecureStorage("deviceInfo").subscribe({
-    //   next: async (result) => {
-    //     this.devicePkg = result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo deviceInfo en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
 
     this.devicePkg = await this.toolService.getSecureStorage("deviceInfo");
 
     if (this.MyRole == "admin") {
-      // let valueRoles: any | null = null;
-
-      // this.toolService.getSecureStorage("roles").subscribe({
-      //   next: async (result) => {
-      //     this.RoleList = await JSON.parse(result);
-      //   },
-      //   error: (err) => {
-      //     this.toolService.toastAlert(
-      //       "error, obteniendo roles en getSecureStorage: " + err,
-      //       0,
-      //       ["Ok"],
-      //       "middle"
-      //     );
-      //   },
-      // });
-
-      this.RoleList = await this.toolService.getSecureStorage("roles");
-
+      const rolesData = await this.toolService.getSecureStorage("roles");
+      this.RoleList = JSON.parse(rolesData).results;
     }
-
-    // this.toolService.getSecureStorage("location").subscribe({
-    //   next: async (result) => {
-    //     if (result) {
-    //       this.location = result!;
-    //     }
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo location en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
 
     this.location = await this.toolService.getSecureStorage("location");
 
     if (this.sourcePage != "login") {
-
-      // this.toolService.getSecureStorage("deviceUuid").subscribe({
-      //   next: async (result) => {
-      //     this.RegisterForm.get("Uuid")!.setValue(result);
-      //   },
-      //   error: (err) => {
-      //     this.toolService.toastAlert(
-      //       "error, obteniendo deviceUuid en getSecureStorage: " + err,
-      //       0,
-      //       ["Ok"],
-      //       "middle"
-      //     );
-      //   },
-      // });
-
       const deviceUuid = await this.toolService.getSecureStorage("deviceUuid");
       this.RegisterForm.get("Uuid")!.setValue(deviceUuid);
-
-
     }
 
-    // this.toolService.getSecureStorage("adminEmail").subscribe({
-    //   next: (result) => {
-    //     this.adminEmail = JSON.parse(result!)[0]["email"];
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo adminEmail en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
-
-    const admin_email = await  this.toolService.getSecureStorage("adminEmail");
-   this.adminEmail = JSON.parse(admin_email)[0]["email"];
-
-
-    // this.toolService.getSecureStorage("adminSim").subscribe({
-    //   next: (result) => {
-    //     this.adminSim = result;
-    //     console.log("adminSim: ", this.adminSim);
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo adminSim en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    const admin_email = await this.toolService.getSecureStorage("adminEmail");
 
     this.adminSim = await this.toolService.getSecureStorage("adminSim");
 
@@ -352,9 +189,9 @@ export class UpdUsersPage implements OnInit {
       this.sourcePage == "adminNew" ||
       this.sourcePage == "adminNewExtrange"
     ) {
-      this.api.getData("api/cpus/").subscribe({
-        next: async (result) => {
-          this.CpuList = result;
+      this.api.getData(`api/cpus/${this.userId}`).subscribe({
+        next: async (result: any) => {
+          this.CpuList = result.results;
         },
         error: (error: any) => {
           this.toolService.showAlertBasic(
@@ -413,10 +250,10 @@ export class UpdUsersPage implements OnInit {
   }
 
   async getCores(cpu: string) {
-    this.api.getData("api/cores/" + cpu).subscribe({
+    this.api.getData(`api/cores/cpu/${cpu}/${this.userId}`).subscribe({
       next: async (result: any) => {
-        console.log("coreList: ", result);
-        this.CoreList = await result;
+        console.log("coreList: ", result.results);
+        this.CoreList = await result.results;
       },
       error: (error: any) => {
         this.toolService.showAlertBasic(
@@ -432,12 +269,12 @@ export class UpdUsersPage implements OnInit {
   async getRoles() {
     let url = "api/roles/";
     if (this.sourcePage == "tab1NewNeighbor") {
-      url = "api/roles/neiAdmin/";
+      url = "api/roles/newAdmin/";
     }
 
     this.api.getData(url + this.userId).subscribe({
       next: async (result: any) => {
-        this.RoleList = await result;
+        this.RoleList = await result.results;
       },
       error: (error: any) => {
         this.toolService.showAlertBasic(
@@ -732,7 +569,6 @@ export class UpdUsersPage implements OnInit {
     //     );
     //   },
     // });
-
 
     const options: SmsOptions = {
       replaceLineBreaks: false,

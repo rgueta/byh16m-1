@@ -128,14 +128,13 @@
       ></ion-icon>
       <ion-icon color="white" slot="start" name="grid-outline"></ion-icon>
       <ion-label class="ion-text-wrap">
-        <strong>{{item.name}}</strong> Houses:
-        <b>{{item.Houses.qty}}</b></ion-label
+        <strong>{{item.name}}</strong> Houses: <b>{{item.houses}}</b></ion-label
       >
     </ion-item>
 
     <form tappable *ngIf="item.open" class="detail">
       <ion-item class="detail-item">
-        <ion-label> Address: <b>{{item.Address}}</b></ion-label>
+        <ion-label> Address: <b>{{item.address}}</b></ion-label>
       </ion-item>
       <ion-item class="detail-item">
         <ion-icon
@@ -147,8 +146,8 @@
         <ion-label>
           Coordinates:
           <b
-            >{{item.coord[0] | number:'.2-2'}}, {{item.coord[1] |
-            number:'.2-2'}}</b
+            >{{item.latitud | number:'.3-3'}}, {{item.longitud |
+            number:'.3-3'}}</b
           ></ion-label
         >
       </ion-item>
@@ -174,7 +173,7 @@
             *ngIf="simSectionOpen"
           ></ion-icon>
           <ion-icon color="white" slot="start" name="call-outline"></ion-icon>
-          <ion-label> Sim: <b>{{item.Sim}}</b></ion-label>
+          <ion-label> Sim: <b>{{item.sim}}</b></ion-label>
         </ion-item>
 
         <form tappable *ngIf="simSectionOpen" class="detailRoutines">
@@ -184,7 +183,7 @@
               name="code"
               required
               placeholder="new Sim"
-              value="{{item.Sim}}"
+              value="{{item.sim}}"
               [(ngModel)]="sim"
             ></ion-input>
             <ion-icon
@@ -197,12 +196,12 @@
         </form>
       </ion-list>
 
-      <ion-item class="detail-item">
+      <!--<ion-item class="detail-item">
         <ion-label class="labelInput"
           >Gate : <b>{{item.detail.Gate_type}}</b>, Motor:
           <b>{{item.detail.Motor}}</b></ion-label
         >
-      </ion-item>
+      </ion-item>-->
 
       <ion-list class="accordion-list" lines="none" detail="false" no-padding>
         <ion-item
@@ -235,7 +234,7 @@
         <form tappable *ngIf="routineOpen" class="detailRoutines">
           <ion-item
             class="detail-item"
-            (click)="collectUsers(item._id,item.name)"
+            (click)="collectUsers(item.id,item.name)"
           >
             <ion-icon
               color="white"
@@ -246,7 +245,7 @@
           </ion-item>
           <ion-item
             class="detail-item"
-            (click)="addNewUser(item._id,item.name,item.location)"
+            (click)="addNewUser(item.id,item.name,item.location)"
           >
             <ion-icon
               color="white"
@@ -257,7 +256,7 @@
           </ion-item>
           <ion-item
             class="detail-item"
-            (click)="newExtrange(item._id,item.name,item.location)"
+            (click)="newExtrange(item.id,item.name,item.location)"
           >
             <ion-icon
               color="white"
@@ -361,7 +360,7 @@
         <ion-toggle
           id="remoteToggle"
           labelPlacement="start"
-          checked="{{item.remote}}"
+          checked="item.remote == 1"
           (ionChange)="chgRemoteButton($event,item)"
           >Remote buttons :
         </ion-toggle>
@@ -371,7 +370,7 @@
         <ion-toggle
           id="disableToggle"
           labelPlacement="start"
-          checked="{{item.enable}}"
+          checked="item.enable === 1"
           (ionChange)="chgStatusCore($event,item)"
           >Enabled core :
         </ion-toggle>
@@ -386,7 +385,7 @@
         >
           <ion-select-option
             *ngFor="let user of myUserList; let i = index;"
-            value="{{user._id}}"
+            value="{{user.id}}"
           >
             {{user.name}}</ion-select-option
           >

@@ -335,72 +335,18 @@ export class AdminPage implements OnInit {
   async ngOnInit() {
     //   getting coreSim ---------------------------
     this.coreSim = await this.toolService.getSecureStorage("coreSim");
-    // this.toolService.getSecureStorage("coreSim").subscribe({
-    //   next: async (result) => {
-    //     this.coreSim = await result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo coreSim en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
 
     // getting userId ---------------------------
     this.userId = await this.toolService.getSecureStorage("userId");
     this.getCores();
 
-    // this.toolService.getSecureStorage("userId").subscribe({
-    //   next: (result) => {
-    //     this.userId = result;
-    //     this.getCores();
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo userId en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
-
     //   getting demoMode ---------------------------
     this, (this.demoMode = await this.toolService.getSecureStorage("demoMode"));
-    // this.toolService.getSecureStorage("demoMode").subscribe({
-    //   next: (result) => {
-    //     this.demoMode = result == "true" ? true : false;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo demoMode en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
 
     //   getting emailToVisitor ---------------------------
     this.emailToVisitor = await this.toolService.getSecureStorage(
       "emailToVisitor"
     );
-    // this.toolService.getSecureStorage("emailToVisitor").subscribe({
-    //   next: (result) => {
-    //     this.emailToVisitor = result == "true" ? true : false;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo emailToVisitor en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
 
     //   getting roles ---------------------------
     const roles = await this.toolService.getSecureStorage("roles");
@@ -409,38 +355,8 @@ export class AdminPage implements OnInit {
       this.getRoles();
     }
 
-    // this.toolService.getSecureStorage("roles").subscribe({
-    //   next: (result) => {
-    //     if (result) {
-    //       this.getRoles();
-    //     }
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo roles en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
-
     //   getting userName ---------------------------
     this.userName = await this.toolService.getSecureStorage("email");
-    // this.toolService.getSecureStorage("email").subscribe({
-    //   next: (result) => {
-    //     this.userName = result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo userName en getSecureStorage..: " +
-    //         JSON.stringify(err),
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
   }
 
   DemoMode() {
@@ -454,7 +370,6 @@ export class AdminPage implements OnInit {
         next: async (result: any) => {
           this.CoresList = result.results;
           this.CoresList[0].open = true;
-          console.log("cores-->", this.CoresList);
         },
         error: (err) => {
           this.toolService.toastAlert(
@@ -477,9 +392,9 @@ export class AdminPage implements OnInit {
   }
 
   async getRoles() {
-    this.api.getData(`api/roles/${this.userId}/`).subscribe({
-      next: async (result) => {
-        this.RoleList = result;
+    this.api.getData(`api/roles/${this.userId}`).subscribe({
+      next: async (result: any) => {
+        this.RoleList = result.results;
         this.toolService.setSecureStorage("roles", JSON.stringify(result));
       },
       error: (err: any) => {
@@ -847,106 +762,170 @@ export class AdminPage implements OnInit {
                 }
                 break;
               case "simChange":
-                this.loadingController
-                  .create({
-                    message: "Cambiando numero sim...",
-                    translucent: true,
-                  })
-                  .then(async (res) => {
-                    res.present();
+                const loading = await this.loadingController.create({
+                  message: "Cambiando numero sim...",
+                  translucent: true,
+                });
 
-                    this.toolService.setSecureStorage("coreSim", this.sim);
+                await loading.present();
 
-                    try {
-                      if (this.sim.length >= 10) {
-                        if (
-                          await this.toolService.getSecureBoolean("netStatus")
-                        ) {
-                          await this.api
-                            .postData("api/cores/chgSim/" + this.userId, {
-                              coreId: item._id,
-                              newSim: this.sim,
-                            })
-                            .then(async (result) => {
-                              // Change sim on pcb
-                              var options: SmsOptions = {
-                                replaceLineBreaks: false,
-                                android: {
-                                  intent: "",
-                                },
-                              };
-                              await this.sms
-                                .send(
-                                  item.Sim,
-                                  "cfgCHG," +
-                                    (await this.getTimestamp()) +
-                                    ",sim,value," +
-                                    this.sim,
-                                  options
-                                )
-                                .then(() => {
-                                  this.sim = "";
-                                  this.getCores();
-                                  this.simSectionOpen = false;
-                                  this.toolService.toastAlert(
-                                    "Sim cambiado " + this.sim,
-                                    0,
-                                    ["Ok"],
-                                    "bottom"
-                                  );
-                                })
-                                .catch((err) => {
-                                  this.loadingController.dismiss();
-                                  this.toolService.toastAlert(
-                                    "Falla conexion a red telefonica",
-                                    0,
-                                    ["Ok"],
-                                    "bottom"
-                                  );
-                                  return;
-                                });
-                            })
-                            .catch((error) => {
-                              this.loadingController.dismiss();
-                              this.toolService.toastAlert(
-                                "chgSim API error: <br>" +
-                                  JSON.stringify(error),
-                                0,
-                                ["Ok"],
-                                "bottom"
-                              );
-                              return;
-                            });
+                try {
+                  this.toolService.setSecureStorage("coreSim", this.sim);
 
-                          this.loadingController.dismiss();
-                        } else {
-                          this.loadingController.dismiss();
-                          this.toolService.toastAlert(
-                            "No hay Acceso a internet",
-                            0,
-                            ["Ok"],
-                            "middle"
-                          );
-                        }
-                      } else {
-                        this.loadingController.dismiss();
-                        this.toolService.toastAlert(
-                          "Formato Invalido",
-                          0,
-                          ["Ok"],
-                          "bottom"
-                        );
-                      }
-                    } catch (e) {
-                      this.loadingController.dismiss();
-                      this.toolService.toastAlert(
-                        "Sim no cambiado, error:<br>" + JSON.stringify(e),
-                        0,
-                        ["Ok"],
-                        "bottom"
-                      );
+                  if (this.sim.length < 10) {
+                    await loading.dismiss();
+                    await this.toolService.toastAlert(
+                      "Formato Invalido",
+                      0,
+                      ["Ok"],
+                      "bottom"
+                    );
+                    return;
+                  }
+
+                  if (!(await this.toolService.getSecureBoolean("netStatus"))) {
+                    await loading.dismiss();
+                    await this.toolService.toastAlert(
+                      "No hay Acceso a internet",
+                      0,
+                      ["Ok"],
+                      "middle"
+                    );
+                    return;
+                  }
+
+                  // ✅ Usar un nombre diferente o reutilizar la misma variable
+                  const apiResult = await this.api.postData(
+                    "api/cores/chgSim/" + this.userId,
+                    {
+                      coreId: item._id,
+                      newSim: this.sim,
                     }
-                  });
+                  );
+
+                  console.log("Cambiado", apiResult);
+
+                  this.sim = "";
+                  await this.getCores();
+                  this.simSectionOpen = false;
+
+                  await loading.dismiss();
+                  await this.toolService.toastAlert(
+                    "Sim cambiado",
+                    0,
+                    ["Ok"],
+                    "bottom"
+                  );
+                } catch (error) {
+                  await loading.dismiss();
+                  await this.toolService.toastAlert(
+                    "Error: " + JSON.stringify(error),
+                    0,
+                    ["Ok"],
+                    "bottom"
+                  );
+                }
+
+                // this.loadingController
+                //   .create({
+                //     message: "Cambiando numero sim...",
+                //     translucent: true,
+                //   })
+                //   .then(async (res) => {
+                //     res.present();
+
+                //     this.toolService.setSecureStorage("coreSim", this.sim);
+                //     try {
+                //       if (this.sim.length >= 10) {
+                //         if (
+                //           await this.toolService.getSecureBoolean("netStatus")
+                //         ) {
+                //           await this.api
+                //             .postData("api/cores/chgSim/" + this.userId, {
+                //               coreId: item._id,
+                //               newSim: this.sim,
+                //             })
+                //             .then(async (result: any) => {
+                //               // Change sim on pcb
+                //               console.log("Cambiado");
+                //               //   var options: SmsOptions = {
+                //               //     replaceLineBreaks: false,
+                //               //     android: {
+                //               //       intent: "",
+                //               //     },
+                //               //   };
+                //               //   await this.sms
+                //               //     .send(
+                //               //       item.Sim,
+                //               //       "cfgCHG," +
+                //               //         (await this.getTimestamp()) +
+                //               //         ",sim,value," +
+                //               //         this.sim,
+                //               //       options
+                //               //     )
+                //               //     .then(() => {
+                //               //       this.sim = "";
+                //               //       this.getCores();
+                //               //       this.simSectionOpen = false;
+                //               //       this.toolService.toastAlert(
+                //               //         "Sim cambiado " + this.sim,
+                //               //         0,
+                //               //         ["Ok"],
+                //               //         "bottom"
+                //               //       );
+                //               //     })
+                //               //     .catch((err) => {
+                //               //       this.loadingController.dismiss();
+                //               //       this.toolService.toastAlert(
+                //               //         "Falla conexion a red telefonica",
+                //               //         0,
+                //               //         ["Ok"],
+                //               //         "bottom"
+                //               //       );
+                //               //       return;
+                //               //     });
+                //             })
+                //             .catch((error) => {
+                //               this.loadingController.dismiss();
+                //               this.toolService.toastAlert(
+                //                 "chgSim API error: <br>" +
+                //                   JSON.stringify(error),
+                //                 0,
+                //                 ["Ok"],
+                //                 "bottom"
+                //               );
+                //               return;
+                //             });
+
+                //           this.loadingController.dismiss();
+                //         } else {
+                //           this.loadingController.dismiss();
+                //           this.toolService.toastAlert(
+                //             "No hay Acceso a internet",
+                //             0,
+                //             ["Ok"],
+                //             "middle"
+                //           );
+                //         }
+                //       } else {
+                //         await this.loadingController.dismiss();
+                //         await this.toolService.toastAlert(
+                //           "Formato Invalido",
+                //           0,
+                //           ["Ok"],
+                //           "bottom"
+                //         );
+                //       }
+                //     } catch (e) {
+                //       this.loadingController.dismiss();
+                //       this.toolService.toastAlert(
+                //         "Sim no cambiado, error:<br>" + JSON.stringify(e),
+                //         0,
+                //         ["Ok"],
+                //         "bottom"
+                //       );
+                //     }
+                //   });
                 break;
               case "getSIMstatus":
                 this.sendSms(

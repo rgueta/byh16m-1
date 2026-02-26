@@ -117,32 +117,6 @@ export class ToolsService {
     }
   }
 
-  // async getSecureStorageS(key: string) {
-  //   let storedValue: string | null = null;
-  //   const { value } = await Preferences.get({ key: key });
-  //   storedValue = value;
-  //   return storedValue;
-  // }
-
-  // Obtener token Observable
-  // getSecureStorage(key: string): Observable<any> {
-  //   // Usamos 'from' para convertir la promesa de Capacitor en un Observable
-  //   return from(Preferences.get({ key: key })).pipe(
-  //     map(({ value }) => {
-  //       if (value !== null) {
-  //         return value;
-  //       } else {
-  //         console.log("No se encontró el token.");
-  //         return null;
-  //       }
-  //     }),
-  //     catchError((error) => {
-  //     console.error(`Fallo Obtener token ${key}:`, error);
-  //       return of(null); // Retorna null en caso de error
-  //     })
-  //   );
-  // }
-
   async getSecureStorage(key: string): Promise<any> {
     try {
       const result = await Preferences.get({ key: key });

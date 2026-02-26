@@ -189,6 +189,7 @@ export class AuthenticationService {
           )
           .pipe(
             tap(async (tokens: any) => {
+              console.log("tokens: ", tokens);
               this.currentAuthToken = await tokens.authToken;
 
               // --------   secure storege  -------------
