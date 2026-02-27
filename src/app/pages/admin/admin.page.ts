@@ -285,7 +285,7 @@ export class AdminPage implements OnInit {
   public CoresList: any;
   public myUserList: any;
   automaticClose = false;
-  public userId = "";
+  public userId: string = "0";
   myToast: any;
   public routineOpen = false;
   localenable: boolean = true;
@@ -334,29 +334,43 @@ export class AdminPage implements OnInit {
 
   async ngOnInit() {
     //   getting coreSim ---------------------------
-    this.coreSim = await this.toolService.getSecureStorage("coreSim");
+    this.coreSim = await this.toolService.getSecureStorage<string>(
+      "coreSim",
+      ""
+    );
 
     // getting userId ---------------------------
-    this.userId = await this.toolService.getSecureStorage("userId");
+    this.userId = await this.toolService.getSecureStorage<string>(
+      "userId",
+      "0"
+    );
     this.getCores();
 
     //   getting demoMode ---------------------------
-    this, (this.demoMode = await this.toolService.getSecureStorage("demoMode"));
+    this,
+      (this.demoMode = await this.toolService.getSecureStorage<boolean>(
+        "demoMode",
+        false
+      ));
 
     //   getting emailToVisitor ---------------------------
-    this.emailToVisitor = await this.toolService.getSecureStorage(
-      "emailToVisitor"
+    this.emailToVisitor = await this.toolService.getSecureStorage<boolean>(
+      "emailToVisitor",
+      false
     );
 
     //   getting roles ---------------------------
-    const roles = await this.toolService.getSecureStorage("roles");
+    const roles = await this.toolService.getSecureStorage<any>("roles", null);
 
     if (roles) {
       this.getRoles();
     }
 
     //   getting userName ---------------------------
-    this.userName = await this.toolService.getSecureStorage("email");
+    this.userName = await this.toolService.getSecureStorage<string>(
+      "email",
+      ""
+    );
   }
 
   DemoMode() {
@@ -680,6 +694,12 @@ export class AdminPage implements OnInit {
       inputs = [];
     }
 
+    const netStats = await this.toolService.getSecureStorage<boolean>(
+      "netStatus",
+      false
+    );
+    console.log("valor obtenido del netStats:", netStats);
+
     let alert = await this.alertCtrl.create({
       header: titleMsg,
       message: Message,
@@ -707,7 +727,12 @@ export class AdminPage implements OnInit {
             switch (option) {
               case "chgStatusCore":
               case "chgRemoteButtons":
-                if (await this.toolService.getSecureBoolean("netStatus")) {
+                if (
+                  await this.toolService.getSecureStorage<boolean>(
+                    "netStatus",
+                    false
+                  )
+                ) {
                   let jsonItem: any;
                   let valueItem = "";
                   switch (option) {
@@ -783,7 +808,12 @@ export class AdminPage implements OnInit {
                     return;
                   }
 
-                  if (!(await this.toolService.getSecureBoolean("netStatus"))) {
+                  if (
+                    !(await this.toolService.getSecureStorage<boolean>(
+                      "netStatus",
+                      false
+                    ))
+                  ) {
                     await loading.dismiss();
                     await this.toolService.toastAlert(
                       "No hay Acceso a internet",

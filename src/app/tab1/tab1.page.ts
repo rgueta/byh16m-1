@@ -174,29 +174,42 @@ export class Tab1Page implements OnInit {
       this.isAndroid = true;
     }
 
-    this.MyRole = await this.toolService.getSecureStorage("myRole");
+    this.MyRole = await this.toolService.getSecureStorage<string>("myRole", "");
 
-    this.myEmail = await this.toolService.getSecureStorage("email");
+    this.myEmail = await this.toolService.getSecureStorage<string>("email", "");
 
-    this.myName = await this.toolService.getSecureStorage("name");
+    this.myName = await this.toolService.getSecureStorage<string>("name", "");
 
     //   getting remote ---------------------------
-    this.remoteCtrl = await this.toolService.getSecureStorage("remote");
+    this.remoteCtrl = await this.toolService.getSecureStorage<boolean>(
+      "remote",
+      false
+    );
 
-    var sim = await this.toolService.getSecureStorage("coreSim");
+    var sim = await this.toolService.getSecureStorage<string>("coreSim", "");
 
-    this.userId = await this.toolService.getSecureStorage("userId");
+    this.userId = await this.toolService.getSecureStorage<string>(
+      "userId",
+      "0"
+    );
 
-    this.coreId = await this.toolService.getSecureStorage("coreId");
+    this.coreId = await this.toolService.getSecureStorage<string>(
+      "coreId",
+      "0"
+    );
 
-    this.coreName = await this.toolService.getSecureStorage("coreName");
+    this.coreName = await this.toolService.getSecureStorage<string>(
+      "coreName",
+      ""
+    );
 
     //   getting demoMode ---------------------------
     await this.getDemoMode();
 
     // -----------------firebase Push notification
-    let devicePlatform: any = await this.toolService.getSecureStorage(
-      "devicePlatform"
+    let devicePlatform: any = await this.toolService.getSecureStorage<string>(
+      "devicePlatform",
+      ""
     );
 
     if (["android", "ios"].includes(devicePlatform)) {
@@ -347,7 +360,10 @@ export class Tab1Page implements OnInit {
 
   lockToPortrait() {
     let devicePlatform: any | null = null;
-    devicePlatform = this.toolService.getSecureStorage("devicePlatform");
+    devicePlatform = this.toolService.getSecureStorage<string>(
+      "devicePlatform",
+      ""
+    );
     if (["android", "ios"].includes(devicePlatform))
       this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.PORTRAIT);
   }
@@ -368,7 +384,10 @@ export class Tab1Page implements OnInit {
   }
 
   async modalBackstage() {
-    let coreName = await this.toolService.getSecureStorage("coreName");
+    let coreName = await this.toolService.getSecureStorage<string>(
+      "coreName",
+      ""
+    );
 
     const modal = await this.modalController.create({
       component: BackstagePage,
@@ -384,13 +403,16 @@ export class Tab1Page implements OnInit {
     let timestamp: any;
 
     if (await this.networkService.checkInternetConnection()) {
-      timestamp = await this.toolService.getSecureStorage("lastInfoUpdated");
+      timestamp = await this.toolService.getSecureStorage<string>(
+        "lastInfoUpdated",
+        ""
+      );
 
       if (timestamp.value === null) {
         timestamp = await this.toolService.convDate(new Date());
       }
 
-      const info = await this.toolService.getSecureStorage("info");
+      const info = await this.toolService.getSecureStorage<any>("info", null);
 
       if (this.localInfo.length == 0 && !info) {
         let d = new Date();
@@ -451,7 +473,10 @@ export class Tab1Page implements OnInit {
       }
     } else {
       if (this.localInfo.length == 0 && this.localInfo) {
-        this.localInfo = await this.toolService.getSecureStorage("info");
+        this.localInfo = await this.toolService.getSecureStorage<any>(
+          "info",
+          null
+        );
       }
       this.toolService.toastAlert(
         "No hay acceso a internet",
@@ -476,7 +501,10 @@ export class Tab1Page implements OnInit {
   }
 
   async getDemoMode() {
-    this.demoMode = await this.toolService.getSecureStorage("demoMode");
+    this.demoMode = await this.toolService.getSecureStorage<boolean>(
+      "demoMode",
+      false
+    );
   }
 
   async openUrl(url: string) {
@@ -500,11 +528,20 @@ export class Tab1Page implements OnInit {
       },
     };
 
-    let local_sim = await this.toolService.getSecureStorage("coreSim");
+    let local_sim = await this.toolService.getSecureStorage<string>(
+      "coreSim",
+      ""
+    );
 
-    let use_twilio = await this.toolService.getSecureStorage("twilio");
+    let use_twilio = await this.toolService.getSecureStorage<boolean>(
+      "twilio",
+      false
+    );
 
-    let uuid = await this.toolService.getSecureStorage("deviceUuid");
+    let uuid = await this.toolService.getSecureStorage<string>(
+      "deviceUuid",
+      ""
+    );
 
     // const local_sim =  await this.storage.get('coreSim');
 

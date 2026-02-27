@@ -81,7 +81,7 @@ export class UpdUsersPage implements OnInit {
   demoMode: boolean = false;
   public MyRole: any = "visitor";
   comment: string = "";
-  userId: string | null = "";
+  userId: string = "0";
 
   codeId = "";
   adminEmail = "";
@@ -148,7 +148,10 @@ export class UpdUsersPage implements OnInit {
     }
 
     //   getting userId ---------------------------
-    this.userId = await this.toolService.getSecureStorage("userId");
+    this.userId = await this.toolService.getSecureStorage<string>(
+      "userId",
+      "0"
+    );
 
     if (
       this.sourcePage == "adminNewUser" ||
@@ -159,29 +162,50 @@ export class UpdUsersPage implements OnInit {
       this.getRoles();
     }
 
-    this.demoMode = await this.toolService.getSecureStorage("demoMode");
+    this.demoMode = await this.toolService.getSecureStorage<any>(
+      "demoMode",
+      null
+    );
 
-    this.coreId = this.toolService.getSecureStorage("coreId");
+    this.coreId = this.toolService.getSecureStorage<number>("coreId", 0);
 
-    this.MyRole = await this.toolService.getSecureStorage("myRole");
+    this.MyRole = await this.toolService.getSecureStorage<string>("myRole", "");
 
-    this.devicePkg = await this.toolService.getSecureStorage("deviceInfo");
+    this.devicePkg = await this.toolService.getSecureStorage<any>(
+      "deviceInfo",
+      null
+    );
 
     if (this.MyRole == "admin") {
-      const rolesData = await this.toolService.getSecureStorage("roles");
+      const rolesData = await this.toolService.getSecureStorage<any>(
+        "roles",
+        null
+      );
       this.RoleList = JSON.parse(rolesData).results;
     }
 
-    this.location = await this.toolService.getSecureStorage("location");
+    this.location = await this.toolService.getSecureStorage<string>(
+      "location",
+      ""
+    );
 
     if (this.sourcePage != "login") {
-      const deviceUuid = await this.toolService.getSecureStorage("deviceUuid");
+      const deviceUuid = await this.toolService.getSecureStorage<string>(
+        "deviceUuid",
+        ""
+      );
       this.RegisterForm.get("Uuid")!.setValue(deviceUuid);
     }
 
-    const admin_email = await this.toolService.getSecureStorage("adminEmail");
+    const admin_email = await this.toolService.getSecureStorage<string>(
+      "adminEmail",
+      ""
+    );
 
-    this.adminSim = await this.toolService.getSecureStorage("adminSim");
+    this.adminSim = await this.toolService.getSecureStorage<string>(
+      "adminSim",
+      ""
+    );
 
     // getCpus -------
     if (
@@ -553,22 +577,10 @@ export class UpdUsersPage implements OnInit {
   }
 
   async newExtrange() {
-    let coreSim = await this.toolService.getSecureStorage("coreSim");
-
-    //   getting coreSim ---------------------------
-    // this.toolService.getSecureStorage("coreSim").subscribe({
-    //   next: (result) => {
-    //     coreSim = result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo coreSim en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    let coreSim = await this.toolService.getSecureStorage<string>(
+      "coreSim",
+      ""
+    );
 
     const options: SmsOptions = {
       replaceLineBreaks: false,

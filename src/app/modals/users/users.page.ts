@@ -76,7 +76,7 @@ export class UsersPage implements OnInit {
   editSim: boolean = false;
   sim: string = "";
   public simSectionOpen = false;
-  userId: string = "";
+  userId: string = "0";
 
   constructor(
     private modalController: ModalController,
@@ -100,11 +100,17 @@ export class UsersPage implements OnInit {
 
   async ngOnInit() {
     //   getting myRole ---------------------------
-    this.soyAdmin = await this.toolService.getSecureStorage("myRole");
+    this.soyAdmin = await this.toolService.getSecureStorage<string>(
+      "myRole",
+      ""
+    );
     this.soyNeighborAdmin = this.soyAdmin == "neighborAdmin" ? true : false;
 
     //   getting userId ---------------------------
-    this.userId = await this.toolService.getSecureStorage("userId");
+    this.userId = await this.toolService.getSecureStorage<string>(
+      "userId",
+      "0"
+    );
     this.getRoles();
     this.getUsers();
   }
@@ -150,7 +156,10 @@ export class UsersPage implements OnInit {
   }
 
   async simChange(neighborId: string, actualSim: string) {
-    const coreSim = await this.toolService.getSecureStorage("coreSim");
+    const coreSim = await this.toolService.getSecureStorage<string>(
+      "coreSim",
+      ""
+    );
     //   getting coreSim ---------------------------
 
     var options: SmsOptions = {
@@ -177,7 +186,12 @@ export class UsersPage implements OnInit {
             try {
               if (this.sim.length >= 10) {
                 if (actualSim != this.sim) {
-                  if (await this.toolService.getSecureBoolean("netStatus")) {
+                  if (
+                    await this.toolService.getSecureStorage<boolean>(
+                      "netStatus",
+                      false
+                    )
+                  ) {
                     await this.api
                       .postData("api/users/updSim/" + this.userId, {
                         userId: neighborId,

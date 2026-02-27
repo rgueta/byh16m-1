@@ -103,103 +103,38 @@ export class CodesPage implements OnInit {
 
   async ngOnInit() {
     //   getting role ---------------------------
-    this.MyRole = await this.toolsService.getSecureStorage("role");
-    // this.toolsService.getSecureStorage("role").subscribe({
-    //   next: (result) => {
-    //     this.MyRole = result;
-    //   },
-    //   error: (err) => {
-    //     this.toolsService.toastAlert(
-    //       "error, obteniendo role en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    this.MyRole = await this.toolsService.getSecureStorage<string>("role", "");
 
     //   getting authToken ---------------------------
-    this.myToken = await this.toolsService.getSecureStorage("authToken");
-
-    // this.toolsService.getSecureStorage("authToken").subscribe({
-    //   next: (result) => {
-    //     this.myToken = result;
-    //   },
-    //   error: (err) => {
-    //     this.toolsService.toastAlert(
-    //       "error, obteniendo authToken en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    this.myToken = await this.toolsService.getSecureStorage<string>(
+      "authToken",
+      ""
+    );
 
     //   getting userId ---------------------------
-    this.userId = await this.toolsService.getSecureStorage("userId");
-
-    // this.toolsService.getSecureStorage("userId").subscribe({
-    //   next: (result) => {
-    //     this.userId = result;
-    //   },
-    //   error: (err) => {
-    //     this.toolsService.toastAlert(
-    //       "error, obteniendo userId en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    this.userId = await this.toolsService.getSecureStorage<string>(
+      "userId",
+      "0"
+    );
 
     //   getting roles ---------------------------
-    this, (this.myRoles = await this.toolsService.getSecureStorage("roles"));
-
-    // this.toolsService.getSecureStorage("roles").subscribe({
-    //   next: (result) => {
-    //     this.myRoles = result;
-    //   },
-    //   error: (err) => {
-    //     this.toolsService.toastAlert(
-    //       "error, obteniendo roles en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    this,
+      (this.myRoles = await this.toolsService.getSecureStorage<any>(
+        "roles",
+        null
+      ));
 
     //   getting codeExpiry ---------------------------
-    this.code_expiry = await this.toolsService.getSecureStorage("codeExpiry");
-    // this.toolsService.getSecureStorage("codeExpiry").subscribe({
-    //   next: (result) => {
-    //     this.code_expiry = Number(result);
-    //   },
-    //   error: (err) => {
-    //     this.toolsService.toastAlert(
-    //       "error, obteniendo codeExpiry en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    this.code_expiry = await this.toolsService.getSecureStorage<any>(
+      "codeExpiry",
+      null
+    );
 
     //   getting coreSim ---------------------------
-    this.coreSim = await this.toolsService.getSecureStorage("coreSim");
-    // this.toolsService.getSecureStorage("coreSim").subscribe({
-    //   next: (result) => {
-    //     this.coreSim = result;
-    //   },
-    //   error: (err) => {
-    //     this.toolsService.toastAlert(
-    //       "error, obteniendo coreSim en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    this.coreSim = await this.toolsService.getSecureStorage<string>(
+      "coreSim",
+      ""
+    );
 
     this.initial = new Date();
     this.expiry = new Date(
@@ -292,7 +227,9 @@ export class CodesPage implements OnInit {
       }
 
       try {
-        if (await this.toolsService.getSecureBoolean("netStatus")) {
+        if (
+          await this.toolsService.getSecureStorage<boolean>("netStatus", false)
+        ) {
           await this.api.putData(
             "api/codes/update/" + this.userId + "/" + pkg["_id"],
             pkg

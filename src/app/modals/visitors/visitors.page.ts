@@ -74,7 +74,7 @@ export class VisitorsPage implements OnInit {
   // contacts: Observable<Contact[]>;
   contacts: [] = [];
   contactSelected: any = {};
-  userId: string = "";
+  userId: string = "0";
   visitors: any = [];
   pkg: {} = {};
 
@@ -97,37 +97,16 @@ export class VisitorsPage implements OnInit {
 
     //   getting userId ---------------------------
 
-    this.userId = await this.toolService.getSecureStorage("userId");
-
-    // this.toolService.getSecureStorage("userId").subscribe({
-    //   next: (result) => {
-    //     this.userId = result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo userId en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    this.userId = await this.toolService.getSecureStorage<string>(
+      "userId",
+      "0"
+    );
 
     //   getting visitors ---------------------------
-    this.visitors = await this.toolService.getSecureStorage("visitors");
-  //   this.toolService.getSecureStorage("visitors").subscribe({
-  //     next: (result) => {
-  //       this.visitors = JSON.parse(result);
-  //     },
-  //     error: (err) => {
-  //       this.toolService.toastAlert(
-  //         "error, obteniendo visitors en getSecureStorage: " + err,
-  //         0,
-  //         ["Ok"],
-  //         "middle"
-  //       );
-  //     },
-  //   });
+    this.visitors = await this.toolService.getSecureStorage<any>(
+      "visitors",
+      null
+    );
   }
 
   async appendVisitor(pkg: any) {

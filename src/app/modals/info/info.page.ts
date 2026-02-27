@@ -84,7 +84,7 @@ export class InfoPage implements OnInit {
   imageURI: any;
   imageFileName: any;
   myToast: any;
-  userId: string = "";
+  userId: string = "0";
   @Input() localTitle: string = "";
   @Input() localDescription: string = "";
   @Input() localUrl: string = "";
@@ -136,23 +136,11 @@ export class InfoPage implements OnInit {
 
   async ngOnInit() {
     // this.localTitle = "Aqui va el titulo..";
-    this.userId = await this.toolService.getSecureStorage("userId");
+    this.userId = await this.toolService.getSecureStorage<string>(
+      "userId",
+      "0"
+    );
     this.collectCountries();
-
-    // this.toolService.getSecureStorage("userId").subscribe({
-    //   next: (result) => {
-    //     this.userId = result;
-    //     this.collectCountries();
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo userId en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
 
     this.collectInfo();
   }
@@ -405,7 +393,7 @@ export class InfoPage implements OnInit {
       params: params,
     };
 
-    if (await this.toolService.getSecureBoolean("netStatus")) {
+    if (await this.toolService.getSecureStorage<boolean>("netStatus", false)) {
       const data$ = this.http.post<any>(
         this.REST_API_SERVER + "api/info/" + this.userId,
         formData,
@@ -436,7 +424,7 @@ export class InfoPage implements OnInit {
     };
 
     // use your own API
-    if (await this.toolService.getSecureBoolean("netStatus")) {
+    if (await this.toolService.getSecureStorage<boolean>("netStatus", false)) {
       this.api
         .postDataInfo("api/info", formData, params)
         .then(async (resp) => {});
@@ -465,7 +453,7 @@ export class InfoPage implements OnInit {
   //#endregion Image section ------------------------------------------------
 
   async collectInfo() {
-    if (await this.toolService.getSecureBoolean("netStatus")) {
+    if (await this.toolService.getSecureStorage<boolean>("netStatus", false)) {
       this.api.getData("api/info/all/" + this.userId).subscribe({
         next: async (result) => {
           this.localInfo = result;
@@ -497,7 +485,9 @@ export class InfoPage implements OnInit {
     try {
       if (event.detail.checked && status) {
         //Show
-        if (await this.toolService.getSecureBoolean("netStatus")) {
+        if (
+          await this.toolService.getSecureStorage<boolean>("netStatus", false)
+        ) {
           await this.api
             .postData("api/info/updStatus/" + this.userId + "/" + infoId, {
               disable: false,
@@ -517,7 +507,9 @@ export class InfoPage implements OnInit {
         }
       } else if (event.detail.checked && !status) {
         // Hide
-        if (await this.toolService.getSecureBoolean("netStatus")) {
+        if (
+          await this.toolService.getSecureStorage<boolean>("netStatus", false)
+        ) {
           await this.api
             .postData("api/info/updStatus/" + this.userId + "/" + infoId, {
               disable: true,

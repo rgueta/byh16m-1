@@ -58,65 +58,48 @@ export class BackstagePage implements OnInit {
 
   async ngOnInit() {
     this.sourcePage = this.navParams.data["SourcePage"];
-    this.MyRole = await this.toolService.getSecureStorage("myRole");
-    // this.toolService.getSecureStorage("myRole").subscribe({
-    //   next: async (result) => {
-    //     this.MyRole = await result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo myRole en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    this.MyRole = await this.toolService.getSecureStorage<string>("myRole", "");
     this.getBackstage();
   }
 
   async getBackstage() {
-    let userId = "";
-    userId = await this.toolService.getSecureStorage("userId");
-    // this.toolService.getSecureStorage("userId").subscribe({
-    //   next: async (result) => {
-    //     userId = await result;
+    let userId = "0";
+    userId = await this.toolService.getSecureStorage<string>("userId", "0");
+    this.api.getData("api/backstage/" + userId).subscribe({
+      next: async (result: any) => {
+        this.backstageList = await result;
+        if (this.backstageList.length > 0) {
+          this.backstageList[0].open = true;
+        } else {
+          this.toolService.showAlertBasic(
+            "",
+            "No hay usuarios por agregar",
+            "",
+            ["Ok"]
+          );
+          this.modalController.dismiss("no refresh");
+        }
+      },
+      error: (err: any) => {
+        this.toolService.showAlertBasic(
+          "Alerta",
+          "Fallo obteniendo backstage: ",
+          JSON.stringify(err),
+          ["Ok"]
+        );
+      },
+    });
 
-        this.api.getData("api/backstage/" + userId).subscribe({
-          next: async (result: any) => {
-            this.backstageList = await result;
-            if (this.backstageList.length > 0) {
-              this.backstageList[0].open = true;
-            } else {
-              this.toolService.showAlertBasic(
-                "",
-                "No hay usuarios por agregar",
-                "",
-                ["Ok"]
-              );
-              this.modalController.dismiss("no refresh");
-            }
-          },
-          error: (err: any) => {
-            this.toolService.showAlertBasic(
-              "Alerta",
-              "Fallo obteniendo backstage: ",
-              JSON.stringify(err),
-              ["Ok"]
-            );
-          },
-        });
-
-      // }
-      //,
-      // error: (err) => {
-      //   this.toolService.toastAlert(
-      //     "error, obteniendo userId en getSecureStorage: " + err,
-      //     0,
-      //     ["Ok"],
-      //     "middle"
-      //   );
-      // },
+    // }
+    //,
+    // error: (err) => {
+    //   this.toolService.toastAlert(
+    //     "error, obteniendo userId en getSecureStorage: " + err,
+    //     0,
+    //     ["Ok"],
+    //     "middle"
+    //   );
+    // },
     // });
   }
 
@@ -126,20 +109,7 @@ export class BackstagePage implements OnInit {
       url = "api/roles/neiAdmin/";
     }
 
-    let userId = await this.toolService.getSecureStorage("userId");
-    // this.toolService.getSecureStorage("userId").subscribe({
-    //   next: async (result) => {
-    //     userId = await result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo userId en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    let userId = await this.toolService.getSecureStorage<string>("userId", "0");
 
     this.api.getData(url + userId).subscribe({
       next: async (result: any) => {

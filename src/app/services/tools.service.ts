@@ -117,26 +117,30 @@ export class ToolsService {
     }
   }
 
-  async getSecureStorage(key: string): Promise<any> {
+  // async getSecureStorage_(key: string): Promise<any> {
+  //   try {
+  //     const result = await Preferences.get({ key: key });
+
+  //     if (!result || result.value === null) {
+  //       return result;
+  //     }
+
+  //     return this.deserialize(result.value);
+  //   } catch (error) {
+  //     console.error("Error obteniendo dato:", error);
+  //     return error;
+  //   }
+  // }
+
+  async getSecureStorage<T>(key: string, fallback: T): Promise<T> {
     try {
-      const result = await Preferences.get({ key: key });
+      const { value } = await Preferences.get({ key });
 
-      if (!result || result.value === null) {
-        return result;
-      }
-
-      return this.deserialize(result.value);
+      return this.deserialize<T>(value, fallback);
     } catch (error) {
       console.error("Error obteniendo dato:", error);
-      return error;
+      return fallback;
     }
-  }
-
-  async getSecureBoolean(key: string): Promise<boolean> {
-    const { value } = await Preferences.get({ key: key });
-    const result = value === "true" ? true : false;
-    console.log(`Valor obtenido para la clave '${key}': ${result}`);
-    return result;
   }
 
   // remove single key
@@ -236,7 +240,61 @@ export class ToolsService {
   /**
    * Deserializa el string al tipo original
    */
-  private deserialize<T>(serializedValue: string): T {
+
+  private deserialize<T>(raw: string | null, fallback: T): T {
+    if (!raw) return fallback;
+
+    try {
+      const parsed = JSON.parse(raw);
+
+      if (!parsed || typeof parsed !== "object") {
+        return parsed as T;
+      }
+
+      switch (parsed.type) {
+        case "null":
+          return null as T;
+
+        case "boolean":
+          return Boolean(parsed.value) as T;
+
+        case "number":
+          return Number(parsed.value) as T;
+
+        case "string":
+          return String(parsed.value) as T;
+
+        case "date":
+          return new Date(parsed.value) as T;
+
+        case "bigint":
+          return BigInt(parsed.value) as T;
+
+        case "map":
+          return new Map(parsed.value) as T;
+
+        case "set":
+          return new Set(parsed.value) as T;
+
+        case "buffer":
+          return new Uint8Array(parsed.value) as T;
+
+        case "regexp":
+          return new RegExp(parsed.value.pattern, parsed.value.flags) as T;
+
+        case "objectid":
+          return parsed.value as T;
+
+        default:
+          return parsed.value as T;
+      }
+    } catch (e) {
+      console.error("deserialize error:", e);
+      return fallback;
+    }
+  }
+
+  private deserialize_<T>(serializedValue: string): T {
     try {
       const parsed = JSON.parse(serializedValue);
 
@@ -333,60 +391,18 @@ export class ToolsService {
 
   async cleanSecureStorage() {
     let myVisitors: string = "";
-    let coreId: string = "";
+    let coreId: number = 0;
     let refreshToken: string = "";
-    let netStatus: string = "";
+    let netStatus: boolean = false;
     let demoMode: boolean = false;
 
-    netStatus = await this.getSecureStorage("netStatus");
-    // this.getSecureStorage("netStatus").subscribe({
-    //   next: (result) => {
-    //     netStatus = result;
-    //   },
-    //   error: (err) => {
-    //     this.toastAlert(
-    //       "error, obteniendo netStatus en tool.service.ts getSecureStorage: " +
-    //         err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    netStatus = await this.getSecureStorage<boolean>("netStatus", false);
 
-    myVisitors = await this.getSecureStorage("visitors");
-    // this.getSecureStorage("visitors").subscribe({
-    //   next: (result) => {
-    //     myVisitors = result;
-    //   },
-    //   error: (err) => {
-    //     this.toastAlert(
-    //       "error, obteniendo visitors en tool.service.ts getSecureStorage: " +
-    //         err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    myVisitors = await this.getSecureStorage<any>("visitors", null);
 
-    coreId = await this.getSecureStorage("coreId");
-    // this.getSecureStorage("coreId").subscribe({
-    //   next: (result) => {
-    //     coreId = result;
-    //   },
-    //   error: (err) => {
-    //     this.toastAlert(
-    //       "error, obteniendo coreId en tool.service.ts getSecureStorage: " +
-    //         err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    coreId = await this.getSecureStorage<number>("coreId", 0);
 
-    refreshToken = await this.getSecureStorage("refreshToken");
+    refreshToken = await this.getSecureStorage<string>("refreshToken", "");
     // this.getSecureStorage("refreshToken").subscribe({
     //   next: (result) => {
     //     refreshToken = result;
@@ -402,22 +418,7 @@ export class ToolsService {
     //   },
     // });
 
-    demoMode = await this.getSecureStorage("demoMode");
-    // this.getSecureStorage("demoMode").subscribe({
-    //   next: (result) => {
-    //     demoMode = result == "true" ? true : false;
-    //     console.log("Valor demoMode antes del clear --> ", demoMode);
-    //   },
-    //   error: (err) => {
-    //     this.toastAlert(
-    //       "error, obteniendo demoMode en tool.service.ts getSecureStorage: " +
-    //         err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    demoMode = await this.getSecureStorage<boolean>("demoMode", false);
 
     await this.clearAllPreferences();
     await this.setSecureStorage("netStatus", netStatus);

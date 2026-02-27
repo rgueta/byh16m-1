@@ -78,7 +78,7 @@ export class AuthenticationService {
   }
 
   async loadToken() {
-    const token = this.toolService.getSecureStorage("authToken");
+    const token = this.toolService.getSecureStorage<string>("authToken", "");
 
     if (token) {
       this.currentAuthToken = token;
@@ -173,7 +173,9 @@ export class AuthenticationService {
     tokens: this.Tokens;
 
     // Obtener el UUID del dispositivo del SecureStorage
-    return from(this.toolService.getSecureStorage("deviceUuid")).pipe(
+    return from(
+      this.toolService.getSecureStorage<string>("deviceUuid", "")
+    ).pipe(
       switchMap((deviceUuid) => {
         // Crear el payload con el deviceUuid
         const loginPayload = {
@@ -350,13 +352,19 @@ export class AuthenticationService {
 
   // Obtener access token
   async getAccessToken(): Promise<string | null> {
-    const result = await this.toolService.getSecureStorage("authToken");
+    const result = await this.toolService.getSecureStorage<string>(
+      "authToken",
+      ""
+    );
     return result;
   }
 
   // Obtener refresh token
   async getRefreshToken(): Promise<string | null> {
-    const result = await this.toolService.getSecureStorage("refreshToken");
+    const result = await this.toolService.getSecureStorage<string>(
+      "refreshToken",
+      ""
+    );
     return result;
   }
 
@@ -435,7 +443,7 @@ export class AuthenticationService {
   getNewAccessToken() {
     // commented for migration removed from
     const refreshToken = from(
-      this.toolService.getSecureStorage("refreshToken") ?? ""
+      this.toolService.getSecureStorage<string>("refreshToken", "") ?? ""
     );
 
     return refreshToken.pipe(

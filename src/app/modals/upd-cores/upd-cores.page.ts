@@ -85,7 +85,7 @@ export class UpdCoresPage implements OnInit {
   public SelectHousingUnitTitle: any = "Housing unit";
   public myHousingUnitList: any;
   location: any;
-  userId: String = "";
+  userId: string = "0";
   refresh_page: boolean = false;
 
   // -- Validators  ------------
@@ -122,37 +122,15 @@ export class UpdCoresPage implements OnInit {
   }
 
   async ngOnInit() {
-    // this.toolService.getSecureStorage("userId").subscribe({
-    //   next: (result) => {
-    //     this.userId = result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo userId en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    this.userId = await this.toolService.getSecureStorage<string>(
+      "userId",
+      "0"
+    );
 
-    this.userId = await this.toolService.getSecureStorage("userId");
-
-    // this.toolService.getSecureStorage("location").subscribe({
-    //   next: (result) => {
-    //     this.location = result || "visitor";
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo location en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
-
-    this.location = await this.toolService.getSecureStorage("location");
+    this.location = await this.toolService.getSecureStorage<string>(
+      "location",
+      ""
+    );
 
     var locationArr = this.location.split(".");
     console.log("location Array --> ", locationArr);

@@ -76,21 +76,10 @@ export class Tab4Page implements OnInit {
   }
 
   async ngOnInit() {
-    this.userId = await this.toolService.getSecureStorage("userId");
-    // this.toolService.getSecureStorage("userId").subscribe({
-    //   next: async (result) => {
-    //     this.userId = await result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo userId en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
-
+    this.userId = await this.toolService.getSecureStorage<string>(
+      "userId",
+      "0"
+    );
     this.getVisitors();
   }
 
@@ -107,22 +96,25 @@ export class Tab4Page implements OnInit {
   }
 
   async getVisitors() {
-    this.VisitorsList = await this.toolService.getSecureStorage("visitors");
-      if (this.VisitorsList) {
-          // this.VisitorsList = JSON.parse(result);
-          //Sort Visitors by name
-          if (this.VisitorsList !== null && this.VisitorsList.length > 0) {
-            console.log("this.VisitorsList:", this.VisitorsList);
-            if ((this, this.VisitorsList))
-              this.VisitorsList = await this.toolService.sortJsonVisitors(
-                this.VisitorsList,
-                "name",
-                true
-              );
+    this.VisitorsList = await this.toolService.getSecureStorage<any>(
+      "visitors",
+      null
+    );
+    if (this.VisitorsList) {
+      // this.VisitorsList = JSON.parse(result);
+      //Sort Visitors by name
+      if (this.VisitorsList !== null && this.VisitorsList.length > 0) {
+        console.log("this.VisitorsList:", this.VisitorsList);
+        if ((this, this.VisitorsList))
+          this.VisitorsList = await this.toolService.sortJsonVisitors(
+            this.VisitorsList,
+            "name",
+            true
+          );
 
-            this.VisitorsList[0].open = true;
-          }
-        }
+        this.VisitorsList[0].open = true;
+      }
+    }
 
     // this.toolService.getSecureStorage("visitors").subscribe({
     //   next: async (result) => {
@@ -239,7 +231,7 @@ export class Tab4Page implements OnInit {
           text: "Cambiar",
           handler: async (data: any) => {
             try {
-              if (await this.toolService.getSecureBoolean("netStatus")) {
+              if (await this.toolService.getSecureStorage("netStatus", false)) {
                 await this.api
                   .putData(
                     "api/visitors/simple/" + this.userId + "/" + visitorId,

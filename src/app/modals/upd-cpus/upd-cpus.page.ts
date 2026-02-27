@@ -58,7 +58,7 @@ import { ToolsService } from "../../services/tools.service";
 })
 export class UpdCpusPage implements OnInit {
   @Input() cores?: number = 23;
-  public userId: any;
+  public userId: string = "0";
   public CpuList: any;
   automaticClose = false;
   routineOpen = false;
@@ -111,44 +111,15 @@ export class UpdCpusPage implements OnInit {
   }
 
   async getCpus() {
-
-    this.userId = await this.toolService.getSecureStorage("userId");
-
-    // this.toolService.getSecureStorage("userId").subscribe({
-    //   next: (result) => {
-    //     this.userId = result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo userId en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    this.userId = await this.toolService.getSecureStorage<string>(
+      "userId",
+      "0"
+    );
 
     let location: any;
-    // this.toolService.getSecureStorage("location").subscribe({
-    //   next: async (result) => {
-    //     location = await result.split(".");
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo location en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
 
-    location = this.toolService.getSecureStorage("location");
+    location = this.toolService.getSecureStorage<string>("location", "");
     location = location.split(".");
-
-
-
-
     this.api
       .getData(
         "api/cpus/full/" +

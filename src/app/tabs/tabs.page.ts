@@ -36,8 +36,7 @@ export class TabsPage implements OnInit {
   }
 
   async ngOnInit() {
-
-    this.MyRole = await this.toolService.getSecureStorage("myRole");
+    this.MyRole = await this.toolService.getSecureStorage<string>("myRole", "");
     // this.toolService.getSecureStorage("myRole").subscribe({
     //   next: (result) => {
     //     this.MyRole = result || "visitor";

@@ -293,12 +293,16 @@ export class LoginPage implements OnInit {
             //   },
             // });
 
-            const lockedValue = await this.toolService.getSecureStorage(
-              "locked"
+            const lockedValue = await this.toolService.getSecureStorage<any>(
+              "locked",
+              null
             );
 
             // In your component
-            const roles = await this.toolService.getSecureStorage("roles");
+            const roles = await this.toolService.getSecureStorage<any>(
+              "roles",
+              null
+            );
             for (const val_myrole of roles) {
               console.log("lockedValue: ", lockedValue);
               if (lockedValue === "true") {

@@ -89,51 +89,20 @@ export class Tab2Page implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.convertDate("Oninit", new Date(Date.now()));
-    this.myUserId = await this.toolService.getSecureStorage("userId");
+    this.myUserId = await this.toolService.getSecureStorage<number>(
+      "userId",
+      0
+    );
 
-    // this.toolService.getSecureStorage("userId").subscribe({
-    //   next: (result) => {
-    //     this.myUserId = result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo userId en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    this.myToken = await this.toolService.getSecureStorage<string>(
+      "authToken",
+      ""
+    );
 
-    this.myToken = await this.toolService.getSecureStorage("authToken");
-    // this.toolService.getSecureStorage("authToken").subscribe({
-    //   next: (result) => {
-    //     this.myToken = result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo authToken en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
-
-    this.Core_sim = await this.toolService.getSecureStorage("coreSim");
-    // this.toolService.getSecureStorage("coreSim").subscribe({
-    //   next: (result) => {
-    //     this.Core_sim = result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo coreSim en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    this.Core_sim = await this.toolService.getSecureStorage<string>(
+      "coreSim",
+      ""
+    );
   }
 
   async getEventsInitial(event: any) {

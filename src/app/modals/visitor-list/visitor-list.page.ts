@@ -62,21 +62,10 @@ export class VisitorListPage implements OnInit {
 
   async ngOnInit() {
     //   getting visitors ---------------------------
-    this.myVisitors = await this.toolService.getSecureStorage("visitors");
-
-    // this.toolService.getSecureStorage("visitors").subscribe({
-    //   next: (result) => {
-    //     this.myVisitors = JSON.parse(result);
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo visitors en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
+    this.myVisitors = await this.toolService.getSecureStorage<any>(
+      "visitors",
+      null
+    );
 
     this.getVisitors();
     // this.getContacts();

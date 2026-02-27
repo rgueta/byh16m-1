@@ -90,7 +90,7 @@ export class UpdCodesModalPage implements OnInit {
   expiry: any = new Date().toISOString();
   diff: any;
   expiry_hrs = 0;
-  userId = {};
+  userId: string = "0";
   StrPlatform = "";
   comment = "";
   Localtoast: any;
@@ -122,38 +122,15 @@ export class UpdCodesModalPage implements OnInit {
   }
 
   async ngOnInit() {
-    this.userId = await this.toolService.getSecureStorage("userId");
+    this.userId = await this.toolService.getSecureStorage<string>(
+      "userId",
+      "0"
+    );
 
-    // this.toolService.getSecureStorage("userId").subscribe({
-    //   next: (result) => {
-    //     this.userId = result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo userId en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
-
-    this.code_expiry = await this.toolService.getSecureStorage("codeExpiry");
-
-    // this.toolService.getSecureStorage("codeExpiry").subscribe({
-    //   next: (result) => {
-    //     this.code_expiry = result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo codeExpiry en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
-    //
+    this.code_expiry = await this.toolService.getSecureStorage<any>(
+      "codeExpiry",
+      null
+    );
 
     // Comentado para evitar que se abra la lista de contactos
     // this.openVisitorModal();
@@ -217,34 +194,15 @@ export class UpdCodesModalPage implements OnInit {
   }
 
   async getVisitors() {
-    this.myVisitors = await this.toolService.getSecureStorage("visitors");
+    this.myVisitors = await this.toolService.getSecureStorage<any>(
+      "visitors",
+      null
+    );
     this.myVisitors = await this.toolService.sortJsonVisitors(
       this.myVisitors,
       "name",
       true
     );
-
-    // this.toolService.getSecureStorage("visitors").subscribe({
-    //   next: async (result) => {
-    //     if (result.length > 0) {
-    //       this.myVisitors = JSON.parse(result);
-    //       //Sort Visitors by name
-    //       this.myVisitors = await this.toolService.sortJsonVisitors(
-    //         this.myVisitors,
-    //         "name",
-    //         true
-    //       );
-    //     }
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo visitors en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
   }
 
   async setupCode(event: any) {
@@ -294,56 +252,15 @@ export class UpdCodesModalPage implements OnInit {
     var dateFinal = "";
     this.codeCreated = true;
 
-    // let coreSim: any | null = null;
-    // this.toolService.getSecureStorage("coreSim").subscribe({
-    //   next: async (result) => {
-    //     coreSim = await result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo coreSim en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
-
-    const coreSim = await this.toolService.getSecureStorage("coreSim");
-
-    // let userSim: string;
-    // this.toolService.getSecureStorage("sim").subscribe({
-    //   next: async (result) => {
-    //     userSim = await result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo sim en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
-
-    const userSim = await this.toolService.getSecureStorage("sim");
-
-    // let coreName: string;
-    // this.toolService.getSecureStorage("coreName").subscribe({
-    //   next: async (result) => {
-    //     coreName = await result;
-    //   },
-    //   error: (err) => {
-    //     this.toolService.toastAlert(
-    //       "error, obteniendo coreName en getSecureStorage: " + err,
-    //       0,
-    //       ["Ok"],
-    //       "middle"
-    //     );
-    //   },
-    // });
-
-    const coreName = await this.toolService.getSecureStorage("coreName");
+    const coreSim = await this.toolService.getSecureStorage<string>(
+      "coreSim",
+      ""
+    );
+    const userSim = await this.toolService.getSecureStorage<string>("sim", "");
+    const coreName = await this.toolService.getSecureStorage<string>(
+      "coreName",
+      ""
+    );
 
     const expire = (
       (new Date(this.expiry).getTime() - new Date().getTime()) /
@@ -454,7 +371,10 @@ export class UpdCodesModalPage implements OnInit {
       },
     };
 
-    const use_twilio = await this.toolService.getSecureStorage("twilio");
+    const use_twilio = await this.toolService.getSecureStorage<any>(
+      "twilio",
+      null
+    );
 
     try {
       await this.sms.send(sim, text);
