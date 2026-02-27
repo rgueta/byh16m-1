@@ -34,33 +34,21 @@ export class NetworkService {
       this.updateNetworkStatus(initialStatus);
 
       // Escuchar cambios
-      Network.addListener("networkStatusChange", (status: ConnectionStatus) => {
-        console.log(
-          "[NetworkService] cambio detectado:",
-          status.connected,
-          status.connectionType
-        );
-        this.toolsService.setSecureStorage("netStatus", status.connected);
+      Network.addListener(
+        "networkStatusChange",
+        async (status: ConnectionStatus) => {
+          console.log(
+            "[NetworkService] cambio detectado:",
+            status.connected,
+            status.connectionType
+          );
+          this.toolsService.setSecureStorage("netStatus", status.connected);
 
-        const NetStatus = this.toolsService.getSecureStorage<boolean>(
-          "netStatus",
-          false
-        );
-
-        console.log("netStatus: ", NetStatus);
-
-        if (!NetStatus) {
-          console.log("No hay Internet......");
-        } else {
-          console.log("Si hay Internet......");
+          this.ngZone.run(() => {
+            this.updateNetworkStatus(status);
+          });
         }
-
-        this.ngZone.run(() => {
-          this.updateNetworkStatus(status);
-        });
-      });
-
-      console.log("[NetworkService] listener de red configurado correctamente");
+      );
     } catch (error) {
       console.error(
         "[NetworkService] Error al inicializar monitoreo de red:",
