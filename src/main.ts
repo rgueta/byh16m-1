@@ -21,9 +21,18 @@ import { SMS, SmsOptions } from "@ionic-native/sms/ngx";
 import { ScreenOrientation } from "@ionic-native/screen-orientation/ngx";
 import { Sim } from "@ionic-native/sim/ngx";
 import { AuthInterceptor } from "./app/interceptors/jwt.interceptor";
+import { NetworkService } from "./app/services/network.service";
+import { inject } from "@angular/core";
 
 bootstrapApplication(AppComponent, {
   providers: [
+    {
+      provide: "INIT_NETWORK",
+      useFactory: () => {
+        inject(NetworkService);
+        return true;
+      },
+    },
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules)),

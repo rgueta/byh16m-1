@@ -28,24 +28,58 @@ export class NetworkService {
   private async initializeNetworkMonitoring() {
     await this.platform.ready();
 
-    // Obtener el estado inicial
-    const initialStatus = await Network.getStatus();
-    this.updateNetworkStatus(initialStatus);
+    try {
+      // Obtener el estado inicial
+      const initialStatus = await Network.getStatus();
+      this.updateNetworkStatus(initialStatus);
 
-    // Escuchar cambios
-    Network.addListener("networkStatusChange", (status: ConnectionStatus) => {
-      this.ngZone.run(() => {
-        this.updateNetworkStatus(status);
+      // Escuchar cambios
+      Network.addListener("networkStatusChange", (status: ConnectionStatus) => {
+        console.log(
+          "[NetworkService] cambio detectado:",
+          status.connected,
+          status.connectionType
+        );
+        this.toolsService.setSecureStorage("netStatus", status.connected);
+
+        const NetStatus = this.toolsService.getSecureStorage<boolean>(
+          "netStatus",
+          false
+        );
+
+        console.log("netStatus: ", NetStatus);
+
+        if (!NetStatus) {
+          console.log("No hay Internet......");
+        } else {
+          console.log("Si hay Internet......");
+        }
+
+        this.ngZone.run(() => {
+          this.updateNetworkStatus(status);
+        });
       });
-    });
+
+      console.log("[NetworkService] listener de red configurado correctamente");
+    } catch (error) {
+      console.error(
+        "[NetworkService] Error al inicializar monitoreo de red:",
+        error
+      );
+    }
   }
 
   private updateNetworkStatus(status: ConnectionStatus) {
     this.networkStatusSubject.next(status);
-    this.toolsService.setSecureStorage(
-      "netStatus",
-      status.connected ? "true" : "false"
-    );
+
+    // Guardar en secure storage
+    this.toolsService
+      .setSecureStorage("netStatus", status.connected ? "true" : "false")
+      .catch((err) =>
+        console.error("Error guardando status en secure storage:", err)
+      );
+
+    console.log("[NetworkService] estado actualizado:", status.connected);
   }
 
   /**
