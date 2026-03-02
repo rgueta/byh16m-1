@@ -31,24 +31,18 @@ export class NetworkService {
     try {
       // Obtener el estado inicial
       const initialStatus = await Network.getStatus();
+      console.log("[NetworkService] estado inicial:", initialStatus);
       this.updateNetworkStatus(initialStatus);
 
-      // Escuchar cambios
-      Network.addListener(
-        "networkStatusChange",
-        async (status: ConnectionStatus) => {
-          console.log(
-            "[NetworkService] cambio detectado:",
-            status.connected,
-            status.connectionType
-          );
-          this.toolsService.setSecureStorage("netStatus", status.connected);
+      // Escuchar cambios - CORREGIDO: Ahora actualiza el BehaviorSubject
+      Network.addListener("networkStatusChange", (status: ConnectionStatus) => {
+        // Usar NgZone para asegurar que Angular detecte los cambios
+        this.ngZone.run(() => {
+          this.updateNetworkStatus(status);
+        });
+      });
 
-          this.ngZone.run(() => {
-            this.updateNetworkStatus(status);
-          });
-        }
-      );
+      console.log("[NetworkService] listener de red configurado correctamente");
     } catch (error) {
       console.error(
         "[NetworkService] Error al inicializar monitoreo de red:",
@@ -57,72 +51,82 @@ export class NetworkService {
     }
   }
 
-  private updateNetworkStatus(status: ConnectionStatus) {
+  private updateNetworkStatus = async (status: ConnectionStatus) => {
     this.networkStatusSubject.next(status);
 
     // Guardar en secure storage
     this.toolsService
-      .setSecureStorage("netStatus", status.connected ? "true" : "false")
+      .setSecureStorage("netStatus", status.connected)
       .catch((err) =>
         console.error("Error guardando status en secure storage:", err)
       );
 
-    console.log("[NetworkService] estado actualizado:", status.connected);
-  }
+    if (
+      !(await this.toolsService.getSecureStorage<boolean>("netStatus", false))
+    ) {
+      console.error(`No Internet`);
+    } else {
+      console.log(`Si hay Internet`);
+    }
+  };
 
   /**
    * Retorna el estado actual de la conexión de red como un Observable.
-   * Utiliza el BehaviorSubject para dar el valor actual inmediatamente.
    */
   public getNetworkStatusObservable(): Observable<ConnectionStatus> {
     return this.networkStatus$;
   }
 
   /**
-   * Retorna el estado actual de la conexión de red como una Promesa (útil para checks únicos).
+   * Retorna el estado actual de la conexión de red como una Promesa.
    */
   public async getCurrentNetworkStatus(): Promise<ConnectionStatus> {
     return await Network.getStatus();
   }
 
   /**
-   * Retorna true si hay conexión a Internet, false en caso contrario.
+   * Retorna true si hay conexión a Internet.
    */
   public isOnline(): boolean {
     return this.networkStatusSubject.getValue().connected;
   }
 
   /**
-   * Verifica la conexión a Internet y devuelve un Observable<boolean>.
-   * Esto es útil para encadenar operaciones con llamadas a la API.
-   * Agrega un pequeño "ping" a un sitio confiable para una verificación más robusta
-   * que solo la verificación local del dispositivo.
+   * Verifica la conexión a Internet con un ping a un sitio confiable.
    */
-  public checkInternetConnection_(): Observable<boolean> {
-    console.log("Entre a la verificacion netword_ ...");
+  // public checkInternetConnection_(): Observable<boolean> {
+  //   console.log("Verificando conexión a Internet...");
 
-    return from(this.getCurrentNetworkStatus()).pipe(
-      switchMap((status) => {
-        console.error("verificacion netword antes del IF");
-        if (!status.connected) {
-          console.error("verificacion netword...FALSE");
-          return of(false); // No hay conexión local
-        } else {
-          console.error("verificacion netword...TRUE");
-          // Opcional: Intentar un ping a un sitio confiable para una verificación más profunda
-          // Esto puede tardar un poco y agregar latencia
-          return from(
-            fetch("https://www.google.com/favicon.ico", { mode: "no-cors" })
-              .then(() => true)
-              .catch(() => false)
-          ).pipe(
-            catchError(() => of(false)) // En caso de cualquier error con fetch, asumir offline
-          );
-        }
-      }),
-      catchError(() => of(false)) // En caso de error al obtener el estado de la red del Capacitor
-    );
-  }
+  //   return from(this.getCurrentNetworkStatus()).pipe(
+  //     switchMap((status) => {
+  //       if (!status.connected) {
+  //         console.log("Verificación: sin conexión local");
+  //         return of(false);
+  //       } else {
+  //         console.log("Verificación: con conexión local, probando ping...");
+  //         return from(
+  //           fetch("https://www.google.com/favicon.ico", {
+  //             mode: "no-cors",
+  //             cache: "no-cache",
+  //             timeout: 5000, // Timeout de 5 segundos
+  //           })
+  //             .then(() => {
+  //               console.log("Ping exitoso");
+  //               return true;
+  //             })
+  //             .catch((error) => {
+  //               console.log("Ping falló:", error);
+  //               return false;
+  //             })
+  //         ).pipe(catchError(() => of(false)));
+  //       }
+  //     }),
+  //     catchError((error) => {
+  //       console.error("Error en checkInternetConnection:", error);
+  //       return of(false);
+  //     })
+  //   );
+  // }
 
   public checkInternetConnection() {
     return this.getCurrentNetworkStatus()
