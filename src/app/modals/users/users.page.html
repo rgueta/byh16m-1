@@ -131,7 +131,7 @@
             id="disableToggle"
             labelPlacement="start"
             [checked]="item.blocked === 1"
-            (ionChange)="chgItem($event,'lock',item.id, item.sim,
+            (ionChange)="chgItem($event,'blocked',item.id, item.sim,
               item.name, item.house, item.coreSim)"
           >
             <ion-label id="lblUnlock" *ngIf="item.locked"

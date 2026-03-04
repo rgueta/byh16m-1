@@ -144,7 +144,6 @@ export class UsersPage implements OnInit {
       next: async (result: any) => {
         if (result) this.users = result;
         this.users[0].open = true;
-        console.log("result: ", result);
       },
       error: (error: any) => {
         console.log("Error call api: ", error);
@@ -381,15 +380,6 @@ export class UsersPage implements OnInit {
         {
           text: "Ok",
           handler: async (data) => {
-            const pkg = `updStatus_${
-              userItem === "lock"
-                ? event.target.checked
-                  ? "lock"
-                  : "unlock"
-                : userItem
-            },
-              ${await this.getTimestamp()},${name},${house},${sim},${userId}`;
-
             const options: SmsOptions = {
               replaceLineBreaks: false,
               android: {
@@ -405,49 +395,59 @@ export class UsersPage implements OnInit {
               .then(async (res) => {
                 res.present();
 
-                let qry: any = {};
                 switch (userItem) {
-                  case "lock":
-                    qry = `{"userId" : ${userId},
-                            "qry":{"lock": ${event.target.checked ? 1 : 0}}}`;
+                  case "blocked":
+                    const pkg = `updStatus_${
+                      userItem === "blocked"
+                        ? event.target.checked
+                          ? "lock"
+                          : "unlock"
+                        : userItem
+                    },${await this.getTimestamp()},${name},${house},${sim},${userId}`;
+                    let qry: any = {};
+                    qry = `{"userId" : ${userId},"qry":{"blocked": ${
+                      event.target.checked ? 1 : 0
+                    }}}`;
+
+                    // console.log("pkg: ", pkg.trim());
+                    // console.log("qry: ", qry);
+                    // console.log("coreSim: ", coreSim);
+
+                    // await res.dismiss();
+                    // return;
+
+                    await this.api.postData("api/users/chgItem", qry).then(
+                      async (onResolve) => {
+                        // set lock status on device
+                        await this.sms
+                          .send(coreSim, pkg, options)
+                          .then(() => this.loadingController.dismiss())
+                          .catch((e: any) => {
+                            this.loadingController.dismiss();
+                            this.toolService.showAlertBasic(
+                              "Alerta",
+                              "Falla conexion a red telefonica",
+                              "",
+                              ["Ok"]
+                            );
+                          });
+
+                        await this.getUsers();
+                      },
+                      (err) => {
+                        this.toolService.showAlertBasic(
+                          "Alert",
+                          "Error api call",
+                          "Can not " + userItem + " user, " + err,
+                          ["Ok"]
+                        );
+                      }
+                    );
+
                     break;
                   default:
                     break;
                 }
-
-                console.log("pkg: ", pkg);
-                console.log("qry: ", qry);
-
-                // await res.dismiss();
-                // return;
-
-                await this.api.postData("api/users/chgItem", qry).then(
-                  async (onResolve) => {
-                    // set lock status on device
-                    await this.sms
-                      .send(coreSim, pkg, options)
-                      .then(() => this.loadingController.dismiss())
-                      .catch((e: any) => {
-                        this.loadingController.dismiss();
-                        this.toolService.showAlertBasic(
-                          "Alerta",
-                          "Falla conexion a red telefonica",
-                          "",
-                          ["Ok"]
-                        );
-                      });
-
-                    await this.getUsers();
-                  },
-                  (err) => {
-                    this.toolService.showAlertBasic(
-                      "Alert",
-                      "Error api call",
-                      "Can not " + status + " user, " + err,
-                      ["Ok"]
-                    );
-                  }
-                );
               });
           },
         },
