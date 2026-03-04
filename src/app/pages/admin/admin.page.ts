@@ -571,7 +571,6 @@ export class AdminPage implements OnInit {
 
   async chgStatusCore(event: any, item: any) {
     let titleMsg = "Disable ";
-
     if (event.target.checked) {
       titleMsg = "Enable ";
     }
@@ -745,12 +744,12 @@ export class AdminPage implements OnInit {
                       break;
                   }
                   const strJson =
-                    '{"coreId" : "' +
+                    '{"coreId" : ' +
                     item.id +
-                    '","item" : { "' +
+                    ',"qry" : { "' +
                     valueItem +
                     '" : ' +
-                    event.target.checked +
+                    (event.target.checked ? 1 : 0) +
                     "}}";
 
                   jsonItem = JSON.parse(strJson);
@@ -809,8 +808,6 @@ export class AdminPage implements OnInit {
                     );
                     return; //  Salir del handler
                   }
-
-                  console.log(`netStats: ${netStats}, ${typeof netStats}`);
 
                   // Validar conexión a internet
                   if (!netStats) {
@@ -958,7 +955,6 @@ export class AdminPage implements OnInit {
       "netStatus",
       false
     );
-    console.log("valor obtenido del netStats:", netStats);
 
     let alert = await this.alertCtrl.create({
       header: titleMsg,

@@ -87,7 +87,7 @@
             name="save-outline"
             size="large"
             *ngIf="sim"
-            (click)="simChange(item._id,item.sim)"
+            (click)="simChange(item.id,item.sim)"
           ></ion-icon>
         </ion-item>
       </form>
@@ -110,12 +110,12 @@
         <ion-select
           ok-text="Seleccionar"
           placeholder="Select Event"
-          (ionChange)="changeRoles($event,item._id,item.name)"
+          (ionChange)="changeRoles($event,item.id,item.name)"
           label="Roles:"
           cancel-text="Cancelar"
           [multiple]="true"
         >
-          <ion-select-option *ngFor="let item of RoleList" value="{{item._id}}"
+          <ion-select-option *ngFor="let item of RoleList" value="{{item.id}}"
             >{{item.name}}
           </ion-select-option>
         </ion-select>
@@ -130,10 +130,8 @@
           <ion-toggle
             id="disableToggle"
             labelPlacement="start"
-            [ngModel]="item.locked"
-            [ngModelOptions]="{standalone: true}"
-            checked="item.locked ? true : false"
-            (ionChange)="chgLockStatus($event,item.locked,item._id, item.sim,
+            [checked]="item.blocked === 1"
+            (ionChange)="chgItem($event,'lock',item.id, item.sim,
               item.name, item.house, item.coreSim)"
           >
             <ion-label id="lblUnlock" *ngIf="item.locked"
@@ -151,7 +149,7 @@
               name="trash-outline"
               size="large"
               slot="end"
-              (click)="delUser(item._id, item.name, item.coreSim)"
+              (click)="delUser(item.id, item.name, item.coreSim)"
             ></ion-icon>
           </div>
         </div>

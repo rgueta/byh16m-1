@@ -215,7 +215,7 @@
         <ion-card-subtitle *ngIf="item.disable">Mostrar</ion-card-subtitle>
         <ion-card-subtitle *ngIf="!item.disable">Ocultar</ion-card-subtitle>
         <ion-checkbox
-          (ionChange)="StatusInfo($event,item.disable,item._id)"
+          (ionChange)="StatusInfo($event,item.disable,item.id)"
         ></ion-checkbox>
       </div>
       <ion-card-title>{{item.title}}</ion-card-title>

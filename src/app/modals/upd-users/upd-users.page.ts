@@ -250,7 +250,7 @@ export class UpdUsersPage implements OnInit {
   }
 
   async fillData() {
-    this.id = this.pkgUser["_id"];
+    this.id = this.pkgUser["id"];
     this.name = this.pkgUser["name"];
     this.username = this.pkgUser["username"];
     this.email = this.pkgUser["email"];
@@ -330,7 +330,7 @@ export class UpdUsersPage implements OnInit {
 
   async onChangeCpu(event: any) {
     this.selectedCpu = event.detail.value;
-    this.getCores(event.detail.value._id);
+    this.getCores(event.detail.value.id);
   }
 
   async onChangeCore(event: any) {
@@ -410,7 +410,7 @@ export class UpdUsersPage implements OnInit {
                       "," +
                       this.RegisterForm.get("Sim")!.value +
                       "," +
-                      resUser["_id"] +
+                      resUser["id"] +
                       "," +
                       this.localRole[0]["name"];
 
@@ -465,7 +465,7 @@ export class UpdUsersPage implements OnInit {
 
   async onSubmitItSelf() {
     const pkg: {} = {
-      cpu: this.selectedCpu._id,
+      cpu: this.selectedCpu.id,
       core: this.selectedCore.id,
       name: this.RegisterForm.get("Name")!.value,
       username: this.RegisterForm.get("UserName")!.value,

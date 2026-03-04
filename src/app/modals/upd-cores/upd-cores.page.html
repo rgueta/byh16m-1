@@ -109,7 +109,7 @@
             >
               <ion-select-option
                 *ngFor="let housing_unit of myHousingUnitList"
-                [value]="{id:housing_unit._id,name:housing_unit.Name}"
+                [value]="{id:housing_unit.id,name:housing_unit.Name}"
                 >{{housing_unit.name}}</ion-select-option
               >
             </ion-select>

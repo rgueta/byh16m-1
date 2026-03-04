@@ -65,7 +65,7 @@ export class UpdCpusPage implements OnInit {
   isReadOnly: boolean = true;
   myToast: any;
   cpus = {
-    _id: "",
+    id: "",
     cores: 0,
     entry: 0,
     coord: ["", ""],
@@ -147,7 +147,7 @@ export class UpdCpusPage implements OnInit {
           {
             text: "OK",
             handler: async () => {
-              this.cpus._id = this.CpuList[index]["_id"];
+              this.cpus.id = this.CpuList[index]["id"];
               this.cpus.cores = this.CpuList[index]["cores"];
               this.cpus.entry = this.CpuList[index]["entry"];
               this.cpus.coord = this.CpuList[index]["coord"];
@@ -179,7 +179,7 @@ export class UpdCpusPage implements OnInit {
       await MsgAlert.present();
     } else {
       // create item backup
-      this.cpus._id = item._id;
+      this.cpus.id = item.id;
       this.cpus.cores = item.cores;
       this.cpus.entry = item.entry;
       this.cpus.coord = item.coord;
@@ -194,7 +194,7 @@ export class UpdCpusPage implements OnInit {
 
   CancelUpd(index: number) {
     this.isReadOnly = true;
-    this.CpuList[index]._id = this.cpus._id;
+    this.CpuList[index].id = this.cpus.id;
     this.CpuList[index].cores = this.cpus.cores;
     this.CpuList[index].entry = this.cpus.entry;
     this.CpuList[index].coord = this.cpus.coord;

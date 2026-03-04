@@ -213,7 +213,7 @@ export class CodesPage implements OnInit {
             "," +
             this.userId +
             ",n/a," +
-            this.pkg["_id"]
+            this.pkg["id"]
         );
 
         this.toolsService.toastAlert("Texto fue enviado", 0, ["Ok"], "middle");
@@ -231,7 +231,7 @@ export class CodesPage implements OnInit {
           await this.toolsService.getSecureStorage<boolean>("netStatus", false)
         ) {
           await this.api.putData(
-            "api/codes/update/" + this.userId + "/" + pkg["_id"],
+            "api/codes/update/" + this.userId + "/" + pkg["id"],
             pkg
           );
 
@@ -265,7 +265,7 @@ export class CodesPage implements OnInit {
   async ResendCode(code: string, codeId: string, Initial: any, Expiry: any) {
     this.expiry = this.initial = new Date();
     this.initial = this.toolsService.convDate(new Date(this.initial));
-    this.pkg = { code: "", _id: "", initial: "", expiry: "" };
+    this.pkg = { code: "", id: "", initial: "", expiry: "" };
 
     this.expiry = this.expiry.setHours(
       this.expiry.getHours() + Number(this.diff)
@@ -289,7 +289,7 @@ export class CodesPage implements OnInit {
     };
 
     this.pkg["code"] = code;
-    this.pkg["_id"] = codeId;
+    this.pkg["id"] = codeId;
     this.pkg["initial"] = this.initial;
     this.pkg["expiry"] = this.expiry;
   }
@@ -310,7 +310,7 @@ export class CodesPage implements OnInit {
       ).toFixed(1);
       if (this.diff > 0) {
         var arrFound = this.CodeList.find((item: any, i: number) => {
-          if (item["_id"] == codeId) {
+          if (item["id"] == codeId) {
             this.CodeList[i].changed = true;
           }
         });

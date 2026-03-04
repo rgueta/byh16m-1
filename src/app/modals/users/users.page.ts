@@ -144,6 +144,7 @@ export class UsersPage implements OnInit {
       next: async (result: any) => {
         if (result) this.users = result;
         this.users[0].open = true;
+        console.log("result: ", result);
       },
       error: (error: any) => {
         console.log("Error call api: ", error);
@@ -354,18 +355,17 @@ export class UsersPage implements OnInit {
     await alert.present();
   }
 
-  async chgLockStatus(
+  async chgItem(
     event: any,
-    userStatus: any,
-    id: string,
+    userItem: any,
+    userId: string,
     sim: string,
     name: string,
     house: string,
     coreSim: string
   ) {
     const adminId = this.userId;
-    const titleMsg = userStatus ? "Desbloqueo" : "Bloqueo";
-    const status = userStatus ? "unlock" : "lock";
+    const titleMsg = `Cambiar ${userItem}`;
 
     let alert = await this.alertCtrl.create({
       subHeader: "Continuar con " + titleMsg,
@@ -381,19 +381,14 @@ export class UsersPage implements OnInit {
         {
           text: "Ok",
           handler: async (data) => {
-            const pkg =
-              "updStatus_" +
-              status +
-              "," +
-              (await this.getTimestamp()) +
-              "," +
-              name +
-              "," +
-              house +
-              "," +
-              sim +
-              "," +
-              id;
+            const pkg = `updStatus_${
+              userItem === "lock"
+                ? event.target.checked
+                  ? "lock"
+                  : "unlock"
+                : userItem
+            },
+              ${await this.getTimestamp()},${name},${house},${sim},${userId}`;
 
             const options: SmsOptions = {
               replaceLineBreaks: false,
@@ -401,7 +396,8 @@ export class UsersPage implements OnInit {
                 intent: "",
               },
             };
-            this.loadingController
+
+            const loading = await this.loadingController
               .create({
                 message: titleMsg + " de usuario ...",
                 translucent: true,
@@ -409,38 +405,49 @@ export class UsersPage implements OnInit {
               .then(async (res) => {
                 res.present();
 
-                await this.api
-                  .postData("api/users/" + status + "/" + adminId + "/" + id, {
-                    neighborId: id,
-                  })
-                  .then(
-                    async (onResolve) => {
-                      // set lock status on device
+                let qry: any = {};
+                switch (userItem) {
+                  case "lock":
+                    qry = `{"userId" : ${userId},
+                            "qry":{"lock": ${event.target.checked ? 1 : 0}}}`;
+                    break;
+                  default:
+                    break;
+                }
 
-                      await this.sms
-                        .send(coreSim, pkg, options)
-                        .then(() => this.loadingController.dismiss())
-                        .catch((e: any) => {
-                          this.loadingController.dismiss();
-                          this.toolService.showAlertBasic(
-                            "Alerta",
-                            "Falla conexion a red telefonica",
-                            "",
-                            ["Ok"]
-                          );
-                        });
+                console.log("pkg: ", pkg);
+                console.log("qry: ", qry);
 
-                      await this.getUsers();
-                    },
-                    (err) => {
-                      this.toolService.showAlertBasic(
-                        "Alert",
-                        "Error api call",
-                        "Can not " + status + " user, " + err,
-                        ["Ok"]
-                      );
-                    }
-                  );
+                // await res.dismiss();
+                // return;
+
+                await this.api.postData("api/users/chgItem", qry).then(
+                  async (onResolve) => {
+                    // set lock status on device
+                    await this.sms
+                      .send(coreSim, pkg, options)
+                      .then(() => this.loadingController.dismiss())
+                      .catch((e: any) => {
+                        this.loadingController.dismiss();
+                        this.toolService.showAlertBasic(
+                          "Alerta",
+                          "Falla conexion a red telefonica",
+                          "",
+                          ["Ok"]
+                        );
+                      });
+
+                    await this.getUsers();
+                  },
+                  (err) => {
+                    this.toolService.showAlertBasic(
+                      "Alert",
+                      "Error api call",
+                      "Can not " + status + " user, " + err,
+                      ["Ok"]
+                    );
+                  }
+                );
               });
           },
         },

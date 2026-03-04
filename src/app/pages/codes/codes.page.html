@@ -75,7 +75,7 @@
           <input
             class="button-17"
             type="button"
-            (click)="ResendCode(item.code,item._id,item.initial,item.expiry)"
+            (click)="ResendCode(item.code,item.id,item.initial,item.expiry)"
             value="Reenviar a modulo"
           />
         </div>
@@ -135,7 +135,7 @@
             min="2022"
             max="2060"
             [showDefaultButtons]="true"
-            (ionChange)="onChangeExpiry(item._id,myExpiry.value,myExpiry.value)"
+            (ionChange)="onChangeExpiry(item.id,myExpiry.value,myExpiry.value)"
           >
           </ion-datetime>
         </ng-template>

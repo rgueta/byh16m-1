@@ -362,7 +362,7 @@
         <ion-toggle
           id="remoteToggle"
           labelPlacement="start"
-          checked="item.remote == 1"
+          [checked]="item.remote == 1"
           (ionChange)="chgRemoteButton($event,item)"
           >Remote buttons :
         </ion-toggle>
@@ -372,7 +372,7 @@
         <ion-toggle
           id="disableToggle"
           labelPlacement="start"
-          checked="item.enable === 1"
+          [checked]="item.enable === 1"
           (ionChange)="chgStatusCore($event,item)"
           >Enabled core :
         </ion-toggle>
