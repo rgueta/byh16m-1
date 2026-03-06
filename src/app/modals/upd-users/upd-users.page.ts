@@ -355,28 +355,31 @@ export class UpdUsersPage implements OnInit {
     let email: any;
 
     if (this.demoMode) {
-      email = this.adminEmail;
+      email = await this.toolService.getSecureStorage<string>("adminEmail", "");
     } else {
       email = this.RegisterForm.get("Email")!.value;
     }
 
     const pkg = {
-      cpu: localCpu,
-      core: localCore,
-      name: this.RegisterForm.get("Name")!.value,
+      email: email,
       username: this.RegisterForm.get("UserName")!.value,
       pwd: "",
-      email: email,
-      sim: this.RegisterForm.get("Sim")!.value,
+      name: this.RegisterForm.get("Name")!.value,
       house: this.RegisterForm.get("House")!.value,
+      sim: this.RegisterForm.get("Sim")!.value,
       gender: this.RegisterForm.get("Gender")!.value,
-      roles: this.RegisterForm.get("Roles")?.value,
-      uuid: this.RegisterForm.get("Uuid")?.value,
-      location: this.location,
       avatar: "",
+      coreId: localCore,
+      location: this.location,
+      locked: 0,
+      uuid: this.RegisterForm.get("Uuid")?.value,
+      blocked: 0,
+      roles: this.RegisterForm.get("Roles")?.value,
     };
 
     pkg.roles = pkg.roles.map((role: any) => role.id);
+    console.log("pkg: ", pkg);
+    console.log("userId: ", this.userId);
 
     try {
       this.showLoading(2500);
@@ -386,6 +389,8 @@ export class UpdUsersPage implements OnInit {
         .then(async (resUser: any) => {
           // create password reset
 
+          console.log("resUser:", resUser);
+          return;
           this.api
             .postData("api/pwdResetReq/" + email, JSON.parse(this.devicePkg))
             .then(async (result) => {

@@ -36,21 +36,22 @@
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
 
-.topHeader {
-  .md {
-    padding-top: 1rem;
-  }
-
-  &.ios {
-    /*padding-top: env(safe-area-inset-top);*/
-  }
+/* inicia seccion de encabezado */
+.absolute-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  pointer-events: none; // evita bloquear botones
+  text-align: center;
 }
 
 ion-toolbar {
-  // By default, ion-toolbar is a flex container.
-  // We need to ensure the space between start/end slots and the center is flexible.
-  // This helps the .centered-content-wrapper take up available space.
-  --min-height: 56px; // Standard height, adjust if needed
+  --min-height: 56px;
+
+  @supports (-webkit-touch-callout: none) {
+    --min-height: 44px; // iOS
+  }
 
   ion-icon {
     font-size: 2.2rem;
@@ -63,32 +64,9 @@ ion-toolbar {
       font-size: 2.2rem;
     }
   }
-  .centered-content-wrapper {
-    // This div needs to fill the space for centering to work effectively
-    flex-grow: 1; // Allows the div to grow and take available space
-    display: flex; /* Make this div a flex container */
-    align-items: center; /* Align items vertically in the center */
-    justify-content: center; /* Align items horizontally in the center */
-    height: 100%; /* Ensure it takes full height of the toolbar for vertical centering */
-
-    ion-title {
-      // Remove default padding of ion-title to ensure true centering
-      padding-inline-start: 0;
-      padding-inline-end: 0;
-      padding-top: 0;
-      padding-bottom: 0px;
-      // Optional: enforce text alignment if it's still off
-      text-align: center;
-    }
-  }
 }
 
-.bottomFooter {
-  padding-bottom: calc(2rem + env(safe-area-inset-bottom));
-}
-
-.ios {
-}
+/* ----- termina seccion de encabezado  ---- */
 
 // Accordion -------------------------------
 ion-accordion.accordion-expandSng ion-item[slot="header"],

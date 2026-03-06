@@ -375,7 +375,7 @@ export class AdminPage implements OnInit {
 
   DemoMode() {
     this.demoMode = !this.demoMode;
-    this.toolService.setSecureStorage("demoMode", this.demoMode.toString());
+    this.toolService.setSecureStorage("demoMode", this.demoMode);
   }
 
   async getCores() {

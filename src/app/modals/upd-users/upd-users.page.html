@@ -7,17 +7,19 @@
       ></ion-icon>
     </ion-buttons>
 
-    <div class="centered-content-wrapper">
-      <ion-title *ngIf="sourcePage == 'login' ||sourcePage == 'adminNewUser'"
-        >Usuario Nuevo</ion-title
-      >
-      <ion-title *ngIf="sourcePage == 'adminNewExtrange'"
-        >New extrange</ion-title
-      >
-      <ion-title *ngIf="sourcePage == 'commentApp'"
-        >Comentar de la aplicacion</ion-title
-      >
-    </div>
+    <!--<div class="centered-content-wrapper">-->
+    <ion-title
+      class="absolute-title"
+      *ngIf="sourcePage == 'login' ||sourcePage == 'adminNewUser'"
+      >Usuario Nuevo</ion-title
+    >
+    <ion-title class="absolute-title" *ngIf="sourcePage == 'adminNewExtrange'"
+      >New extrange</ion-title
+    >
+    <ion-title class="absolute-title" *ngIf="sourcePage == 'commentApp'"
+      >Comentar de la aplicacion</ion-title
+    >
+    <!--</div>-->
   </ion-toolbar>
 </ion-header>
 
