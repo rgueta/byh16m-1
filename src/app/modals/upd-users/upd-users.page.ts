@@ -454,7 +454,7 @@ export class UpdUsersPage implements OnInit {
           this.toolService.showAlertBasic(
             "Alert",
             "Error api call",
-            "Can not add user, " + JSON.stringify(rej["error"]["msg"]),
+            "Can not add user, " + JSON.stringify(rej["error"]["details"]),
             ["Ok"]
           );
         });
