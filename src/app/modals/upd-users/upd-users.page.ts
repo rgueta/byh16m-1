@@ -352,16 +352,8 @@ export class UpdUsersPage implements OnInit {
         ? this.RegisterForm.get("Core")!.value["id"]
         : this.RegisterForm.get("Core")!.value;
 
-    let email: any;
-
-    if (this.demoMode) {
-      email = await this.toolService.getSecureStorage<string>("adminEmail", "");
-    } else {
-      email = this.RegisterForm.get("Email")!.value;
-    }
-
     const pkg = {
-      email: email,
+      email: this.RegisterForm.get("Email")!.value,
       username: this.RegisterForm.get("UserName")!.value,
       pwd: "",
       name: this.RegisterForm.get("Name")!.value,
@@ -375,11 +367,16 @@ export class UpdUsersPage implements OnInit {
       uuid: this.RegisterForm.get("Uuid")?.value,
       blocked: 0,
       roles: this.RegisterForm.get("Roles")?.value,
+      adminEmail: await this.toolService.getSecureStorage<string>(
+        "adminEmail",
+        ""
+      ),
+      demo: this.demoMode,
     };
 
     pkg.roles = pkg.roles.map((role: any) => role.id);
-    console.log("pkg: ", pkg);
-    console.log("userId: ", this.userId);
+
+    console.log("device pkg: ", this.devicePkg);
 
     try {
       this.showLoading(2500);
@@ -389,66 +386,52 @@ export class UpdUsersPage implements OnInit {
         .then(async (resUser: any) => {
           // create password reset
 
-          console.log("resUser:", resUser);
-          return;
-          this.api
-            .postData("api/pwdResetReq/" + email, JSON.parse(this.devicePkg))
-            .then(async (result) => {
-              if (this.MyRole == "admin" || this.MyRole == "neighborAdmin") {
-                // delete backstage document
-                this.api
-                  .deleteData("api/backstage/" + this.userId + "/" + this.id)
-                  .then(async (result) => {
-                    const options: SmsOptions = {
-                      replaceLineBreaks: false,
-                      android: {
-                        intent: "",
-                      },
-                    };
-                    const pkgDevice =
-                      "newUser," +
-                      (await this.getTimestamp()) +
-                      "," +
-                      this.RegisterForm.get("Name")!.value +
-                      "," +
-                      this.RegisterForm.get("House")!.value +
-                      "," +
-                      this.RegisterForm.get("Sim")!.value +
-                      "," +
-                      resUser["id"] +
-                      "," +
-                      this.localRole[0]["name"];
+          if (this.MyRole == "admin" || this.MyRole == "neighborAdmin") {
+            // delete backstage document
+            // this.api
+            //   .deleteData("api/backstage/" + this.userId + "/" + this.id)
+            //   .then(async (result) => {
+            const options: SmsOptions = {
+              replaceLineBreaks: false,
+              android: {
+                intent: "",
+              },
+            };
+            const pkgDevice =
+              "newUser," +
+              (await this.getTimestamp()) +
+              "," +
+              this.RegisterForm.get("Name")!.value +
+              "," +
+              this.RegisterForm.get("House")!.value +
+              "," +
+              this.RegisterForm.get("Sim")!.value +
+              "," +
+              resUser["id"] +
+              "," +
+              this.localRole[0]["name"];
 
-                    await this.sms
-                      .send(this.coreSim, pkgDevice, options)
-                      .then()
-                      .catch((e: any) =>
-                        this.toolService.showAlertBasic(
-                          "Error",
-                          "Adding newUser error",
-                          e,
-                          ["Ok"]
-                        )
-                      );
-                  })
-                  .catch((err) => {
-                    this.toolService.showAlertBasic(
-                      "Alerta",
-                      "Error, delete backstage: ",
-                      JSON.stringify(err),
-                      ["Ok"]
-                    );
-                  });
-              }
-            })
-            .catch((err) => {
-              this.toolService.showAlertBasic(
-                "Alerta",
-                "Error, pwd reset: ",
-                JSON.stringify(err),
-                ["Ok"]
+            await this.sms
+              .send(this.coreSim, pkgDevice, options)
+              .then()
+              .catch((e: any) =>
+                this.toolService.showAlertBasic(
+                  "Error",
+                  "Adding newUser error",
+                  e,
+                  ["Ok"]
+                )
               );
-            });
+            // })
+            // .catch((err) => {
+            //   this.toolService.showAlertBasic(
+            //     "Alerta",
+            //     "Error, delete backstage: ",
+            //     JSON.stringify(err),
+            //     ["Ok"]
+            //   );
+            // });
+          }
         })
         .catch((rej) => {
           this.toolService.showAlertBasic(

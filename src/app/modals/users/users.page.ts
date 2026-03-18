@@ -457,7 +457,7 @@ export class UsersPage implements OnInit {
     await alert.present();
   }
 
-  async delUser(userId: string, name: string, coreSim: string) {
+  async delUser(delUserId: string, name: string, coreSim: string) {
     let alert = await this.alertCtrl.create({
       subHeader: "Continuar con borrar",
       message: "al usuario: " + name + "  ?",
@@ -476,6 +476,9 @@ export class UsersPage implements OnInit {
               },
             };
 
+            console.log("userId: ", delUserId);
+            console.log("userId: ", this.userId);
+
             this.loadingController
               .create({
                 message: " Borrando usuario ...",
@@ -485,16 +488,18 @@ export class UsersPage implements OnInit {
                 res.present();
 
                 await this.api
-                  .deleteData("api/users" + "/" + this.userId + "/" + userId)
+                  .deleteData(`api/users/${this.userId}/${delUserId}`)
                   .then(
                     async (onResolve) => {
                       // set lock status on device
-
                       // console.log('cmd: ', cmd);
                       // this.loadingController.dismiss();
 
                       const cmd =
-                        "delete," + (await this.getTimestamp()) + "," + userId;
+                        "delete," +
+                        (await this.getTimestamp()) +
+                        "," +
+                        delUserId;
                       await this.sms
                         .send(coreSim, cmd, options)
                         .then(() => this.loadingController.dismiss())
