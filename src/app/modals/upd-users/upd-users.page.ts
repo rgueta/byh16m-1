@@ -376,8 +376,6 @@ export class UpdUsersPage implements OnInit {
 
     pkg.roles = pkg.roles.map((role: any) => role.id);
 
-    console.log("device pkg: ", this.devicePkg);
-
     try {
       this.showLoading(2500);
       //  add new user
@@ -387,10 +385,6 @@ export class UpdUsersPage implements OnInit {
           // create password reset
 
           if (this.MyRole == "admin" || this.MyRole == "neighborAdmin") {
-            // delete backstage document
-            // this.api
-            //   .deleteData("api/backstage/" + this.userId + "/" + this.id)
-            //   .then(async (result) => {
             const options: SmsOptions = {
               replaceLineBreaks: false,
               android: {
@@ -422,15 +416,6 @@ export class UpdUsersPage implements OnInit {
                   ["Ok"]
                 )
               );
-            // })
-            // .catch((err) => {
-            //   this.toolService.showAlertBasic(
-            //     "Alerta",
-            //     "Error, delete backstage: ",
-            //     JSON.stringify(err),
-            //     ["Ok"]
-            //   );
-            // });
           }
         })
         .catch((rej) => {
@@ -441,12 +426,12 @@ export class UpdUsersPage implements OnInit {
             ["Ok"]
           );
         });
-
-      // exit model
-      this.modalController.dismiss("refresh");
     } catch (err) {
       console.log("error final catch", err);
     }
+
+    // exit model
+    await this.modalController.dismiss();
   }
 
   async sendToDevice(sim: string) {}

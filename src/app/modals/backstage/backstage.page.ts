@@ -65,9 +65,9 @@ export class BackstagePage implements OnInit {
   async getBackstage() {
     let userId = "0";
     userId = await this.toolService.getSecureStorage<string>("userId", "0");
-    this.api.getData("api/backstage/" + userId).subscribe({
+    this.api.getData("api/users/backstage/" + userId).subscribe({
       next: async (result: any) => {
-        this.backstageList = await result;
+        this.backstageList = await result.results;
         if (this.backstageList.length > 0) {
           this.backstageList[0].open = true;
         } else {
@@ -89,18 +89,6 @@ export class BackstagePage implements OnInit {
         );
       },
     });
-
-    // }
-    //,
-    // error: (err) => {
-    //   this.toolService.toastAlert(
-    //     "error, obteniendo userId en getSecureStorage: " + err,
-    //     0,
-    //     ["Ok"],
-    //     "middle"
-    //   );
-    // },
-    // });
   }
 
   async getRoles() {
