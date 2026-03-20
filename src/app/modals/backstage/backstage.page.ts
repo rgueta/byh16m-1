@@ -1,12 +1,7 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import {
-  ModalController,
-  NavParams,
-  AlertController,
-  IonicModule,
-} from "@ionic/angular";
+import { ModalController, AlertController, IonicModule } from "@ionic/angular";
 
 import {
   IonSelect,
@@ -35,18 +30,18 @@ import {
   imports: [CommonModule, FormsModule, ReactiveFormsModule, IonicModule],
 })
 export class BackstagePage implements OnInit {
+  @Input() sourcePage!: any;
+
   backstageList: any;
   simSectionOpen = false;
   public MyRole: any = "visitor";
-  sourcePage: string = "";
   RoleList: any = [];
 
   constructor(
     private modalController: ModalController,
     private api: DatabaseService,
     public alertCtrl: AlertController,
-    private toolService: ToolsService,
-    private navParams: NavParams
+    private toolService: ToolsService
   ) {
     addIcons({
       arrowBackCircleOutline,
@@ -57,7 +52,6 @@ export class BackstagePage implements OnInit {
   }
 
   async ngOnInit() {
-    this.sourcePage = this.navParams.data["SourcePage"];
     this.MyRole = await this.toolService.getSecureStorage<string>("myRole", "");
     this.getBackstage();
   }
