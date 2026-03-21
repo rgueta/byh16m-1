@@ -181,7 +181,10 @@ export class AuthenticationService {
         const loginPayload = {
           email: credentials.email,
           pwd: credentials.pwd,
-          deviceId: deviceUuid,
+          deviceId: this.toolService.getSecureStorage<string>(
+            "device_uuid",
+            ""
+          ),
         };
 
         return this.http

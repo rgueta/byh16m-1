@@ -285,14 +285,6 @@ export class LoginPage implements OnInit {
         this.authService.login(this.credentials.value).subscribe({
           next: async (res) => {
             await loading.dismiss();
-
-            // Check Locked --------------------
-            // this.toolService.getSecureStorage("locked").subscribe({
-            //   next: async (result) => {
-            //     lockedValue = result;
-            //   },
-            // });
-
             const lockedValue = await this.toolService.getSecureStorage<any>(
               "locked",
               null
