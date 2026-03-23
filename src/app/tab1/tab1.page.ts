@@ -38,7 +38,6 @@ import { CommonModule } from "@angular/common";
 import { UsersPage } from "../modals/users/users.page";
 import { VisitorListPage } from "../modals/visitor-list/visitor-list.page";
 import { FamilyPage } from "../modals/family/family.page";
-import { RequestsPage } from "../modals/requests/requests.page";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { DatabaseService } from "../services/database.service";
 import { Router } from "@angular/router";
@@ -318,19 +317,19 @@ export class Tab1Page implements OnInit {
   }
 
   async recoverAccount() {
-    const modal = await this.modalController.create({
-      component: RequestsPage,
-      componentProps: { request: "UnblockAccount" },
-    });
-    await modal.present();
+    // const modal = await this.modalController.create({
+    //   component: RequestsPage,
+    //   componentProps: { request: "UnblockAccount" },
+    // });
+    // await modal.present();
   }
 
   async deviceLost() {
-    const modal = await this.modalController.create({
-      component: RequestsPage,
-      componentProps: { request: "deviceLost" },
-    });
-    await modal.present();
+    // const modal = await this.modalController.create({
+    //   component: RequestsPage,
+    //   componentProps: { request: "deviceLost" },
+    // });
+    // await modal.present();
   }
 
   async localNotification() {

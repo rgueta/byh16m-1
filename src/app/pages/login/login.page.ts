@@ -14,19 +14,6 @@ import {
   LoadingController,
   ModalController,
   Platform,
-} from "@ionic/angular/standalone";
-import { ScreenOrientation } from "@ionic-native/screen-orientation/ngx";
-import { Device } from "@capacitor/device";
-import { RequestsPage } from "../../modals/requests/requests.page";
-import { Sim } from "@ionic-native/sim/ngx";
-import { DatabaseService } from "../../services/database.service";
-import { ToolsService } from "src/app/services/tools.service";
-import { NetworkService } from "../../services/network.service";
-import { Capacitor } from "@capacitor/core";
-import { UpdUsersPage } from "../../modals/upd-users/upd-users.page";
-import { FormsModule } from "@angular/forms";
-import { CommonModule } from "@angular/common";
-import {
   IonContent,
   IonHeader,
   IonToolbar,
@@ -35,6 +22,16 @@ import {
   IonInput,
   IonItem,
 } from "@ionic/angular/standalone";
+import { ScreenOrientation } from "@ionic-native/screen-orientation/ngx";
+import { Device } from "@capacitor/device";
+import { Sim } from "@ionic-native/sim/ngx";
+import { DatabaseService } from "../../services/database.service";
+import { ToolsService } from "src/app/services/tools.service";
+import { NetworkService } from "../../services/network.service";
+import { Capacitor } from "@capacitor/core";
+import { UpdUsersPage } from "../../modals/upd-users/upd-users.page";
+import { FormsModule } from "@angular/forms";
+import { CommonModule } from "@angular/common";
 
 import { addIcons } from "ionicons";
 import { eye, eyeOffOutline } from "ionicons/icons";
@@ -354,7 +351,7 @@ export class LoginPage implements OnInit {
               message: err.error.ErrMsg,
               buttons: [
                 {
-                  text: "Registro nuevo ?",
+                  text: "Correo o contraseña incorrectos ?",
                   role: "registro",
                   handler: () => {
                     this.newUser();
@@ -416,13 +413,41 @@ export class LoginPage implements OnInit {
     await alert.present();
   }
 
-  async pwdReset() {
-    const modal = await this.modalController.create({
-      component: RequestsPage,
-      componentProps: { request: "pwdReset" },
-    });
+  // Función que valida email manualmente
+  validateEmail(email: string): boolean {
+    // Crear un control temporal con el validador de email
+    const emailControl = new FormControl(email, [
+      Validators.required,
+      Validators.email,
+    ]);
 
-    await modal.present();
+    // Ejecutar validación
+    emailControl.updateValueAndValidity();
+
+    // Retornar si es válido (true si no hay error de email)
+    // return !emailControl.hasError("email");
+    return emailControl.valid;
+  }
+
+  async pwdReset() {
+    const email = this.credentials.get("email")?.value;
+
+    if (this.validateEmail(email)) {
+      this.showAlert(
+        "Confimar solicitud",
+        "",
+        "Deseas recuperar contraseña ?",
+        "Cancelar",
+        "Solicitar"
+      );
+    } else {
+      const alert = await this.alertController.create({
+        header: "Error",
+        message: "Por favor, ingresa un email válido",
+        buttons: ["OK"],
+      });
+      await alert.present();
+    }
   }
 
   async openStore() {
@@ -431,12 +456,52 @@ export class LoginPage implements OnInit {
 
   // -------------- Notifications ---------------------------
 
-  async showAlert(Header: string, subHeader: string, msg: string, btns: any) {
+  async showAlert(
+    Header: string,
+    subHeader: string,
+    msg: string,
+    txtCancel: string,
+    txtConfirm: string
+  ) {
     const alert = await this.alertController.create({
       header: Header,
       subHeader: subHeader,
       message: msg,
-      buttons: btns,
+      buttons: [
+        {
+          text: txtCancel,
+          role: "cancel",
+          cssClass: "icon-color",
+        },
+        {
+          role: "yes",
+          text: txtConfirm,
+          cssClass: "icon-color",
+          handler: async () => {
+            this.api.getData(`api/users/pwdRST/${this.email.value}`).subscribe({
+              next: async (result: any) => {
+                console.log("result: ", result);
+                const alert = await this.alertController.create({
+                  header: "Correo enviado",
+                  message:
+                    "Expira en: " +
+                    new Date(result.expires).toLocaleString("es-MX"),
+                  buttons: ["OK"],
+                });
+                await alert.present();
+              },
+              error: async (err: any) => {
+                const alert = await this.alertController.create({
+                  header: err.error.msg,
+                  message: err.error.details,
+                  buttons: ["OK"],
+                });
+                await alert.present();
+              },
+            });
+          },
+        },
+      ],
     });
 
     await alert.present();

@@ -27,11 +27,7 @@ export const routes: Routes = [
     loadComponent: () =>
       import("./modals/family/family.page").then((m) => m.FamilyPage),
   },
-  {
-    path: "requests",
-    loadComponent: () =>
-      import("./modals/requests/requests.page").then((m) => m.RequestsPage),
-  },
+
   {
     path: "upd-users",
     loadComponent: () =>
@@ -102,7 +98,8 @@ export const routes: Routes = [
       import("./modals/users/users.page").then((m) => m.UsersPage),
   },
   {
-    path: 'store',
-    loadComponent: () => import('./pages/store/store.page').then( m => m.StorePage)
+    path: "store",
+    loadComponent: () =>
+      import("./pages/store/store.page").then((m) => m.StorePage),
   },
 ];
