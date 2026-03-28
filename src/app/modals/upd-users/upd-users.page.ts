@@ -330,6 +330,7 @@ export class UpdUsersPage implements OnInit {
 
   async onChangeCpu(event: any) {
     this.selectedCpu = event.detail.value;
+    console.log("selectedCpu: ", this.selectedCpu);
     this.getCores(event.detail.value.id);
   }
 
@@ -367,6 +368,7 @@ export class UpdUsersPage implements OnInit {
       uuid: this.RegisterForm.get("Uuid")?.value,
       blocked: 0,
       roles: this.RegisterForm.get("Roles")?.value,
+      // note: this.RegisterForm.get("Comment")!.value,
       adminEmail: await this.toolService.getSecureStorage<string>(
         "adminEmail",
         ""
@@ -375,6 +377,8 @@ export class UpdUsersPage implements OnInit {
     };
 
     pkg.roles = pkg.roles.map((role: any) => role.id);
+
+    console.log("pkg:", pkg);
 
     try {
       this.showLoading(2500);
@@ -438,18 +442,31 @@ export class UpdUsersPage implements OnInit {
 
   async onSubmitItSelf() {
     const pkg: {} = {
-      cpu: this.selectedCpu.id,
-      core: this.selectedCore.id,
-      name: this.RegisterForm.get("Name")!.value,
-      username: this.RegisterForm.get("UserName")!.value,
       email: this.RegisterForm.get("Email")!.value,
-      sim: this.RegisterForm.get("Sim")!.value,
+      username: this.RegisterForm.get("UserName")!.value,
+      pwd: "",
+      name: this.RegisterForm.get("Name")!.value,
       house: this.RegisterForm.get("House")!.value,
-      device: JSON.parse(this.devicePkg),
+      sim: this.RegisterForm.get("Sim")!.value,
       gender: this.RegisterForm.get("Gender")!.value,
-      note: this.RegisterForm.get("Comment")!.value,
-      demoMode: this.demoMode,
+      avatar: "",
+      coreId: this.selectedCore.id,
+      location: this.location,
+      locked: 0,
+      uuid: this.RegisterForm.get("Uuid")?.value,
+      blocked: 0,
+      roles: [4],
+      // device: JSON.parse(this.devicePkg),
+
+      // note: this.RegisterForm.get("Comment")!.value,
+      adminEmail: await this.toolService.getSecureStorage<string>(
+        "adminEmail",
+        ""
+      ),
+      demo: this.demoMode,
     };
+
+    console.log("pkg:", pkg);
 
     let alert = await this.alertCtrl.create({
       message: "Mandar solicitud ?",
@@ -476,12 +493,12 @@ export class UpdUsersPage implements OnInit {
   async sendUserReq(pkg: any): Promise<any> {
     this.showLoading(2500);
     this.api
-      .postData("api/backstage/", pkg)
+      .postData("api/users/new/0", pkg)
       .then(async (result: any) => {
         this.toolService.showAlertBasic(
           "",
           "Requerimiento enviado",
-          "Pronto recibiras un correo",
+          "Sigue el proceso, desde el correo enviado",
           ["Ok"]
         );
         return true;

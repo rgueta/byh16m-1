@@ -1,7 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.bytheg.byh16m"
+    androidResources {
+      ignoreAssetsPattern '!aar-metadata.properties'
+    }
+  lint {
+    abortOnError false
+    disable 'InvalidPackage'
+  }
+  namespace "com.bytheg.byh16m"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "com.bytheg.byh16m"
@@ -19,20 +26,13 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
       // Desactiva específicamente la verificación problemática
-    lintOptions {
-        disable 'InvalidPackage'
-        abortOnError false
-    }
 
-     // Configuración para evitar el error de metadata
-    aaptOptions {
-        ignoreAssetsPattern '!aar-metadata.properties'
-    }
+  // Configuración para evitar el error de metadata
 }
 
 repositories {
