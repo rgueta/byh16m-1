@@ -88,6 +88,7 @@ export class UpdUsersPage implements OnInit {
   adminSim = "";
   selectedCpu: any = {};
   selectedCore: any = {};
+  deviceUuid: string = "";
 
   constructor(
     private modalController: ModalController,
@@ -189,12 +190,13 @@ export class UpdUsersPage implements OnInit {
       ""
     );
 
+    this.deviceUuid = await this.toolService.getSecureStorage<string>(
+      "deviceUuid",
+      ""
+    );
+
     if (this.sourcePage != "login") {
-      const deviceUuid = await this.toolService.getSecureStorage<string>(
-        "deviceUuid",
-        ""
-      );
-      this.RegisterForm.get("Uuid")!.setValue(deviceUuid);
+      this.RegisterForm.get("Uuid")!.setValue(this.deviceUuid);
     }
 
     const admin_email = await this.toolService.getSecureStorage<string>(
@@ -453,7 +455,7 @@ export class UpdUsersPage implements OnInit {
       coreId: this.selectedCore.id,
       location: this.location,
       locked: 0,
-      uuid: this.RegisterForm.get("Uuid")?.value,
+      uuid: this.deviceUuid,
       blocked: 0,
       roles: [4],
       // device: JSON.parse(this.devicePkg),
@@ -466,8 +468,6 @@ export class UpdUsersPage implements OnInit {
       demo: this.demoMode,
     };
 
-    console.log("pkg:", pkg);
-
     let alert = await this.alertCtrl.create({
       message: "Mandar solicitud ?",
       buttons: [
@@ -479,9 +479,11 @@ export class UpdUsersPage implements OnInit {
         {
           text: "Si",
           handler: async () => {
-            if ((await this.sendUserReq(pkg)) == true) {
-              this.modalController.dismiss();
-            }
+            this.sendUserReq(pkg)
+              .then(() => {
+                this.modalController.dismiss();
+              })
+              .catch();
           },
         },
       ],
@@ -498,7 +500,7 @@ export class UpdUsersPage implements OnInit {
         this.toolService.showAlertBasic(
           "",
           "Requerimiento enviado",
-          "Sigue el proceso, desde el correo enviado",
+          "Sigue el proceso, desde el correo que recibiste",
           ["Ok"]
         );
         return true;
