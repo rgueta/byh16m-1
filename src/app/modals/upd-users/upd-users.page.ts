@@ -479,11 +479,15 @@ export class UpdUsersPage implements OnInit {
         {
           text: "Si",
           handler: async () => {
-            this.sendUserReq(pkg)
-              .then(() => {
-                this.modalController.dismiss();
-              })
-              .catch();
+            try {
+              const response = await this.sendUserReq(pkg);
+              if (response && response.success) {
+                this.modalController.dismiss({
+                  success: true,
+                  data: response.data,
+                });
+              }
+            } catch (err: any) {}
           },
         },
       ],
@@ -494,26 +498,18 @@ export class UpdUsersPage implements OnInit {
 
   async sendUserReq(pkg: any): Promise<any> {
     this.showLoading(2500);
-    this.api
-      .postData("api/users/new/0", pkg)
-      .then(async (result: any) => {
-        this.toolService.showAlertBasic(
-          "",
-          "Requerimiento enviado",
-          "Sigue el proceso, desde el correo que recibiste",
-          ["Ok"]
-        );
-        return true;
-      })
-      .catch((err) => {
-        this.toolService.showAlertBasic(
-          "",
-          "Error",
-          JSON.stringify(err["error"]["msg"]),
-          ["Ok"]
-        );
-        return false;
-      });
+    try {
+      const result = await this.api.postData("api/users/new/0", pkg);
+      return { success: true, data: result };
+    } catch (err: any) {
+      this.toolService.showAlertBasic(
+        "",
+        "Error",
+        JSON.stringify(err["error"]),
+        ["Ok"]
+      );
+      throw err;
+    }
   }
 
   async closeModal() {
