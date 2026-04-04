@@ -22,7 +22,13 @@ import { ScreenOrientation } from "@ionic-native/screen-orientation/ngx";
 import { Sim } from "@ionic-native/sim/ngx";
 import { AuthInterceptor } from "./app/interceptors/jwt.interceptor";
 import { NetworkService } from "./app/services/network.service";
-import { inject } from "@angular/core";
+
+import { inject, importProvidersFrom, LOCALE_ID } from "@angular/core";
+import { registerLocaleData } from "@angular/common";
+import localeEs from "@angular/common/locales/es";
+
+// Registrar el locale español
+registerLocaleData(localeEs);
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -33,6 +39,7 @@ bootstrapApplication(AppComponent, {
         return true;
       },
     },
+
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules)),
@@ -48,5 +55,6 @@ bootstrapApplication(AppComponent, {
     SMS,
     ScreenOrientation,
     Sim,
+    { provide: LOCALE_ID, useValue: "es" },
   ],
 });

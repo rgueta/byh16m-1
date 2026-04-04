@@ -129,14 +129,37 @@
       <ion-item class="wrap-input">
         <ion-input
           class="input"
-          type="text"
+          type="tel"
           name="sim"
           label="Cell: "
           required
           placeholder="# celular"
           formControlName="Sim"
           value="{{sim}}"
+          [class.ion-valid]="sim?.valid && sim?.touched"
+          [class.ion-invalid]="sim?.invalid && sim?.touched"
         ></ion-input>
+      </ion-item>
+
+      <!-- Agregar mensajes de error -->
+      <ion-item
+        *ngIf="sim?.invalid && sim?.touched"
+        lines="none"
+        class="error-item"
+      >
+        <ion-label color="danger">
+          <ion-text color="danger">
+            <small *ngIf="sim?.errors?.['required']">
+              ⚠️ El número de teléfono es obligatorio
+            </small>
+            <small *ngIf="sim?.errors?.['invalidPhone']">
+              ⚠️ Ingresa un número de teléfono válido (mínimo 10 dígitos)
+            </small>
+            <small *ngIf="sim?.errors?.['pattern']">
+              ⚠️ Formato de teléfono inválido
+            </small>
+          </ion-text>
+        </ion-label>
       </ion-item>
 
       <ion-item class="wrap-input" *ngIf="sourcePage != 'adminNewExtrange'">
@@ -248,11 +271,7 @@
       </div>
     </ion-item>
 
-    <ion-item
-      *ngIf="sourcePage == 'adminNewExtrange'"
-      class="wrap-input"
-      [disabled]="RegisterForm.invalid"
-    >
+    <ion-item *ngIf="sourcePage == 'adminNewExtrange'" class="wrap-input">
       <div class="item-wripper">
         <input
           class="button-17 submit"

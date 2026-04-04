@@ -51,9 +51,7 @@ export const routes: Routes = [
   {
     path: "upd-codes-modal",
     loadComponent: () =>
-      import("./modals/upd-codes-modal/upd-codes-modal.page").then(
-        (m) => m.UpdCodesModalPage
-      ),
+      import("./modals/upd-codes/upd-codes.page").then((m) => m.UpdCodesPage),
   },
   {
     path: "visitors",

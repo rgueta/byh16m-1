@@ -1,7 +1,11 @@
 import { Component, OnInit } from "@angular/core";
 import { DatabaseService } from "../../services/database.service";
-import { AnimationController, AlertController } from "@ionic/angular";
-import { UpdCodesModalPage } from "../../modals/upd-codes-modal/upd-codes-modal.page";
+import {
+  AnimationController,
+  AlertController,
+  IonicModule,
+} from "@ionic/angular";
+import { UpdCodesPage } from "../../modals/upd-codes/upd-codes.page";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { SMS, SmsOptions } from "@ionic-native/sms/ngx";
@@ -25,6 +29,12 @@ import {
   IonFab,
   IonRefresherContent,
   IonRefresher,
+  IonDatetimeButton,
+  IonBadge,
+  IonListHeader,
+  IonButton,
+  IonCard,
+  IonCardContent,
   ModalController,
 } from "@ionic/angular/standalone";
 import { addIcons } from "ionicons";
@@ -34,6 +44,10 @@ import {
   calendarOutline,
   addOutline,
   chevronForwardOutline,
+  lockClosedOutline,
+  chevronForward,
+  calendarClearOutline,
+  chevronDown,
 } from "ionicons/icons";
 
 @Component({
@@ -61,10 +75,10 @@ import {
     IonRefresherContent,
     IonRefresher,
   ],
-  // providers: [ModalController]
 })
 export class CodesPage implements OnInit {
   CodeList: any;
+  private codigosCargados = false;
   myToast: any;
   userId = {};
   automaticClose = false;
@@ -98,6 +112,10 @@ export class CodesPage implements OnInit {
       calendarOutline,
       addOutline,
       chevronForwardOutline,
+      lockClosedOutline,
+      chevronForward,
+      calendarClearOutline,
+      chevronDown,
     });
   }
 
@@ -148,9 +166,14 @@ export class CodesPage implements OnInit {
   }
 
   async collectCodes() {
+    if (this.codigosCargados) {
+      return;
+    }
+
     this.api
       .getData("api/codes/user/" + this.userId)
       .subscribe(async (result: any) => {
+        this.codigosCargados = true;
         Object.entries(result.results).forEach(async ([_, item]) => {
           const code = item as any;
           if (new Date(code.expiry) < new Date()) {
@@ -380,17 +403,25 @@ export class CodesPage implements OnInit {
 
   async addCode() {
     console.log("ON addCode...");
-    let modal = await this.modalController.create({
-      component: UpdCodesModalPage,
+    const modal = await this.modalController.create({
+      component: UpdCodesPage,
     });
 
-    modal.onDidDismiss().then(async (data) => {
-      if (data.data) {
-        console.log("Refresh data --> ", data);
-        await this.collectCodes();
+    await modal.present();
+
+    modal.onDidDismiss().then(async (result) => {
+      if (result.data) {
+        try {
+          this.CodeList = [result.data, ...this.CodeList];
+          this.CodeList[0].open = true;
+          this.CodeList[1].open = false;
+          this.initial = this.CodeList[0].initial;
+          this.expiry = this.CodeList[0].expiry;
+        } catch (err) {
+          this.codigosCargados = false;
+          await this.collectCodes();
+        }
       }
     });
-
-    return await modal.present();
   }
 }

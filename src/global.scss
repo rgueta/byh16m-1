@@ -261,6 +261,44 @@ ion-menu-button {
   color: red;
 }
 
+/* item validate  ------------ */
+
+.error-item {
+  margin-top: -10px;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+
+  ion-label {
+    font-size: 12px;
+    padding-left: 16px;
+  }
+}
+
+.ion-valid {
+  --border-color: var(--ion-color-success);
+}
+
+.ion-invalid {
+  --border-color: var(--ion-color-danger);
+}
+
+// Para mejorar la experiencia del input
+ion-input {
+  --padding-start: 16px;
+  --padding-end: 16px;
+
+  &.ion-touched {
+    &.ion-valid {
+      --highlight-color: var(--ion-color-success);
+    }
+
+    &.ion-invalid {
+      --highlight-color: var(--ion-color-danger);
+    }
+  }
+}
+/* Fin item validate */
+
 //   --- ACCORDION section  -----
 
 ion-content {

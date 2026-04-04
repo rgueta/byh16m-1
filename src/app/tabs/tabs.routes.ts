@@ -21,11 +21,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import("../pages/codes/codes.page").then((m) => m.CodesPage),
       },
-      {
-        path: "tab4",
-        loadComponent: () =>
-          import("../tab4/tab4.page").then((m) => m.Tab4Page),
-      },
+      // {
+      //   path: "tab4",
+      //   loadComponent: () =>
+      //     import("../tab4/tab4.page").then((m) => m.Tab4Page),
+      // },
       {
         path: "admin",
         loadComponent: () =>

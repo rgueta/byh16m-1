@@ -4,6 +4,7 @@ import {
   OnInit,
   ViewChild,
   ViewEncapsulation,
+  ElementRef,
 } from "@angular/core";
 import {
   ModalController,
@@ -51,9 +52,9 @@ import { SocialSharing } from "@awesome-cordova-plugins/social-sharing/ngx";
 const USERID = "userId";
 
 @Component({
-  selector: "app-upd-codes-modal",
-  templateUrl: "./upd-codes-modal.page.html",
-  styleUrls: ["./upd-codes-modal.page.scss"],
+  selector: "app-upd-codes",
+  templateUrl: "./upd-codes.page.html",
+  styleUrls: ["./upd-codes.page.scss"],
   standalone: true,
   encapsulation: ViewEncapsulation.None,
   imports: [
@@ -74,7 +75,7 @@ const USERID = "userId";
   ],
   providers: [SocialSharing],
 })
-export class UpdCodesModalPage implements OnInit {
+export class UpdCodesPage implements OnInit {
   RegisterForm: FormGroup | any;
   @Input() code: string = "";
   @Input() visitorSim: string = "";
@@ -94,7 +95,7 @@ export class UpdCodesModalPage implements OnInit {
   StrPlatform = "";
   comment = "";
   Localtoast: any;
-  codeCreated: boolean = false; //to return callback for resfresh or not
+  codeCreated: any = {}; //to return callback for resfresh or not
 
   public code_expiry: any;
 
@@ -108,7 +109,8 @@ export class UpdCodesModalPage implements OnInit {
     private alertController: AlertController,
     private loadingController: LoadingController,
     private toolService: ToolsService,
-    private socialSharing: SocialSharing
+    private socialSharing: SocialSharing,
+    private el: ElementRef
   ) {
     addIcons({ arrowBackCircleOutline });
     this.validateControls();
@@ -250,7 +252,6 @@ export class UpdCodesModalPage implements OnInit {
   async onSubmitTemplate(SendVisitor: boolean) {
     var dateInit = "";
     var dateFinal = "";
-    this.codeCreated = true;
 
     const coreSim = await this.toolService.getSecureStorage<string>(
       "coreSim",
@@ -275,75 +276,92 @@ export class UpdCodesModalPage implements OnInit {
       .then(async (res: any) => {
         res.present();
 
+        const pkg = {
+          code: this.code,
+          sim: this.visitorSim,
+          initial: this.toolService.convDate(new Date(this.initial)),
+          expiry: this.toolService.convDate(new Date(this.expiry)),
+          visitorSim: "n/a",
+          visitorName: "n/a",
+          comment: this.localComment,
+          userId: this.userId,
+          device_plaform: this.StrPlatform,
+        };
+
         try {
-          this.api
-            .postData("api/codes/" + this.userId, {
-              code: this.code,
-              sim: this.visitorSim,
-              initial: this.toolService.convDate(new Date(this.initial)),
-              expiry: this.toolService.convDate(new Date(this.expiry)),
-              visitorSim: "n/a",
-              visitorName: "n/a",
-              comment: this.localComment,
-              userId: this.userId,
-              device_plaform: this.StrPlatform,
-            })
-            .then(
-              async (resp: any) => {
-                //------- Uncomment, just to fix bug
-
-                const respId = await Object.values(resp)[1];
-
-                // #region Send code to Core  ----------------------
-
-                const pckgToCore =
-                  "codigo," +
-                  (await this.getTimestamp()) +
-                  "," +
-                  this.code +
-                  "," +
-                  this.toolService.convDate(new Date(this.expiry)) +
-                  "," +
-                  this.userId +
-                  ",n/a," +
-                  respId;
-
-                // Check if core has sim to send sms
-                if (coreSim) {
-                  await this.sendSMS(coreSim, pckgToCore)
-                    .then(() => {
-                      console.log("Sending sms");
-                    })
-                    .catch((e: any) => {
-                      this.loadingController.dismiss();
-                      this.toolService.showAlertBasic(
-                        "",
-                        "Error, send sms to core:",
-                        e,
-                        ["Ok"]
-                      );
-                      this.closeModal();
-                      return;
-                    });
-                }
-
-                // #endregion  --------------
-
-                this.loadingController.dismiss();
-                this.closeModal();
-              },
-              (error) => {
-                this.loadingController.dismiss();
-                this.toolService.showAlertBasic(
-                  "",
-                  "Can not create code",
-                  "error: " + error,
-                  ["Ok"]
-                );
+          this.api.postData("api/codes/" + this.userId, pkg).then(
+            async (resp: any) => {
+              //------- Uncomment, just to fix bug
+              if (resp.data) {
+                resp.data.expired = false;
+                resp.data.range = (
+                  (new Date(resp.data.expiry).getTime() -
+                    new Date().getTime()) /
+                  3600000
+                ).toFixed(1);
               }
-            );
+
+              this.codeCreated = resp.data;
+
+              this.closeModal();
+
+              return;
+
+              const respId = await Object.values(resp)[1];
+
+              // #region Send code to Core  ----------------------
+
+              const pckgToCore =
+                "codigo," +
+                (await this.getTimestamp()) +
+                "," +
+                this.code +
+                "," +
+                this.toolService.convDate(new Date(this.expiry)) +
+                "," +
+                this.userId +
+                ",n/a," +
+                respId;
+
+              // Check if core has sim to send sms
+              if (coreSim) {
+                await this.sendSMS(coreSim, pckgToCore)
+                  .then(() => {
+                    console.log("Sending sms");
+                  })
+                  .catch((e: any) => {
+                    this.loadingController.dismiss();
+                    this.toolService.showAlertBasic(
+                      "",
+                      "Error, send sms to core:",
+                      e,
+                      ["Ok"]
+                    );
+                    this.closeModal();
+                    return;
+                  });
+              }
+
+              // #endregion  --------------
+
+              this.loadingController.dismiss();
+              this.closeModal();
+            },
+            (error) => {
+              // this.loadingController.dismiss();
+              this.loadingController.getTop().then((loader) => {
+                if (loader) loader.dismiss();
+              });
+              this.toolService.showAlertBasic(
+                "",
+                "Can not create code",
+                "error: " + error,
+                ["Ok"]
+              );
+            }
+          );
         } catch (err) {
-          this.loadingController.dismiss();
+          // this.loadingController.dismiss();
           this.toolService.showAlertBasic(
             "",
             "Can not create code",
@@ -351,6 +369,9 @@ export class UpdCodesModalPage implements OnInit {
             ["Ok"]
           );
         }
+      })
+      .catch((err: any) => {
+        console.log("error: ", err);
       });
   }
 
@@ -536,7 +557,6 @@ export class UpdCodesModalPage implements OnInit {
 
             // send code to mongo and core device
             this.onSubmitTemplate(false);
-            this.modalController.dismiss(true);
           })
           .catch((err: any) => {
             console.log("error sharing, " + err.message);
@@ -682,7 +702,26 @@ export class UpdCodesModalPage implements OnInit {
     return await modal.present();
   }
 
-  closeModal() {
-    this.modalController.dismiss(this.codeCreated);
+  async closeModal_borrar() {
+    console.log("antes de cerrar modal:", this.codeCreated);
+    // Buscamos el elemento HTML 'ion-modal' que contiene a este componente
+    const modalElement = this.el.nativeElement.closest("ion-modal");
+
+    if (modalElement) {
+      // Usamos el método dismiss directamente del elemento HTML
+      await modalElement.dismiss(this.codeCreated);
+    } else {
+      // Si falló lo anterior, intentamos el método tradicional como último recurso
+      console.error("Fallo búsqueda por DOM, intentando controller...");
+      await this.modalController.dismiss(this.codeCreated);
+    }
+  }
+
+  async closeModal() {
+    await this.loadingController.dismiss();
+    const loader = await this.modalController.getTop();
+    if (loader) {
+      await loader.dismiss(this.codeCreated);
+    }
   }
 }

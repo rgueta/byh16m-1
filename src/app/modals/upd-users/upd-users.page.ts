@@ -8,6 +8,8 @@ import {
   FormControl,
   ReactiveFormsModule,
   Validators,
+  AbstractControl,
+  ValidationErrors,
 } from "@angular/forms";
 import {
   ModalController,
@@ -49,7 +51,7 @@ export class UpdUsersPage implements OnInit {
   @Input() name: string = "";
   @Input() username: string = "";
   @Input() email: string = "";
-  @Input() sim: string = "";
+  // @Input() sim: string = "";
   @Input() house: string = "";
   @Input() roles: any = [];
   @Input() avatar: string = "";
@@ -62,6 +64,7 @@ export class UpdUsersPage implements OnInit {
   @Input() pathLocation!: any;
   @Input() pkg!: any;
 
+  LocalSim: string = "";
   RoleList: any = [];
   CpuList: any = [];
   CoreList: any = [];
@@ -110,6 +113,10 @@ export class UpdUsersPage implements OnInit {
     }
   }
 
+  get sim() {
+    return this.RegisterForm.get("Sim");
+  }
+
   async ngOnInit() {
     if (this.pkg) {
       console.log("Trae pkg --> ", this.pkg);
@@ -126,7 +133,7 @@ export class UpdUsersPage implements OnInit {
         Name: ["", [Validators.required]],
         UserName: ["", [Validators.required]],
         Email: ["", [Validators.required]],
-        Sim: ["", [Validators.required]],
+        Sim: ["", [Validators.required, this.phoneValidator()]],
         House: ["", [Validators.required]],
         Gender: ["", [Validators.required]],
         Location: [""],
@@ -139,7 +146,7 @@ export class UpdUsersPage implements OnInit {
         Name: ["", [Validators.required]],
         UserName: ["", [Validators.required]],
         Email: ["", [Validators.required]],
-        Sim: ["", [Validators.required]],
+        Sim: ["", [Validators.required, this.phoneValidator()]],
         House: ["", [Validators.required]],
         Gender: ["", [Validators.required]],
         Roles: [[], [Validators.required]],
@@ -256,7 +263,7 @@ export class UpdUsersPage implements OnInit {
     this.name = this.pkgUser["name"];
     this.username = this.pkgUser["username"];
     this.email = this.pkgUser["email"];
-    this.sim = this.pkgUser["sim"];
+    this.LocalSim = this.pkgUser["sim"];
     this.house = this.pkgUser["house"];
     this.gender = this.pkgUser["gender"];
     this.location = this.pkgUser["path"];
@@ -268,7 +275,7 @@ export class UpdUsersPage implements OnInit {
     this.RegisterForm.get("Name")!.setValue(this.name);
     this.RegisterForm.get("UserName")!.setValue(this.username);
     this.RegisterForm.get("Email")!.setValue(this.email);
-    this.RegisterForm.get("Sim")!.setValue(this.sim);
+    this.RegisterForm.get("Sim")!.setValue(this.LocalSim);
     this.RegisterForm.get("House")!.setValue(this.house);
     this.RegisterForm.get("Gender")!.setValue(this.gender);
     this.RegisterForm.get("Location")!.setValue(this.location);
@@ -502,12 +509,7 @@ export class UpdUsersPage implements OnInit {
       const result = await this.api.postData("api/users/new/0", pkg);
       return { success: true, data: result };
     } catch (err: any) {
-      this.toolService.showAlertBasic(
-        "",
-        "Error",
-        JSON.stringify(err["error"]),
-        ["Ok"]
-      );
+      this.toolService.showAlertBasic("", "Error", err.error.details, ["Ok"]);
       throw err;
     }
   }
@@ -599,6 +601,8 @@ export class UpdUsersPage implements OnInit {
               "," +
               this.userId;
 
+            console.log("pkgDevice: ", pkgDevice);
+            return;
             await this.sms
               .send(coreSim!, pkgDevice, options)
               .then(() => {
@@ -678,5 +682,31 @@ export class UpdUsersPage implements OnInit {
     });
 
     return await alert.present();
+  }
+
+  // Validador personalizado para teléfono
+  phoneValidator() {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) {
+        return null;
+      }
+
+      const value = control.value.toString().trim();
+      // Eliminar espacios, guiones, paréntesis y el signo +
+      const cleanValue = value.replace(/[\s\-\(\)\+]/g, "");
+
+      // Validar diferentes formatos
+      const patterns = [
+        /^\d{9}$/, // 9 dígitos (Perú)
+        /^\d{10}$/, // 10 dígitos
+        /^\d{11}$/, // 11 dígitos (Brasil)
+        /^9\d{8}$/, // Específico Perú: 9 seguido de 8 dígitos
+        /^\d{9,15}$/, // Entre 9 y 15 dígitos (formato internacional sin +)
+      ];
+
+      const isValid = patterns.some((pattern) => pattern.test(cleanValue));
+
+      return isValid ? null : { invalidPhone: true };
+    };
   }
 }

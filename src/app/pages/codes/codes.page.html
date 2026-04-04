@@ -46,7 +46,7 @@
         {{item.code}}, codigo expirado
       </ion-label>
       <ion-label class="ion-text-wrap" *ngIf="!item.expired">
-        {{item.code}} [ activo ] Expira en {{item.range}} horas
+        <strong>{{item.code}}</strong> Expira en {{item.range}} horas
       </ion-label>
     </ion-item>
 
@@ -90,7 +90,7 @@
       <ion-item id="open-modalInitialToAvoid" class="itemFilter">
         <ion-label class="lblFilterDate">Inicio :</ion-label>
         <ion-note class="filterDate" slot="end"
-          >{{item.initial | date:'dd MMM yyyy hh:mm a'}}</ion-note
+          >{{item.initial | date:'dd MMM yyyy, hh:mm a' | titlecase}}</ion-note
         >
         <ion-icon color="white" slot="end" name="calendar-outline"></ion-icon>
       </ion-item>
@@ -102,12 +102,9 @@
             presentation="date"
             size="cover"
             #myInitial
-            displayFormat="D MMM YYYY hh:mm a"
-            min="2022"
-            max="2060"
-            minuteValues="0,15,30,45"
             [showDefaultButtons]="true"
-            (ionChange)="onChangeInitial(myInitial.value,item.expiry)"
+            minuteValues="0,15,30,45"
+            (ionChange)="onChangeInitial($event.detail.value,item.expiry)"
           >
           </ion-datetime>
         </ng-template>
@@ -119,7 +116,7 @@
       <ion-item id="open-modalExpiryToAvoid" class="itemFilter">
         <ion-label class="lblFilterDate">Fin :</ion-label>
         <ion-note class="filterDate" slot="end"
-          >{{item.expiry | date:'dd MMM yyyy hh:mm a'}}</ion-note
+          >{{item.expiry | date:'dd MMM yyyy, hh:mm a' | titlecase}}</ion-note
         >
         <ion-icon color="white" slot="end" name="calendar-outline"></ion-icon>
       </ion-item>
@@ -132,8 +129,6 @@
             size="cover"
             #myExpiry
             display-format="D MMM YYYY"
-            min="2022"
-            max="2060"
             [showDefaultButtons]="true"
             (ionChange)="onChangeExpiry(item.id,myExpiry.value,myExpiry.value)"
           >
@@ -143,10 +138,21 @@
 
       <ion-item class="detail-item">
         <ion-label *ngIf="item.range <= 0">
-          Ya expiro en dias: ({{((item.range/24) * -1).toFixed(1)}})</ion-label
+          <strong>
+            Expiro en dias: ({{((item.range/24) * -1).toFixed(1)}})</strong
+          ></ion-label
         >
         <ion-label *ngIf="item.range > 0">
-          Expira en {{item.range}} horas
+          <strong> Expira en {{item.range}} horas</strong>
+        </ion-label>
+      </ion-item>
+
+      <ion-item *ngIf="item.comment && item.comment !== ''" class="detail-item">
+        <ion-label class="ion-text-wrap">
+          <p style="font-weight: bold; color: var(--ion-color-step-600)">
+            Comentario
+          </p>
+          <div class="comment-text">{{ item.comment }}</div>
         </ion-label>
       </ion-item>
     </form>

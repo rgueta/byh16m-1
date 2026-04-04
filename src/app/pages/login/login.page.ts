@@ -21,6 +21,7 @@ import {
   IonIcon,
   IonInput,
   IonItem,
+  IonLabel,
 } from "@ionic/angular/standalone";
 import { ScreenOrientation } from "@ionic-native/screen-orientation/ngx";
 import { Device } from "@capacitor/device";

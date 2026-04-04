@@ -59,6 +59,8 @@ const netStatus = "netStatus";
   ],
 })
 export class Tab2Page implements OnInit {
+  minDate: string = "2024-01-01T00:00:00.000Z";
+  maxDate: string = "2060-12-31T23:59:59.999Z";
   start: any;
   end: any;
 
@@ -85,6 +87,13 @@ export class Tab2Page implements OnInit {
       calendar,
       search,
     });
+
+    // Si quieres que el mínimo sea dinámico (ej. 1 año atrás)
+    const date = new Date();
+    date.setFullYear(date.getFullYear() - 1);
+    this.minDate = date.toISOString();
+
+    //  El maximo sea (ej. 1 año atrás)
   }
 
   async ngOnInit(): Promise<void> {
