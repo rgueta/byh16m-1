@@ -303,11 +303,7 @@ export class UpdCodesPage implements OnInit {
 
               this.codeCreated = resp.data;
 
-              this.closeModal();
-
-              return;
-
-              const respId = await Object.values(resp)[1];
+              const codeId = await resp.data["id"];
 
               // #region Send code to Core  ----------------------
 
@@ -321,7 +317,7 @@ export class UpdCodesPage implements OnInit {
                 "," +
                 this.userId +
                 ",n/a," +
-                respId;
+                codeId;
 
               // Check if core has sim to send sms
               if (coreSim) {
