@@ -1,0 +1,41 @@
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content
+      pullingText="Desliza para actualizar"
+      refreshingText="Actualizando..."
+    >
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <ion-button (click)="onCreateInformation()" expand="block">
+    <ion-icon name="add" slot="start"></ion-icon>
+    Agregar Información
+  </ion-button>
+
+  <ion-list>
+    @for (item of informations(); track item.id) {
+    <ion-item>
+      <ion-thumbnail slot="start">
+        <img [src]="getImageUrl(item.r2_key)" />
+      </ion-thumbnail>
+      <ion-label>
+        <h2>{{ item.titulo }}</h2>
+        <p>{{ item.descripcion }}</p>
+        @if (item.link) {
+        <a [href]="item.link" target="_blank">{{ item.link }}</a>
+        }
+        <small>Categoría: {{ item.categoria }}</small>
+      </ion-label>
+      <ion-button (click)="onDelete(item.id)" color="danger" slot="end">
+        <ion-icon name="trash"></ion-icon>
+      </ion-button>
+    </ion-item>
+    } @empty {
+    <ion-item>
+      <ion-label class="ion-text-center">
+        No hay información disponible
+      </ion-label>
+    </ion-item>
+    }
+  </ion-list>
+</ion-content>

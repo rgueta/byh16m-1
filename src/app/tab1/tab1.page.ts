@@ -270,7 +270,7 @@ export class Tab1Page implements OnInit {
         "bottom"
       );
     } else {
-      // this.collectInfo();
+      this.collectInfo();
     }
 
     this.infoPanel = document.getElementById("infoSection");
@@ -428,6 +428,7 @@ export class Tab1Page implements OnInit {
           .getData("api/info/" + this.userId + "/" + timestamp)
           .subscribe({
             next: async (result: any) => {
+              console.log("info:", result);
               if (Object.keys(result).length > 0) {
                 // get last api call variable
                 if (this.localInfo.length > 0) {
