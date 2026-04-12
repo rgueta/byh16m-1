@@ -44,6 +44,27 @@ import {
   IonSelect,
 } from "@ionic/angular/standalone";
 
+interface R2UploadResponse {
+  success: boolean;
+  url?: string;
+  data?: {
+    url: string;
+    key: string;
+    size: number;
+    etag?: string;
+  };
+  error?: string;
+  message?: string;
+}
+
+interface OfflineQueueItem {
+  type: "upload"; // Literal type
+  endpoint: string;
+  formData: FormData;
+  timestamp: string;
+  retryCount?: number; // Opcional para manejo de reintentos
+}
+
 @Component({
   selector: "app-info",
   templateUrl: "./info.page.html",
@@ -95,14 +116,21 @@ export class InfoPage implements OnInit {
   @Input() localCpu: string = "";
   @Input() localCore: string = "";
 
+  titleInput: string = ""; // ← Variable para el binding
+
   public countriesList: any;
   public statesList: any;
   public citiesList: any;
   public divisionsList: any;
   public cpusList: any;
   public coresList: any;
-  public imgFolder: String = "";
+  public imgFolder: string = "";
   public localInfo: any;
+
+  public shortCity: string = "";
+  public shortDivision: string = "";
+  public shortCpus: string = "";
+  public shortCores: string = "";
 
   localImg: any;
   image: any;
@@ -136,6 +164,7 @@ export class InfoPage implements OnInit {
 
   async ngOnInit() {
     // this.localTitle = "Aqui va el titulo..";
+    this.titleInput = this.localTitle; // Inicializar
     this.userId = await this.toolService.getSecureStorage<string>(
       "userId",
       "0"
@@ -225,20 +254,9 @@ export class InfoPage implements OnInit {
       });
   }
 
-  async collectCpus(division: any) {
+  async collectCpus(divisionId: any) {
     this.api
-      .getData(
-        "api/cpus/basic/" +
-          this.localCountry +
-          "/" +
-          this.localState +
-          "/" +
-          this.localCity +
-          "/" +
-          parseInt(division) +
-          "/" +
-          this.userId
-      )
+      .getData("api/cpus/basic/" + divisionId + "/" + this.userId)
       .subscribe({
         next: async (cpusResult) => {
           this.cpusList = cpusResult;
@@ -253,39 +271,25 @@ export class InfoPage implements OnInit {
         },
       });
   }
-  async collectCores(cpu: any) {
-    this.api
-      .getData(
-        "api/cores/light/" +
-          this.localCountry +
-          "/" +
-          this.localState +
-          "/" +
-          this.localCity +
-          "/" +
-          this.localDivision +
-          "/" +
-          cpu +
-          "/" +
-          this.userId
-      )
-      .subscribe({
-        next: async (coresResult) => {
-          this.coresList = coresResult;
-        },
-        error: (error) => {
-          this.toolService.showAlertBasic(
-            "Aviso",
-            "Fallo obteniendo cores light:",
-            `Error: ${error}`,
-            ["Cerrar"]
-          );
-        },
-      });
+  async collectCores(cpuId: any) {
+    this.api.getData("api/cores/basic/" + cpuId + "/" + this.userId).subscribe({
+      next: async (coresResult) => {
+        this.coresList = coresResult;
+      },
+      error: (error) => {
+        this.toolService.showAlertBasic(
+          "Aviso",
+          "Fallo obteniendo cores light:",
+          `Error: ${error}`,
+          ["Cerrar"]
+        );
+      },
+    });
   }
 
   async countrySelection() {
     let country = this.RegisterForm.controls["frmCtrl_country"].value;
+
     if (country) {
       this.collectStates(country);
       this.localCountry = country;
@@ -298,31 +302,54 @@ export class InfoPage implements OnInit {
 
   async stateSelection() {
     let state = this.RegisterForm.controls["frmCtrl_state"].value;
+
     this.collectCities(state);
     this.localState = state;
   }
 
-  async citySelection() {
-    let city = this.RegisterForm.controls["frmCtrl_city"].value;
-    this.collectDivisions(city);
-    this.localCity = city;
+  async citySelection(event: any) {
+    const selectedItem = event.detail.value;
+
+    if (selectedItem) {
+      const { id, shortName, name } = selectedItem;
+      this.localCity = shortName;
+      this.collectDivisions(id);
+    }
   }
 
-  async divisionSelection() {
-    let division = this.RegisterForm.controls["frmCtrl_division"].value;
-    await this.collectCpus(division);
-    this.localDivision = await division;
+  async divisionSelection(event: any) {
+    const selectedItem = event.detail.value;
+    if (selectedItem) {
+      const { id, shortName, name } = selectedItem;
+      this.localDivision = shortName;
+      await this.collectCpus(id);
+    }
   }
 
-  async cpuSelection() {
-    let cpu = this.RegisterForm.controls["frmCtrl_cpu"].value;
-    await this.collectCores(cpu);
-    this.localCpu = await cpu;
+  async cpuSelection(event: any) {
+    const selectedItem = event.detail.value;
+    if (selectedItem) {
+      const { id, shortName, name } = selectedItem;
+      this.localCpu = shortName;
+      await this.collectCores(id);
+    }
   }
 
-  async coreSelection() {
-    let core = this.RegisterForm.controls["frmCtrl_core"].value;
-    this.localCore = core;
+  async coreSelection(event: any) {
+    const selectedItem = event.detail.value;
+    if (selectedItem) {
+      const { id, shortName, name } = selectedItem;
+      this.localCore = shortName;
+    }
+
+    console.log(`country,state,city,div,cpu,core:
+      ${this.localCountry}.
+      ${this.localState}.
+      ${this.localCity}.
+      ${this.localDivision}.
+      ${this.localCpu}.
+      ${this.localCore}`);
+
     this.imgFolder =
       this.localCountry +
       "." +
@@ -364,7 +391,167 @@ export class InfoPage implements OnInit {
     }
   }
 
+  // Nueva seccion para insertar imagenes  ---------------------
+  //
   async uploadFile() {
+    if (this.titleInput) console.log("si tiene valor: ", this.titleInput);
+  }
+
+  async uploadFile_() {
+    // Validar que haya imagen
+    if (!this.localImg?.dataUrl) {
+      this.toolService.toastAlert(
+        "No hay imagen seleccionada",
+        0,
+        ["Ok"],
+        "middle"
+      );
+      return;
+    }
+
+    // Convertir dataURL a Blob
+    const blob = this.dataURLtoBlob(this.localImg.dataUrl);
+
+    // Crear nombre de archivo único para evitar colisiones
+    const timestamp = new Date().getTime();
+    const fileName = `${timestamp}_${this.localTitle || "image"}.jpg`;
+
+    // Crear FormData para el upload
+    let formData = new FormData();
+    formData.append("file", blob, fileName); // ← Importante: el campo debe llamarse "file"
+    formData.append("key", fileName); // ← Campo opcional para el nombre en R2
+
+    // Si necesitas enviar metadatos adicionales
+    if (this.titleInput) formData.append("title", this.titleInput);
+    if (this.localDescription)
+      formData.append("description", this.localDescription);
+    if (this.imgFolder) formData.append("locationFolder", this.imgFolder);
+
+    const loading = await this.loadingCtrl.create({
+      message: "Subiendo imagen...",
+    });
+    await loading.present();
+
+    try {
+      const netStatus = await this.toolService.getSecureStorage<boolean>(
+        "netStatus",
+        false
+      );
+
+      if (netStatus) {
+        // Para Cloudflare R2 - NO usar headers 'content-type': 'application/json'
+        // El navegador automáticamente pondrá el boundary correcto
+        const data$ = this.http.post<R2UploadResponse>(
+          `${this.REST_API_SERVER}api/r2/upload`,
+          formData
+          // No incluyas headers, el navegador los maneja automáticamente
+        );
+
+        const res = await lastValueFrom(data$);
+
+        if (res && res.success) {
+          // Guardar la URL pública de la imagen
+          const imageUrl: any = res.data?.url || res.url;
+
+          // Aquí puedes guardar la información en tu base de datos
+          await this.saveImageInfo(imageUrl, fileName);
+
+          this.toolService.toastAlert(
+            "Imagen subida exitosamente",
+            2000,
+            ["Ok"],
+            "middle"
+          );
+        } else {
+          throw new Error(res?.error || "Error al subir imagen");
+        }
+      } else {
+        // Guardar para subir después (offline)
+        await this.saveOfflineImage(formData);
+        this.toolService.toastAlert(
+          "Sin conexión. La imagen se subirá cuando haya internet",
+          3000,
+          ["Ok"],
+          "middle"
+        );
+      }
+    } catch (error: any) {
+      console.error("Error uploading file:", error);
+      this.toolService.toastAlert(
+        `Error al subir imagen: ${error.message}`,
+        0,
+        ["Ok"],
+        "middle"
+      );
+    } finally {
+      loading.dismiss();
+    }
+  }
+
+  // Función para guardar información de la imagen
+  async saveImageInfo(imageUrl: string, fileName: string) {
+    const imageData = {
+      userId: this.userId,
+      title: this.localTitle,
+      url: imageUrl,
+      fileName: fileName,
+      description: this.localDescription,
+      locationFolder: this.imgFolder,
+      uploadedAt: new Date().toISOString(),
+    };
+
+    // Guardar en tu base de datos local/SQLite
+    // Ejemplo con tu función addRecord
+    // await addRecord(this.DB, "images", imageData);
+  }
+
+  // Guardar para subir offline
+  async saveOfflineImage(formData: FormData) {
+    const offlineQueue = await this.toolService.getSecureStorage<
+      OfflineQueueItem[]
+    >("offlineQueue", []);
+
+    offlineQueue.push({
+      type: "upload",
+      endpoint: "api/r2/upload",
+      formData: formData,
+      timestamp: new Date().toISOString(),
+    });
+
+    await this.toolService.setSecureStorage("offlineQueue", offlineQueue);
+  }
+
+  // Termina nueva seccion agregar imagenes --------------------------
+
+  async uploadData_AWS(formData: FormData) {
+    const loading = await this.loadingCtrl.create({
+      message: "Uploading image... ",
+    });
+
+    let params: {} = {
+      userId: this.userId,
+      title: this.localTitle,
+      url: this.localUrl,
+      description: this.localDescription,
+      locationFolder: this.imgFolder,
+    };
+
+    // use your own API
+    if (await this.toolService.getSecureStorage<boolean>("netStatus", false)) {
+      this.api
+        .postDataInfo("api/info", formData, params)
+        .then(async (resp) => {});
+    } else {
+      this.toolService.toastAlert(
+        "No hay Acceso a internet, uploadData",
+        0,
+        ["Ok"],
+        "middle"
+      );
+    }
+  }
+
+  async uploadFile_AWS() {
     this.image = this.localImg.dataUrl;
     const blob = this.dataURLtoBlob(this.localImg.dataUrl);
     var imageFile = new File([blob], "profile.jpg", { type: "image/jpg" });
@@ -410,34 +597,6 @@ export class InfoPage implements OnInit {
     }
   }
 
-  async uploadData(formData: FormData) {
-    const loading = await this.loadingCtrl.create({
-      message: "Uploading image... ",
-    });
-
-    let params: {} = {
-      userId: this.userId,
-      title: this.localTitle,
-      url: this.localUrl,
-      description: this.localDescription,
-      locationFolder: this.imgFolder,
-    };
-
-    // use your own API
-    if (await this.toolService.getSecureStorage<boolean>("netStatus", false)) {
-      this.api
-        .postDataInfo("api/info", formData, params)
-        .then(async (resp) => {});
-    } else {
-      this.toolService.toastAlert(
-        "No hay Acceso a internet, uploadData",
-        0,
-        ["Ok"],
-        "middle"
-      );
-    }
-  }
-
   dataURLtoBlob(dataurl: any) {
     var arr = dataurl.split(","),
       mime = arr[0].match(/:(.*?);/)[1],
@@ -455,8 +614,11 @@ export class InfoPage implements OnInit {
   async collectInfo() {
     if (await this.toolService.getSecureStorage<boolean>("netStatus", false)) {
       this.api.getData("api/info/all/" + this.userId).subscribe({
-        next: async (result) => {
-          this.localInfo = result;
+        next: async (result: any) => {
+          this.localInfo = result.map((item: any) => ({
+            ...item,
+            encodeImage: encodeURIComponent(item.image),
+          }));
         },
         error: (err: any) => {
           console.log("Error collectInfo --> ", err);

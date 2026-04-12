@@ -3,27 +3,29 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { ToolsService } from "../services/tools.service";
 import { BehaviorSubject, lastValueFrom } from "rxjs";
+import { environment } from "../../environments/environment";
 
 export interface Information {
   id: number;
-  titulo: string;
-  descripcion: string;
+  title: string;
+  url: string;
   path: string;
-  r2_key: string;
-  link: string;
-  categoria: string;
-  fecha_creacion: string;
-  fecha_actualizacion: string;
-  activo: boolean;
-  usuario_id: number;
-  usuario_nombre?: string;
+  key: string;
+  description: string;
+  location: string;
+  size: string;
+  like: number;
+  disable: boolean;
   metadata?: any;
   isNew?: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 @Injectable({ providedIn: "root" })
 export class InformationService {
-  private apiUrl = "http://192.168.1.170:8787/api/r2";
+  REST_API_SERVER = environment.cloud.server_url;
+  private apiUrl = this.REST_API_SERVER + "api/r2";
   private informationSubject = new BehaviorSubject<Information[]>([]);
   information$ = this.informationSubject.asObservable();
 
@@ -87,7 +89,7 @@ export class InformationService {
 
       if (response.success) {
         this.informationSubject.next(response.objects);
-        console.log("r2: ", response.objects);
+        console.log("r2: ", response);
         return response.objects;
       }
       return [];
@@ -138,10 +140,10 @@ export class InformationService {
     data: Partial<Information> & { imageFile?: File }
   ): Promise<Information> {
     const formData = new FormData();
-    if (data.titulo) formData.append("titulo", data.titulo);
-    if (data.descripcion) formData.append("descripcion", data.descripcion);
-    if (data.link) formData.append("link", data.link);
-    if (data.categoria) formData.append("categoria", data.categoria);
+    if (data.title) formData.append("titulo", data.title);
+    if (data.description) formData.append("descripcion", data.description);
+    if (data.url) formData.append("link", data.url);
+    // if (data.categoria) formData.append("categoria", data.categoria);
     if (data.metadata)
       formData.append("metadata", JSON.stringify(data.metadata));
     if (data.imageFile) formData.append("image", data.imageFile);

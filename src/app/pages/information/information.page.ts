@@ -1,5 +1,7 @@
 import { Component, OnInit, signal, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { addIcons } from "ionicons";
+import { trash, add } from "ionicons/icons";
 import {
   IonContent,
   IonList,
@@ -16,6 +18,7 @@ import {
   Information,
 } from "../../services/information.service";
 import { toSignal } from "@angular/core/rxjs-interop";
+import { environment } from "../../../environments/environment";
 
 @Component({
   selector: "app-information",
@@ -46,6 +49,12 @@ export class InformationPage implements OnInit {
   // O puedes usar signal normal
   isLoading = signal(false);
 
+  REST_API_SERVER = environment.cloud.server_url;
+
+  constructor() {
+    addIcons({ trash, add });
+  }
+
   ngOnInit() {
     this.cargarDatos();
   }
@@ -59,6 +68,8 @@ export class InformationPage implements OnInit {
     } finally {
       this.isLoading.set(false);
     }
+
+    console.log("infoService: ", this.infoService);
   }
 
   async onCreateInformation() {
@@ -104,6 +115,6 @@ export class InformationPage implements OnInit {
   }
 
   getImageUrl(r2Key: string): string {
-    return `http://192.168.1.170:8787/api/information/image/${r2Key}`;
+    return `${this.REST_API_SERVER}api/r2/view/${encodeURIComponent(r2Key)}`;
   }
 }

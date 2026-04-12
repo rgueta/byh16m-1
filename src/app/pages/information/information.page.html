@@ -7,24 +7,25 @@
     </ion-refresher-content>
   </ion-refresher>
 
+  <!--<img [src]="'http://192.168.1.170:8787/api/r2/view/' + encodeURIComponent() />-->
   <ion-button (click)="onCreateInformation()" expand="block">
     <ion-icon name="add" slot="start"></ion-icon>
     Agregar Información
   </ion-button>
 
   <ion-list>
-    @for (item of informations(); track item.id) {
+    @for (item of informations(); track item.id || $index) {
     <ion-item>
       <ion-thumbnail slot="start">
-        <img [src]="getImageUrl(item.r2_key)" />
+        <img [src]="getImageUrl(item.key)" />
       </ion-thumbnail>
       <ion-label>
-        <h2>{{ item.titulo }}</h2>
-        <p>{{ item.descripcion }}</p>
-        @if (item.link) {
-        <a [href]="item.link" target="_blank">{{ item.link }}</a>
+        <h2>{{ item.title }}</h2>
+        <p>{{ item.description }}</p>
+        @if (item.url) {
+        <a [href]="item.url" target="_blank">{{ item.url }}</a>
         }
-        <small>Categoría: {{ item.categoria }}</small>
+        <small>like: {{ item.like }}</small>
       </ion-label>
       <ion-button (click)="onDelete(item.id)" color="danger" slot="end">
         <ion-icon name="trash"></ion-icon>

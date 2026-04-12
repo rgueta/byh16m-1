@@ -59,12 +59,10 @@
         label="City"
         ok-text="Seleccionar"
         cancel-text="Cancelar"
-        (ionChange)="citySelection()"
+        (ionChange)="citySelection($event)"
         formControlName="frmCtrl_city"
       >
-        <ion-select-option
-          *ngFor="let item of citiesList"
-          value="{{item.shortName}}"
+        <ion-select-option *ngFor="let item of citiesList" [value]="item"
           >{{item.name}}</ion-select-option
         >
       </ion-select>
@@ -76,12 +74,10 @@
         label="Division"
         ok-text="Seleccionar"
         cancel-text="Cancelar"
-        (ionChange)="divisionSelection();"
+        (ionChange)="divisionSelection($event);"
         formControlName="frmCtrl_division"
       >
-        <ion-select-option
-          *ngFor="let item of divisionsList"
-          value="{{item.id}}"
+        <ion-select-option *ngFor="let item of divisionsList" [value]="item"
           >{{item.name}}</ion-select-option
         >
       </ion-select>
@@ -93,12 +89,10 @@
         label="Cpu"
         ok-text="Seleccionar"
         cancel-text="Cancelar"
-        (ionChange)="cpuSelection()"
+        (ionChange)="cpuSelection($event)"
         formControlName="frmCtrl_cpu"
       >
-        <ion-select-option
-          *ngFor="let item of cpusList"
-          value="{{item.shortName}}"
+        <ion-select-option *ngFor="let item of cpusList" [value]="item"
           >{{item.name}}</ion-select-option
         >
       </ion-select>
@@ -110,12 +104,10 @@
         label="Core"
         ok-text="Seleccionar"
         cancel-text="Cancelar"
-        (ionChange)="coreSelection()"
+        (ionChange)="coreSelection($event)"
         formControlName="frmCtrl_core"
       >
-        <ion-select-option
-          *ngFor="let item of coresList"
-          value="{{item.shortName}}"
+        <ion-select-option *ngFor="let item of coresList" [value]="item"
           >{{item.name}}</ion-select-option
         >
       </ion-select>
@@ -128,7 +120,7 @@
     </ion-item> -->
 
     <ion-item class="">
-      <ion-label class="labelRange" floating>Image size:</ion-label>
+      <ion-label class="labelRange" floating>Resize Image %:</ion-label>
       <ion-range
         class="range wrapper_range"
         aria-label="Range with pin"
@@ -157,14 +149,14 @@
     >
   </form>
 
-  <ion-item *ngIf="imageFileName">
-    <ion-input
-      type="text"
-      class="ion-text-wrap"
-      [ngModel]="localTitle"
-      placeholder="Title"
-    ></ion-input>
-  </ion-item>
+  <!--<ion-item *ngIf="imageFileName">-->
+  <ion-input
+    type="text"
+    class="ion-text-wrap"
+    [(ngModel)]="titleInput"
+    placeholder="Title"
+  ></ion-input>
+  <!--</ion-item>-->
 
   <div *ngIf="imageFileName">
     <ion-item>
@@ -222,7 +214,7 @@
       <ion-card-subtitle>{{item.createdAt}}</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content class="">
-      <img style="height: 100px" src="{{item.path}}{{item.image}}" />
+      <img style="height: 100px" src="{{item.path}}{{item.encodeImage}}" />
       <p>{{item.description}}</p>
     </ion-card-content>
   </ion-card>
