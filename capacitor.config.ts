@@ -4,10 +4,10 @@ const config: CapacitorConfig = {
   appId: "com.bytheg.byh16m",
   appName: "byh16m",
   webDir: "www",
-  // server: {
-  //   url: "http://192.168.1.170:8100", //  <-- pc Ip address
-  //   cleartext: true,
-  // },
+  server: {
+    url: "http://192.168.1.170:8100", //  <-- pc Ip address
+    cleartext: true,
+  },
 
   // server: {
   //   androidScheme: "https",

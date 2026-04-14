@@ -120,7 +120,7 @@
     </ion-item> -->
 
     <ion-item class="">
-      <ion-label class="labelRange" floating>Resize Image %:</ion-label>
+      <ion-label class="labelRange" floating>Image Quality %:</ion-label>
       <ion-range
         class="range wrapper_range"
         aria-label="Range with pin"
@@ -149,14 +149,14 @@
     >
   </form>
 
-  <!--<ion-item *ngIf="imageFileName">-->
-  <ion-input
-    type="text"
-    class="ion-text-wrap"
-    [(ngModel)]="titleInput"
-    placeholder="Title"
-  ></ion-input>
-  <!--</ion-item>-->
+  <ion-item *ngIf="imageFileName">
+    <ion-textarea
+      type="text"
+      class="ion-text-wrap"
+      [(ngModel)]="localTitle"
+      placeholder="Title"
+    ></ion-textarea>
+  </ion-item>
 
   <div *ngIf="imageFileName">
     <ion-item>
@@ -164,10 +164,16 @@
         <!-- <ion-img  class="auxuwiMargin" [src]="imageFileName" alt="Ionic File"></ion-img> -->
         <img class="auxuwiMargin" src="{{imageFileName}}" />
       </ion-thumbnail>
+      <p>&nbsp;&nbsp;&nbsp;Size: {{ImageSize}} - Bytes</p>
     </ion-item>
 
     <ion-item class="auxuwiMargen">
-      <ion-textarea rows="4" placeholder="Url" value="{{localUrl}}">
+      <ion-textarea
+        rows="4"
+        placeholder="Url"
+        [(ngModel)]="localUrl"
+        value="{{localUrl}}"
+      >
         <b>URL:</b></ion-textarea
       >
     </ion-item>
@@ -214,7 +220,10 @@
       <ion-card-subtitle>{{item.createdAt}}</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content class="">
-      <img style="height: 100px" src="{{item.path}}{{item.encodeImage}}" />
+      <img
+        style="height: 200px"
+        src="{{item.path}}{{getEncodedUrl(item.image)}}"
+      />
       <p>{{item.description}}</p>
     </ion-card-content>
   </ion-card>

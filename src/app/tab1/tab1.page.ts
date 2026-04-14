@@ -324,6 +324,11 @@ export class Tab1Page implements OnInit {
     // await modal.present();
   }
 
+  openInfo() {
+    // Aquí puedes agregar lógica previa
+    this.router.navigate(["/information"]);
+  }
+
   async deviceLost() {
     // const modal = await this.modalController.create({
     //   component: RequestsPage,
@@ -401,6 +406,9 @@ export class Tab1Page implements OnInit {
   async collectInfo() {
     let timestamp: any;
 
+    // Limpiando datos del info storage
+    await this.toolService.setSecureStorage("info", {});
+
     if (await this.networkService.checkInternetConnection()) {
       timestamp = await this.toolService.getSecureStorage<string>(
         "lastInfoUpdated",
@@ -412,6 +420,7 @@ export class Tab1Page implements OnInit {
       }
 
       const info = await this.toolService.getSecureStorage<any>("info", null);
+      console.log("SecureStorage info: ", info);
 
       if (this.localInfo.length == 0 && !info) {
         let d = new Date();
@@ -428,13 +437,12 @@ export class Tab1Page implements OnInit {
           .getData("api/info/" + this.userId + "/" + timestamp)
           .subscribe({
             next: async (result: any) => {
-              console.log("info:", result);
               if (Object.keys(result).length > 0) {
                 // get last api call variable
                 if (this.localInfo.length > 0) {
                   Object.entries(result).forEach(async ([key, item]) => {
                     // this.localInfo.push(item);
-                    this.localInfo = [...this.localInfo, item];
+                    // this.localInfo = [...this.localInfo, item];
                   });
                 } else {
                   this.localInfo = await result;
@@ -485,6 +493,10 @@ export class Tab1Page implements OnInit {
         "middle"
       );
     }
+  }
+
+  getEncodedUrl(imagePath: string): string {
+    return encodeURIComponent(imagePath);
   }
 
   async doRefresh(event: any) {

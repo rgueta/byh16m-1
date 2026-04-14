@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, NgModule } from "@angular/core";
+import { Component, OnInit, Input } from "@angular/core";
 import { CommonModule, NgFor, NgIf } from "@angular/common";
 import { Capacitor } from "@capacitor/core";
 import {
@@ -43,6 +43,7 @@ import {
   IonRefresherContent,
   IonSelect,
 } from "@ionic/angular/standalone";
+import { monthlyFolder, encodeUrlSafe } from "../../utils/utils";
 
 interface R2UploadResponse {
   success: boolean;
@@ -116,8 +117,6 @@ export class InfoPage implements OnInit {
   @Input() localCpu: string = "";
   @Input() localCore: string = "";
 
-  titleInput: string = ""; // ← Variable para el binding
-
   public countriesList: any;
   public statesList: any;
   public citiesList: any;
@@ -136,6 +135,7 @@ export class InfoPage implements OnInit {
   image: any;
 
   ImageSize: any;
+  ImageQuality: any;
 
   REST_API_SERVER = environment.cloud.server_url;
 
@@ -164,7 +164,8 @@ export class InfoPage implements OnInit {
 
   async ngOnInit() {
     // this.localTitle = "Aqui va el titulo..";
-    this.titleInput = this.localTitle; // Inicializar
+    // Forzar detección de cambios después de la inicialización
+
     this.userId = await this.toolService.getSecureStorage<string>(
       "userId",
       "0"
@@ -367,7 +368,7 @@ export class InfoPage implements OnInit {
   //#endregion select location  -------------------------------------------
 
   async rangeChange(event: any) {
-    this.ImageSize = await event.detail.value;
+    this.ImageQuality = await event.detail.value;
   }
 
   //#region Image section ------------------------------------------------
@@ -375,11 +376,17 @@ export class InfoPage implements OnInit {
   async getImage() {
     try {
       this.localImg = await Camera.getPhoto({
-        quality: this.ImageSize,
+        quality: this.ImageQuality,
         allowEditing: false,
         resultType: CameraResultType.DataUrl,
         source: CameraSource.Photos,
       });
+
+      const dataUrl = this.localImg.dataUrl || "";
+
+      // Convertir DataUrl a Blob para obtener el tamaño real
+      const blob = this.dataURLtoBlob(dataUrl);
+      this.ImageSize = blob.size;
 
       if (this.localImg) {
         this.imageFileName = Capacitor.convertFileSrc(this.localImg.dataUrl);
@@ -392,12 +399,8 @@ export class InfoPage implements OnInit {
   }
 
   // Nueva seccion para insertar imagenes  ---------------------
-  //
-  async uploadFile() {
-    if (this.titleInput) console.log("si tiene valor: ", this.titleInput);
-  }
 
-  async uploadFile_() {
+  async uploadFile() {
     // Validar que haya imagen
     if (!this.localImg?.dataUrl) {
       this.toolService.toastAlert(
@@ -412,20 +415,27 @@ export class InfoPage implements OnInit {
     // Convertir dataURL a Blob
     const blob = this.dataURLtoBlob(this.localImg.dataUrl);
 
+    console.log("blob: ", blob);
+
     // Crear nombre de archivo único para evitar colisiones
     const timestamp = new Date().getTime();
-    const fileName = `${timestamp}_${this.localTitle || "image"}.jpg`;
+    const fileName = `${
+      this.imgFolder
+    }/${await monthlyFolder()}/${timestamp}.jpg`;
 
     // Crear FormData para el upload
     let formData = new FormData();
     formData.append("file", blob, fileName); // ← Importante: el campo debe llamarse "file"
     formData.append("key", fileName); // ← Campo opcional para el nombre en R2
+    formData.append("url", this.localUrl);
+    formData.append("uploadPath", `${this.imgFolder}/${await monthlyFolder()}`);
+    formData.append("location", this.imgFolder);
+    formData.append("size", blob.size.toString());
 
     // Si necesitas enviar metadatos adicionales
-    if (this.titleInput) formData.append("title", this.titleInput);
+    if (this.localTitle) formData.append("title", this.localTitle);
     if (this.localDescription)
       formData.append("description", this.localDescription);
-    if (this.imgFolder) formData.append("locationFolder", this.imgFolder);
 
     const loading = await this.loadingCtrl.create({
       message: "Subiendo imagen...",
@@ -615,10 +625,7 @@ export class InfoPage implements OnInit {
     if (await this.toolService.getSecureStorage<boolean>("netStatus", false)) {
       this.api.getData("api/info/all/" + this.userId).subscribe({
         next: async (result: any) => {
-          this.localInfo = result.map((item: any) => ({
-            ...item,
-            encodeImage: encodeURIComponent(item.image),
-          }));
+          this.localInfo = result;
         },
         error: (err: any) => {
           console.log("Error collectInfo --> ", err);
@@ -633,6 +640,10 @@ export class InfoPage implements OnInit {
         "middle"
       );
     }
+  }
+
+  getEncodedUrl(imagePath: string): string {
+    return encodeURIComponent(imagePath);
   }
 
   async doRefresh(event: any) {

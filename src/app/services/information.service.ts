@@ -89,7 +89,6 @@ export class InformationService {
 
       if (response.success) {
         this.informationSubject.next(response.objects);
-        console.log("r2: ", response);
         return response.objects;
       }
       return [];

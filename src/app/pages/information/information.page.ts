@@ -68,8 +68,6 @@ export class InformationPage implements OnInit {
     } finally {
       this.isLoading.set(false);
     }
-
-    console.log("infoService: ", this.infoService);
   }
 
   async onCreateInformation() {

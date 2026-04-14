@@ -40,6 +40,11 @@
             <ion-item [button]="true" [detail]="false" (click)="openFamily()"
               >Familia</ion-item
             >
+
+            <ion-item [button]="true" [detail]="false" (click)="openInfo()"
+              >Information</ion-item
+            >
+
             <ion-item
               [button]="true"
               [detail]="false"
@@ -182,7 +187,7 @@
         <ion-card-subtitle>{{item.createdAt}}</ion-card-subtitle>
       </ion-card-header>
       <ion-card-content class="" (click)="openUrl(item.url)">
-        <img src="{{item.path}}{{item.image}}" />
+        <img src="{{item.path}}{{getEncodedUrl(item.image)}}" />
         <p>{{item.description}}</p>
       </ion-card-content>
     </ion-card>
