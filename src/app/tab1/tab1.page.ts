@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, inject } from "@angular/core";
 import {
   ModalController,
   AlertController,
@@ -69,11 +69,10 @@ import {
   documentOutline,
   shareSocialOutline,
   mailOutline,
-  menu,
+  timeOutline,
 } from "ionicons/icons";
-import { catchError, throwError, from, Observable, of } from "rxjs";
-import { tap, switchMap } from "rxjs/operators";
-import { Preferences } from "@capacitor/preferences";
+import { SyncService } from "../services/sync.service";
+import { timeAgoSimple } from "../utils/utils";
 
 @Component({
   selector: "app-tab1",
@@ -109,6 +108,7 @@ import { Preferences } from "@capacitor/preferences";
   ],
 })
 export class Tab1Page implements OnInit {
+  private syncService = inject(SyncService);
   //#region  variables-------------------------
   public localInfo: any = [];
   public codes: [] = [];
@@ -136,6 +136,10 @@ export class Tab1Page implements OnInit {
   demoMode: any;
   remoteCtrl: any;
 
+  // seccion para parrafo extender/colapsar -------------
+  // Estado para controlar qué tarjetas tienen el texto expandido
+  expandedStates: { [key: number]: boolean } = {};
+
   // #endregion -----
   constructor(
     private sms: SMS,
@@ -161,10 +165,12 @@ export class Tab1Page implements OnInit {
       toggleOutline,
       shareSocialOutline,
       mailOutline,
+      timeOutline,
     });
   }
 
   async ngOnInit() {
+    this.doSync();
     this.version = environment.app.version;
 
     if (isPlatform("cordova") || isPlatform("ios")) {
@@ -270,11 +276,38 @@ export class Tab1Page implements OnInit {
         "bottom"
       );
     } else {
-      this.collectInfo();
+      // this.collectInfo(); commentes to use SyncService
+      this.loadData();
     }
 
     this.infoPanel = document.getElementById("infoSection");
     this.infoPanel.style.marginTop = "115px";
+  }
+
+  async doSync() {
+    await this.syncService.synchronize();
+    await this.loadData();
+  }
+
+  async loadData() {
+    this.localInfo = await this.syncService.getLocalInformation();
+  }
+
+  /**
+   * Alterna la expansión del texto para una tarjeta específica
+   */
+  toggleText(index: number): void {
+    this.expandedStates[index] = !this.expandedStates[index];
+  }
+
+  /**
+   * Verifica si un texto excede las 2 líneas
+   * (útil para mostrar/ocultar el botón "ver más")
+   */
+  isTextLong(text: string): boolean {
+    // Aproximadamente 50-60 caracteres por línea dependiendo del ancho
+    // Ajusta según el tamaño de tu card
+    return text.length > 60;
   }
 
   toggleButtons() {
@@ -500,11 +533,16 @@ export class Tab1Page implements OnInit {
   }
 
   async doRefresh(event: any) {
-    this.collectInfo();
+    // this.collectInfo();
+    this.loadData();
 
     setTimeout(() => {
       event.target.complete();
     }, 2000);
+  }
+
+  getTimeAgo(timestamp: string | Date): string {
+    return timeAgoSimple(timestamp);
   }
 
   async DemoMode() {

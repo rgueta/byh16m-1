@@ -19,6 +19,7 @@ import {
 } from "../../services/information.service";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { environment } from "../../../environments/environment";
+import { SyncService } from "../../services/sync.service";
 
 @Component({
   selector: "app-information",
@@ -39,6 +40,7 @@ import { environment } from "../../../environments/environment";
   ],
 })
 export class InformationPage implements OnInit {
+  private syncService = inject(SyncService);
   private infoService = inject(InformationService);
 
   // Convertir BehaviorSubject a Signal

@@ -181,14 +181,45 @@
 
   <div id="infoSection" class="info">
     <!-- <ion-card class="" *ngFor="let item of localInfo; let i = index;"> -->
-    <ion-card class="" *ngFor="let item of localInfo; index as i">
+    <ion-card *ngFor="let item of localInfo; index as i">
       <ion-card-header>
-        <ion-card-title>{{item.title}}</ion-card-title>
-        <ion-card-subtitle>{{item.createdAt}}</ion-card-subtitle>
+        <ion-card-title>{{item.name}}</ion-card-title>
+        <ion-card-subtitle>
+          {{getTimeAgo(item.createdAt)}}
+          <ion-icon name="time-outline"></ion-icon> </ion-card-subtitle
+        >=
+        <ion-card-subtitle>{{item.title}}</ion-card-subtitle>
+        <!--<p>{{item.description}}</p>
+        Ionicons is the official premium open-source icon pack for the Ionic
+        Framework, featuring 1,300 icons designed for web, iOS, Android, and
+        desktop applications. These icons include both Material Design and iOS
+        versions, ensuring native-feeling interfaces across different platforms.-->
+
+        <ion-card-subtitle class="custom-subtitle">
+          <!-- Icono y título -->
+          <div class="subtitle-header">
+            <ion-icon name="time-outline"></ion-icon>
+            <span>{{item.title}}&nbsp;{{getTimeAgo(item.createdAt)}}</span>
+          </div>
+          <!-- Texto con expansión -->
+          <div class="expandable-text" [class.expanded]="expandedStates[i]">
+            <p
+              [class.collapsed]="!expandedStates[i] && isTextLong(item.description)"
+            >
+              {{item.description}}
+            </p>
+            <button
+              *ngIf="isTextLong(item.description)"
+              class="read-more-btn"
+              (click)="toggleText(i)"
+            >
+              {{ expandedStates[i] ? 'ver menos' : '...' }}
+            </button>
+          </div>
+        </ion-card-subtitle>
       </ion-card-header>
       <ion-card-content class="" (click)="openUrl(item.url)">
         <img src="{{item.path}}{{getEncodedUrl(item.image)}}" />
-        <p>{{item.description}}</p>
       </ion-card-content>
     </ion-card>
   </div>
