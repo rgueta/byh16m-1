@@ -14,6 +14,16 @@ const config: CapacitorConfig = {
   //   cleartext: true, // Solo para desarrollo
   // },
   plugins: {
+    SplashScreen: {
+      launchShowDuration: 2000, // reduce si quieres que dure menos
+      launchAutoHide: true,
+      backgroundColor: "#FFFFFF", // pon el color exacto del fondo de tu splash
+      androidSplashResourceName: "splash",
+      androidScaleType: "CENTER_INSIDE", // prueba también FIT_CENTER
+      showSpinner: false,
+      splashFullScreen: false,
+      splashImmersive: false,
+    },
     CapacitorHttp: {
       enabled: true,
     },

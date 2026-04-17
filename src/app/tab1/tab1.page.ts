@@ -117,6 +117,16 @@ import { timeAgoSimple } from "../utils/utils";
 })
 export class Tab1Page implements OnInit {
   private syncService = inject(SyncService);
+  private sms = inject(SMS);
+  public modalController = inject(ModalController);
+  private api = inject(DatabaseService);
+  public alertCtrl = inject(AlertController);
+  private router = inject(Router);
+  private toolService = inject(ToolsService);
+  private loadingController = inject(LoadingController);
+  private screenOrientation = inject(ScreenOrientation);
+  public networkService = inject(NetworkService);
+
   //#region  variables-------------------------
   public localInfo: any = [];
   public codes: [] = [];
@@ -149,17 +159,7 @@ export class Tab1Page implements OnInit {
   expandedStates: { [key: number]: boolean } = {};
 
   // #endregion -----
-  constructor(
-    private sms: SMS,
-    public modalController: ModalController,
-    private api: DatabaseService,
-    public alertCtrl: AlertController,
-    private router: Router,
-    private toolService: ToolsService,
-    private loadingController: LoadingController,
-    private screenOrientation: ScreenOrientation,
-    public networkService: NetworkService
-  ) {
+  constructor() {
     addIcons({
       ellipsisVerticalOutline,
       chevronUpOutline,
