@@ -1,32 +1,43 @@
-<ion-header class="topHeader">
-  <ion-toolbar slot="start">
-    <div class="column left">
-      <div class="mainTitle">
-        <img class="logo_header" src="../../assets/logo_transparent.png" />
-      </div>
-      <div class="version">v {{version}}</div>
-    </div>
-    <div class="column middle">
-      <ion-title>{{coreName}}</ion-title>
-      <!-- <div class="doorsButton-toggle" *ngIf="remote">
-        <ion-label (click)="toggleButtons()">
-          {{btnVisible ? 'Ocultar' : 'Visualizar'}}</ion-label
+<ion-header>
+  <ion-toolbar>
+    <!-- 1. Logo de la app con versión -->
+    <ion-buttons slot="start" class="logo-container">
+      <div class="logo-wrapper">
+        <ion-img
+          src="../../assets/logo_transparent.png"
+          alt="Logo"
+          class="logo"
         >
+        </ion-img>
+        <ion-label class="version-label">v{{ version }}</ion-label>
+      </div>
+    </ion-buttons>
+
+    <!-- 2. Título (máx. 40 caracteres) -->
+    <ion-title class="ion-text-center">
+      <span class="title-text"
+        >{{ coreName | slice:0:40 }}{{ coreName.length > 40 ? '...' : ''
+        }}</span
+      >
+    </ion-title>
+
+    <!-- 3. Botón para ocultar/mostrar el div -->
+    <ion-buttons slot="end">
+      <ion-button
+        (click)="toggleButtons()"
+        [color]="btnVisible ? 'primary' : 'medium'"
+      >
         <ion-icon
-          [name]="btnVisible ? 'chevron-up-outline' : 'chevron-down-outline'"
-          (click)="toggleButtons()"
-          style="padding-left: 5px"
+          slot="icon-only"
+          [name]="btnVisible ? 'eye-off' : 'eye'"
         ></ion-icon>
-      </div> -->
-    </div>
-    <div class="column right">
-      <!-- <span [hidden] = "MyRole != 'admin'" > -->
-      <span>
-        <ion-buttons slot="end" id="popover-button">
-          <ion-menu-button autoHide="false"></ion-menu-button>
-        </ion-buttons>
-      </span>
-    </div>
+      </ion-button>
+
+      <!-- 4. Icono para menú desplegable -->
+      <ion-button id="popover-button">
+        <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -160,7 +171,7 @@
   <!-- --------------------------------------------  -->
 
   <!-- Bi-color -->
-  <div slot="fixed" class="aperturas" *ngIf="btnVisible && remoteCtrl">
+  <div class="aperturas" *ngIf="btnVisible && remoteCtrl">
     <ion-button
       class="doorsButton-green"
       (click)="sendSMS('peatonal')"
@@ -180,26 +191,15 @@
   </ion-refresher>
 
   <div id="infoSection" class="info">
-    <!-- <ion-card class="" *ngFor="let item of localInfo; let i = index;"> -->
     <ion-card *ngFor="let item of localInfo; index as i">
       <ion-card-header>
         <ion-card-title>{{item.name}}</ion-card-title>
-        <ion-card-subtitle>
-          {{getTimeAgo(item.createdAt)}}
-          <ion-icon name="time-outline"></ion-icon> </ion-card-subtitle
-        >=
-        <ion-card-subtitle>{{item.title}}</ion-card-subtitle>
-        <!--<p>{{item.description}}</p>
-        Ionicons is the official premium open-source icon pack for the Ionic
-        Framework, featuring 1,300 icons designed for web, iOS, Android, and
-        desktop applications. These icons include both Material Design and iOS
-        versions, ensuring native-feeling interfaces across different platforms.-->
-
         <ion-card-subtitle class="custom-subtitle">
           <!-- Icono y título -->
           <div class="subtitle-header">
+            <span>{{item.title}}</span>
             <ion-icon name="time-outline"></ion-icon>
-            <span>{{item.title}}&nbsp;{{getTimeAgo(item.createdAt)}}</span>
+            {{getTimeAgo(item.createdAt)}}
           </div>
           <!-- Texto con expansión -->
           <div class="expandable-text" [class.expanded]="expandedStates[i]">
@@ -213,7 +213,7 @@
               class="read-more-btn"
               (click)="toggleText(i)"
             >
-              {{ expandedStates[i] ? 'ver menos' : '...' }}
+              {{ expandedStates[i] ? '.. menos' : '... mas' }}
             </button>
           </div>
         </ion-card-subtitle>

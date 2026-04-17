@@ -6,6 +6,8 @@ import {
   isPlatform,
   IonMenu,
   IonMenuButton,
+  IonImg,
+  IonText,
 } from "@ionic/angular/standalone";
 import { environment } from "../../environments/environment";
 import {
@@ -70,6 +72,11 @@ import {
   shareSocialOutline,
   mailOutline,
   timeOutline,
+  eyeOffOutline,
+  eyeOutline,
+  eyeOff,
+  menuOutline,
+  eye,
 } from "ionicons/icons";
 import { SyncService } from "../services/sync.service";
 import { timeAgoSimple } from "../utils/utils";
@@ -104,7 +111,8 @@ import { timeAgoSimple } from "../utils/utils";
     IonCardTitle,
     IonCardSubtitle,
     IonRefresherContent,
-    IonMenuButton,
+    IonImg,
+    IonLabel,
   ],
 })
 export class Tab1Page implements OnInit {
@@ -166,6 +174,11 @@ export class Tab1Page implements OnInit {
       shareSocialOutline,
       mailOutline,
       timeOutline,
+      eyeOffOutline,
+      eyeOutline,
+      eyeOff,
+      eye,
+      menuOutline,
     });
   }
 
@@ -281,7 +294,6 @@ export class Tab1Page implements OnInit {
     }
 
     this.infoPanel = document.getElementById("infoSection");
-    this.infoPanel.style.marginTop = "115px";
   }
 
   async doSync() {
@@ -300,7 +312,7 @@ export class Tab1Page implements OnInit {
     this.expandedStates[index] = !this.expandedStates[index];
   }
 
-  /**
+  /***
    * Verifica si un texto excede las 2 líneas
    * (útil para mostrar/ocultar el botón "ver más")
    */
@@ -315,7 +327,7 @@ export class Tab1Page implements OnInit {
 
     if (this.btnVisible) {
       this.titleMenuButtons = "Ocultar botones";
-      this.infoPanel.style.marginTop = "115px";
+      // this.infoPanel.style.marginTop = "115px";
     } else {
       this.titleMenuButtons = "Mostrar botones";
       this.infoPanel.style.marginTop = "0px";

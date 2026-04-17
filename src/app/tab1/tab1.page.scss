@@ -34,7 +34,7 @@
 
 #popover-button {
   padding-top: 0px;
-  font-size: 2.5rem;
+  font-size: 1.5rem;
 
   &.ios {
     font-size: 1.2rem;
@@ -120,33 +120,27 @@
   --border-radius: 15px;
 }
 
-// .info{
-//     margin-top: 115px !important;
-// }
+.aperturas {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--ion-background-color, #fff);
+  padding: 16px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+
+  &.hidden {
+    display: none;
+  }
+}
+
+.info {
+  // Las tarjetas scrollearán normalmente detrás del div sticky
+  padding-top: 0;
+}
 
 .logout {
   --background: #6599ce;
-}
-
-.section-SendSMS-hide {
-  ion-item {
-    display: none;
-  }
-  // --ion-div-color:green;
-  // #formSendSMS{
-  //     display: none;
-  // }
-}
-
-.section-SendSMS-show {
-  // ion-header{
-  //     background-color: #64AA95;
-  // }
-
-  // --ion-div-color: red;
-  // #formSendSMS{
-  //     display: inline;
-  // }
 }
 
 ion-item-divider {
@@ -170,11 +164,11 @@ ion-popover {
   // padding: 9px;
 }
 
-/* ion-card-title {
-  font-size: 0.8rem;
-  font-weight: 200;
+ion-card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
 }
-
+/*
 ion-card-subtitle {
   font-size: 0.8rem;
   font-weight: 100;
@@ -187,7 +181,7 @@ ion-card-subtitle {
     vertical-align: middle;
   } */
 
-/* seccion para parrado detalle expandir/colapsar */
+/* seccion para parrafo detalle expandir/colapsar */
 
 .custom-subtitle {
   display: block;
@@ -198,6 +192,7 @@ ion-card-subtitle {
     align-items: center;
     gap: 8px;
     margin-bottom: 8px;
+    font-weight: 600;
 
     ion-icon {
       font-size: 1.1em;
@@ -209,6 +204,7 @@ ion-card-subtitle {
     p {
       margin: 0;
       line-height: 1.4;
+      font-weight: 400;
 
       // Estilo para texto colapsado (2 líneas)
       &.collapsed {
@@ -228,15 +224,103 @@ ion-card-subtitle {
       font-size: 0.85em;
       padding: 4px 0;
       margin-top: 4px;
-      cursor: pointer;
+      text-decoration: none;
 
-      &:hover {
+      /* &:hover {
         text-decoration: underline;
-      }
+      } */
 
       &:focus {
         outline: none;
       }
+    }
+  }
+}
+
+/* ------------  Nuevo header  ------------*/
+
+ion-toolbar {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --min-height: 56px;
+
+  // Contenedor del logo y versión
+  .logo-container {
+    min-width: 60px;
+
+    .logo-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      .logo {
+        width: 46px;
+        height: 46px;
+        object-fit: contain;
+        margin-bottom: 2px;
+      }
+
+      .version-label {
+        font-size: 10px;
+        font-weight: 400;
+        color: var(--ion-color-medium);
+        margin: 0;
+        padding: 0;
+        letter-spacing: 0.3px;
+      }
+    }
+  }
+
+  // Título
+  ion-title {
+    padding: 0 8px;
+
+    .title-text {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 500;
+      letter-spacing: -0.3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  // Botones del lado derecho
+  ion-buttons[slot="end"] {
+    gap: 4px;
+
+    ion-button {
+      margin: 0;
+      min-width: 44px;
+    }
+  }
+}
+
+// Responsive: ajustar para pantallas muy pequeñas
+@media (max-width: 400px) {
+  ion-toolbar {
+    --padding-start: 4px;
+    --padding-end: 4px;
+
+    .logo-container {
+      min-width: 50px;
+
+      .logo-wrapper {
+        .logo {
+          width: 28px;
+          height: 28px;
+        }
+
+        .version-label {
+          font-size: 7px;
+        }
+      }
+    }
+
+    .title-text {
+      font-size: 0.9rem;
     }
   }
 }
