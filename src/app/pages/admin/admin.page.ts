@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import {
@@ -56,6 +56,7 @@ import {
   optionsOutline,
   location,
 } from "ionicons/icons";
+import { AppDB } from "../../services/db.service";
 
 const TWILIO = "twilio";
 const EMAIL_TO_VISITOR = "emailToVisitor";
@@ -281,6 +282,7 @@ export class AdminPage implements OnInit {
   ];
   // #endregion data options menu
 
+  private db = inject(AppDB);
   public SourcePage: string = "admin";
   public CoresList: any;
   public myUserList: any;
@@ -485,6 +487,10 @@ export class AdminPage implements OnInit {
       component: BackstagePage,
     });
     return await modal.present();
+  }
+
+  async clearLocalInfo() {
+    this.db.clearDB();
   }
 
   async routineSelected(event: any, index: number, item: any) {

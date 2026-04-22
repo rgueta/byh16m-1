@@ -170,6 +170,7 @@ export class InfoPage implements OnInit {
       "userId",
       "0"
     );
+
     this.collectCountries();
 
     this.collectInfo();
@@ -431,6 +432,7 @@ export class InfoPage implements OnInit {
     formData.append("uploadPath", `${this.imgFolder}/${await monthlyFolder()}`);
     formData.append("location", this.imgFolder);
     formData.append("size", blob.size.toString());
+    formData.append("userId", this.userId);
 
     // Si necesitas enviar metadatos adicionales
     if (this.localTitle) formData.append("title", this.localTitle);

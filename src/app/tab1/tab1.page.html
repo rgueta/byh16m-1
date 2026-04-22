@@ -219,7 +219,10 @@
         </ion-card-subtitle>
       </ion-card-header>
       <ion-card-content class="" (click)="openUrl(item.url)">
-        <img src="{{item.path}}{{getEncodedUrl(item.image)}}" />
+        <!--<img src="{{item.path}}{{getEncodedUrl(item.image)}}" />-->
+        <img
+          [src]="item.localPath ? convertFileUri(item.localPath) : item.path + item.image"
+        />
       </ion-card-content>
     </ion-card>
   </div>

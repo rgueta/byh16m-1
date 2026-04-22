@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import Dexie, { Table } from "dexie";
+import { environment } from "../../environments/environment";
 
 export interface Information {
   id: number;
@@ -12,6 +13,7 @@ export interface Information {
   size: number;
   like: number;
   disable: number;
+  localPath: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -21,13 +23,24 @@ export interface Information {
 })
 export class AppDB extends Dexie {
   information!: Table<Information, number>;
+  localDB: string = environment.app.localDB;
 
   constructor() {
-    super("Byh16Database");
+    super(environment.app.localDB);
     // Definimos los índices. updatedAt es vital para la sincronización.
     this.version(1).stores({
       information: "id, updatedAt, createdAt, title",
     });
+  }
+
+  async clearDB() {
+    try {
+      await this.information.clear();
+      console.log('✅ Tabla "information" limpiada correctamente');
+    } catch (error) {
+      console.error("❌ Error al limpiar la tabla information:", error);
+      throw error;
+    }
   }
 
   // Métodos para persistir el timestamp de la última consulta
@@ -37,7 +50,7 @@ export class AppDB extends Dexie {
 
   getLastSync(): string {
     return (
-      localStorage.getItem("last_sync_timestamp") || "1970-01-01T00:00:00Z"
+      localStorage.getItem("last_sync_timestamp") || "2026-01-01T00:00:00Z"
     );
   }
 }

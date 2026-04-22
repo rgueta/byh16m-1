@@ -11,7 +11,6 @@ import {
 } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { ToolsService } from "../services/tools.service";
-import { options } from "ionicons/icons";
 
 const REFRESH_TOKEN = "refreshToken";
 const TOKEN = "authToken";
@@ -136,25 +135,8 @@ export class DatabaseService {
   }
 
   //---- GET data from server  ------
-  getData_key(collection: String, data: any) {
-    // secure storage --------------
-    let token = this.toolService.getSecureStorage<string>("authToken", "");
 
-    let options = {
-      headers: {
-        Accept: "application/json",
-        "content-type": "application/json",
-        "Access-Control-Allow-Headers": "Content-Type",
-        authorization: `Bearer ${token}`,
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT",
-      },
-    };
-
-    return this.http.get(this.REST_API_SERVER + collection, options);
-  }
-
-  getData<T>(path: string): Observable<T> {
+  getData<T>(path: string, responseType = "json"): Observable<T> {
     // Convertir la Promise de getSecureStorage a un Observable
     return from(
       this.toolService.getSecureStorage<string>("authToken", "")
@@ -183,6 +165,9 @@ export class DatabaseService {
           }
 
           headers = headers.set("Authorization", `Bearer ${tokenString}`);
+          if (responseType == "blob") {
+            headers = headers.set("responseType", "blob");
+          }
         } else {
           console.log("EndPoint publico...");
         }

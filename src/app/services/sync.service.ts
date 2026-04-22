@@ -1,38 +1,99 @@
 import { Injectable, inject } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
 import { AppDB, Information } from "./db.service";
 import { firstValueFrom } from "rxjs";
+import { Filesystem, Directory } from "@capacitor/filesystem";
+import { DatabaseService } from "../services/database.service";
+import { HttpClient } from "@angular/common/http";
+import { environment } from "../../environments/environment";
 
 @Injectable({
   providedIn: "root",
 })
 export class SyncService {
   private http = inject(HttpClient);
+  private api = inject(DatabaseService);
   private db = inject(AppDB);
-  private readonly API_URL = "http://192.168.1.170:8787/api/info/recent";
+
+  private apiURL = environment.cloud.server_url;
 
   async synchronize() {
+    this.checkPath();
+    const lastSync = this.db.getLastSync();
+
+    try {
+      // 1. Consultar solo datos modificados/creados desde el último sync
+      this.api.getData(`api/info/recent/${lastSync}/50`).subscribe({
+        next: async (news: any) => {
+          if (news.length > 0) {
+            console.log("news: ", news);
+            // guadamos las imagenes localmente
+            for (const item of news) {
+              // Generamos la URL completa de R2/Worker
+              const remoteUrl = item.path + encodeURIComponent(item.image);
+
+              // Descargamos y guardamos localmente
+              const localUri = await this.downloadAndSaveImage(
+                remoteUrl,
+                item.image
+              );
+
+              // 2. Guardar en IndexedDB (bulkPut actualiza si existe el ID o inserta si es nuevo)
+              // Guardamos en IndexedDB con la nueva ruta local
+              await this.db.information.put({
+                ...item,
+                localPath: localUri, // Nuevo campo para la ruta del filesystem
+              });
+            }
+
+            // 3. Obtener el updatedAt más reciente de los nuevos datos para el próximo sync
+            const latestUpdate = news.reduce(
+              (max: any, item: any) =>
+                item.updatedAt > max ? item.updatedAt : max,
+              lastSync
+            );
+
+            this.db.setLastSync(latestUpdate);
+            console.log(`Sincronizados ${news.length} registros nuevos.`);
+          }
+        },
+        error: (error: any) => {
+          console.error("collect info error : ", error);
+        },
+      });
+    } catch (error) {
+      console.error("Error en la sincronización:", error);
+    }
+  }
+
+  async synchronize_org() {
     const lastSync = this.db.getLastSync();
 
     try {
       // 1. Consultar solo datos modificados/creados desde el último sync
       const news = await firstValueFrom(
-        this.http.get<Information[]>(`${this.API_URL}/${lastSync}/50`)
+        this.http.get<Information[]>(
+          `${this.apiURL}api/info/recent/${lastSync}/50`
+        )
       );
 
-      if (news.length > 0) {
-        console.log("news: ", news);
-        // 2. Guardar en IndexedDB (bulkPut actualiza si existe el ID o inserta si es nuevo)
-        await this.db.information.bulkPut(news);
+      console.log("news: ", news);
 
-        // 3. Obtener el updatedAt más reciente de los nuevos datos para el próximo sync
-        const latestUpdate = news.reduce(
-          (max, item) => (item.updatedAt > max ? item.updatedAt : max),
-          lastSync
-        );
+      for (const item of news) {
+        // Generamos la URL completa de R2/Worker
+        const remoteUrl = item.path + encodeURIComponent(item.image);
+        console.log("item.path: ", item.path);
+        console.log("item.image: ", item.image);
+        console.log("remoteUrl: ", remoteUrl);
 
-        this.db.setLastSync(latestUpdate);
-        console.log(`Sincronizados ${news.length} registros nuevos.`);
+        // Descargamos y guardamos localmente
+        const localUri = await this.downloadAndSaveImage(remoteUrl, item.image);
+
+        // Guardamos en IndexedDB con la nueva ruta local
+        console.log("localUri: ", localUri);
+        await this.db.information.put({
+          ...item,
+          localPath: localUri, // Nuevo campo para la ruta del filesystem
+        });
       }
     } catch (error) {
       console.error("Error en la sincronización:", error);
@@ -42,5 +103,61 @@ export class SyncService {
   // Método para obtener todos los datos locales para la UI
   getLocalInformation() {
     return this.db.information.orderBy("id").reverse().toArray();
+  }
+
+  async downloadAndSaveImage(
+    imageUrl: string,
+    fileName: string
+  ): Promise<string> {
+    try {
+      // formacion de folder
+      // 2. Separar el directorio del nombre del archivo
+      // 'pathOnly' será "MX.BC.TJ.6.CG.SJ/42026"
+      // 'fileName' será "1776716228456.jpg"
+      const lastSlashIndex = fileName.lastIndexOf("/");
+      const pathOnly = fileName.substring(0, lastSlashIndex);
+      const file = fileName.substring(lastSlashIndex + 1);
+
+      // 1. Descargar la imagen como un Blob
+      const blob: any = await firstValueFrom(
+        this.http.get(imageUrl, { responseType: "blob" })
+        // this.api.getData(imageUrl, "blob")
+      );
+
+      // 2. Convertir Blob a Base64 (requerido por el plugin Filesystem)
+      const base64Data = await this.blobToBase64(blob);
+
+      // 3. Escribir el archivo en el almacenamiento del dispositivo
+      const savedFile = await Filesystem.writeFile({
+        path: `images/${pathOnly}/${file}`,
+        data: base64Data,
+        directory: Directory.Data,
+        recursive: true,
+      });
+
+      // Retornamos la URI interna del archivo
+      console.log("URI interna del archivo: ", savedFile.uri);
+      return savedFile.uri;
+    } catch (e) {
+      console.error("Error guardando imagen local:", e);
+      return imageUrl; // Fallback a la URL remota si falla
+    }
+  }
+
+  private blobToBase64(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  async checkPath() {
+    const uri = await Filesystem.getUri({
+      path: "images",
+      directory: Directory.Data,
+    });
+    console.log("La ruta real es:", uri.uri);
   }
 }

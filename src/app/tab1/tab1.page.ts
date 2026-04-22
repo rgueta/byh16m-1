@@ -81,6 +81,8 @@ import {
 import { SyncService } from "../services/sync.service";
 import { timeAgoSimple } from "../utils/utils";
 
+import { Capacitor } from "@capacitor/core";
+
 @Component({
   selector: "app-tab1",
   templateUrl: "tab1.page.html",
@@ -305,6 +307,10 @@ export class Tab1Page implements OnInit {
     this.localInfo = await this.syncService.getLocalInformation();
   }
 
+  convertFileUri(uri: string) {
+    return Capacitor.convertFileSrc(uri);
+  }
+
   /**
    * Alterna la expansión del texto para una tarjeta específica
    */
@@ -448,105 +454,105 @@ export class Tab1Page implements OnInit {
     return await modal.present();
   }
 
-  async collectInfo() {
-    let timestamp: any;
+  // async collectInfo() {
+  //   console.log("---------------- En collectInfo      ----------");
+  //   let timestamp: any;
 
-    // Limpiando datos del info storage
-    await this.toolService.setSecureStorage("info", {});
+  //   // Limpiando datos del info storage
+  //   await this.toolService.setSecureStorage("info", {});
 
-    if (await this.networkService.checkInternetConnection()) {
-      timestamp = await this.toolService.getSecureStorage<string>(
-        "lastInfoUpdated",
-        ""
-      );
+  //   if (await this.networkService.checkInternetConnection()) {
+  //     timestamp = await this.toolService.getSecureStorage<string>(
+  //       "lastInfoUpdated",
+  //       ""
+  //     );
 
-      if (timestamp.value === null) {
-        timestamp = await this.toolService.convDate(new Date());
-      }
+  //     if (timestamp.value === null) {
+  //       timestamp = await this.toolService.convDate(new Date());
+  //     }
 
-      const info = await this.toolService.getSecureStorage<any>("info", null);
-      console.log("SecureStorage info: ", info);
+  //     const info = await this.toolService.getSecureStorage<any>("info", null);
+  //     console.log("SecureStorage info: ", info);
 
-      if (this.localInfo.length == 0 && !info) {
-        let d = new Date();
-        d.setDate(d.getDate() - 180);
-        timestamp = this.toolService.convDate(d);
-      }
+  //     if (this.localInfo.length == 0 && !info) {
+  //       let d = new Date();
+  //       d.setDate(d.getDate() - 180);
+  //       timestamp = this.toolService.convDate(d);
+  //     }
 
-      if (this.localInfo.length == 0 && info) {
-        this.localInfo = info;
-      }
+  //     if (this.localInfo.length == 0 && info) {
+  //       this.localInfo = info;
+  //     }
 
-      try {
-        this.api
-          .getData("api/info/" + this.userId + "/" + timestamp)
-          .subscribe({
-            next: async (result: any) => {
-              if (Object.keys(result).length > 0) {
-                // get last api call variable
-                if (this.localInfo.length > 0) {
-                  Object.entries(result).forEach(async ([key, item]) => {
-                    // this.localInfo.push(item);
-                    // this.localInfo = [...this.localInfo, item];
-                  });
-                } else {
-                  this.localInfo = await result;
-                }
+  //     try {
+  //       this.api
+  //         .getData("api/info/" + this.userId + "/" + timestamp)
+  //         .subscribe({
+  //           next: async (result: any) => {
+  //             if (Object.keys(result).length > 0) {
+  //               // get last api call variable
+  //               if (this.localInfo.length > 0) {
+  //                 Object.entries(result).forEach(async ([key, item]) => {
+  //                   // this.localInfo.push(item);
+  //                   // this.localInfo = [...this.localInfo, item];
+  //                 });
+  //               } else {
+  //                 this.localInfo = await result;
+  //               }
 
-                this.localInfo = await this.toolService.sortJsonVisitors(
-                  this.localInfo,
-                  "updatedAt",
-                  false
-                );
+  //               this.localInfo = await this.toolService.sortJsonVisitors(
+  //                 this.localInfo,
+  //                 "updatedAt",
+  //                 false
+  //               );
 
-                // cleanup info
-                if (this.localInfo.length > 1000) {
-                  this.localInfo.splice(1000);
-                }
+  //               // cleanup info
+  //               if (this.localInfo.length > 1000) {
+  //                 this.localInfo.splice(1000);
+  //               }
 
-                this.toolService.setSecureStorage("info", this.localInfo);
-              }
-            },
-            error: (error: any) => {
-              console.error("collect info error : ", error);
-            },
-          });
+  //               this.toolService.setSecureStorage("info", this.localInfo);
+  //             }
+  //           },
+  //           error: (error: any) => {
+  //             console.error("collect info error : ", error);
+  //           },
+  //         });
 
-        this.toolService.setSecureStorage(
-          "lastInfoUpdated",
-          this.toolService.convDate(new Date())
-        );
-      } catch (e) {
-        this.toolService.toastAlert(
-          "Error api/info/ call: " + e,
-          0,
-          ["Ok"],
-          "middle"
-        );
-      }
-    } else {
-      if (this.localInfo.length == 0 && this.localInfo) {
-        this.localInfo = await this.toolService.getSecureStorage<any>(
-          "info",
-          null
-        );
-      }
-      this.toolService.toastAlert(
-        "No hay acceso a internet",
-        0,
-        ["Ok"],
-        "middle"
-      );
-    }
-  }
+  //       this.toolService.setSecureStorage(
+  //         "lastInfoUpdated",
+  //         this.toolService.convDate(new Date())
+  //       );
+  //     } catch (e) {
+  //       this.toolService.toastAlert(
+  //         "Error api/info/ call: " + e,
+  //         0,
+  //         ["Ok"],
+  //         "middle"
+  //       );
+  //     }
+  //   } else {
+  //     if (this.localInfo.length == 0 && this.localInfo) {
+  //       this.localInfo = await this.toolService.getSecureStorage<any>(
+  //         "info",
+  //         null
+  //       );
+  //     }
+  //     this.toolService.toastAlert(
+  //       "No hay acceso a internet",
+  //       0,
+  //       ["Ok"],
+  //       "middle"
+  //     );
+  //   }
+  // }
 
   getEncodedUrl(imagePath: string): string {
     return encodeURIComponent(imagePath);
   }
 
   async doRefresh(event: any) {
-    // this.collectInfo();
-    this.loadData();
+    this.doSync();
 
     setTimeout(() => {
       event.target.complete();
