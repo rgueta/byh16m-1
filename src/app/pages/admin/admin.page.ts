@@ -490,7 +490,7 @@ export class AdminPage implements OnInit {
   }
 
   async clearLocalInfo() {
-    this.db.clearDB();
+    this.db.clearDB("informacion");
   }
 
   async routineSelected(event: any, index: number, item: any) {

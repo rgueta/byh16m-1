@@ -135,55 +135,91 @@ export class DatabaseService {
   }
 
   //---- GET data from server  ------
+  //
+  getData<T>(
+    path: string,
+    responseType: "json" | "blob" = "json"
+  ): Observable<any> {
+    console.log("path: ", path);
 
-  getData<T>(path: string, responseType = "json"): Observable<T> {
-    // Convertir la Promise de getSecureStorage a un Observable
     return from(
       this.toolService.getSecureStorage<string>("authToken", "")
     ).pipe(
-      // switchMap se suscribe al Observable de `from` y luego al nuevo Observable del `http.get`
       switchMap((token: any) => {
         let headers = new HttpHeaders();
-        if (!this.toolService.isPublicEndpoint(path)) {
-          // headers = headers.set("Authorization", `Bearer ${token}`);
-          // Asegurarse de que token sea un string
-          let tokenString = "";
-          if (typeof token === "string") {
-            tokenString = token;
-          } else if (token && typeof token === "object") {
-            // Si es un objeto, intentar extraer el token
-            console.log("Token es objeto:", token);
-            // Intenta con las propiedades más comunes
-            tokenString =
-              token.token ||
-              token.accessToken ||
-              token.value ||
-              JSON.stringify(token);
-            console.log("Token extraído:", tokenString);
-          } else {
-            tokenString = String(token);
-          }
 
+        // Lógica de token (se mantiene igual)
+        if (!this.toolService.isPublicEndpoint(path)) {
+          let tokenString =
+            typeof token === "string"
+              ? token
+              : token?.token || JSON.stringify(token);
           headers = headers.set("Authorization", `Bearer ${tokenString}`);
-          if (responseType == "blob") {
-            headers = headers.set("responseType", "blob");
-          }
-        } else {
-          console.log("EndPoint publico...");
         }
 
-        return this.http.get<T>(`${this.REST_API_SERVER}${path}`, { headers });
+        // LA CORRECCIÓN: Pasar responseType fuera de headers
+        return this.http.get(`${this.REST_API_SERVER}${path}`, {
+          headers,
+          responseType: responseType as "json", // Se castea para evitar errores de tipo en TS
+        });
       }),
-      // Manejo de errores
       catchError((err) => {
         console.error("Error fetching data:", err);
-        if (err.expired) {
-          console.log("Esta chingadera expiro!");
-        }
         return throwError(() => err);
       })
     );
   }
+
+  // getData_old<T>(path: string, responseType = "json"): Observable<T> {
+  //   // Convertir la Promise de getSecureStorage a un Observable
+  //   //
+  //   console.log("path: ", path);
+  //   return from(
+  //     this.toolService.getSecureStorage<string>("authToken", "")
+  //   ).pipe(
+  //     // switchMap se suscribe al Observable de `from` y luego al nuevo Observable del `http.get`
+  //     switchMap((token: any) => {
+  //       let headers = new HttpHeaders();
+  //       if (!this.toolService.isPublicEndpoint(path)) {
+  //         // headers = headers.set("Authorization", `Bearer ${token}`);
+  //         // Asegurarse de que token sea un string
+  //         let tokenString = "";
+  //         if (typeof token === "string") {
+  //           tokenString = token;
+  //         } else if (token && typeof token === "object") {
+  //           // Si es un objeto, intentar extraer el token
+  //           console.log("Token es objeto:", token);
+  //           // Intenta con las propiedades más comunes
+  //           tokenString =
+  //             token.token ||
+  //             token.accessToken ||
+  //             token.value ||
+  //             JSON.stringify(token);
+  //           console.log("Token extraído:", tokenString);
+  //         } else {
+  //           tokenString = String(token);
+  //         }
+
+  //         headers = headers.set("Authorization", `Bearer ${tokenString}`);
+  //         if (responseType == "blob") {
+  //           headers = headers.set(responseType, "blob");
+  //         }
+  //       } else {
+  //         console.log("EndPoint publico...");
+  //       }
+
+  //       return this.http.get<T>(`${this.REST_API_SERVER}${path}`, { headers });
+  //     }),
+  //     // Manejo de errores
+  //     catchError((err) => {
+  //       console.error("Error fetching data:", err);
+  //       if (err.expired) {
+  //         console.log("Esta chingadera expiro!");
+  //       }
+  //       return throwError(() => err);
+  //     })
+  //   );
+  // }
 
   // --- POST data to server
 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import {
   IonHeader,
   IonToolbar,
@@ -26,7 +26,7 @@ import {
 } from "ionicons/icons";
 import { NgStyle, DatePipe, NgFor, NgIf } from "@angular/common";
 import { NetworkService } from "../services/network.service";
-import { Subscriber } from "rxjs";
+import { SyncService } from "../services/sync.service";
 
 const USERID = "userId";
 const REFRESH_TOKEN = "refreshToken";
@@ -59,6 +59,11 @@ const netStatus = "netStatus";
   ],
 })
 export class Tab2Page implements OnInit {
+  private syncService = inject(SyncService);
+  private api = inject(DatabaseService);
+  private toolService = inject(ToolsService);
+  private networkService = inject(NetworkService);
+
   minDate: string = "2024-01-01T00:00:00.000Z";
   maxDate: string = "2060-12-31T23:59:59.999Z";
   start: any;
@@ -75,11 +80,7 @@ export class Tab2Page implements OnInit {
   myToast: any;
   myUserId: any;
 
-  constructor(
-    public api: DatabaseService,
-    private toolService: ToolsService,
-    public networkService: NetworkService
-  ) {
+  constructor() {
     addIcons({
       chevronUpOutline,
       chevronDownOutline,
@@ -112,6 +113,35 @@ export class Tab2Page implements OnInit {
       "coreSim",
       ""
     );
+  }
+
+  async doSync() {
+    await this.syncService.syncCodeEvents(this.myUserId);
+    await this.loadData();
+  }
+
+  async loadData() {
+    this.EventsList = await this.syncService.getLocalcodeEvents();
+
+    console.log("EventsList: ", this.EventsList);
+    // this.EventsList = result.results;
+    if (this.EventsList.length > 0) {
+      this.EventsList.forEach(async (item: any) => {
+        let d = new Date(item.createdAt.replace("Z", ""));
+        item.createdAt = new Date(
+          d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+        );
+      });
+
+      this.EventsList[0].open = true;
+    } else {
+      this.toolService.toastAlert(
+        "No hay eventos para esta fecha",
+        0,
+        ["Ok"],
+        "middle"
+      );
+    }
   }
 
   async getEventsInitial(event: any) {
@@ -234,7 +264,7 @@ export class Tab2Page implements OnInit {
 
   async doRefresh(event: any) {
     this.EventsList = null;
-    this.getEvents();
+    this.doSync();
     setTimeout(() => {
       event.target.complete();
     }, 2000);

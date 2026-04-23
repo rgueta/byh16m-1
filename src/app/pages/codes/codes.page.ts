@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { DatabaseService } from "../../services/database.service";
 import {
   AnimationController,
@@ -49,6 +49,7 @@ import {
   calendarClearOutline,
   chevronDown,
 } from "ionicons/icons";
+import { SyncService } from "../../services/sync.service";
 
 @Component({
   selector: "app-codes",
@@ -77,10 +78,19 @@ import {
   ],
 })
 export class CodesPage implements OnInit {
+  private api = inject(DatabaseService);
+  public modalController = inject(ModalController);
+  public animationController = inject(AnimationController);
+  private sms = inject(SMS);
+  public alertCtrl = inject(AlertController);
+  public router = inject(Router);
+  private toolsService = inject(ToolsService);
+  private syncService = inject(SyncService);
+
   CodeList: any;
   private codigosCargados = false;
   myToast: any;
-  userId = {};
+  userId: string = "";
   automaticClose = false;
   codeEnabled: any;
 
@@ -97,15 +107,7 @@ export class CodesPage implements OnInit {
   demoMode: boolean = false;
   coreSim = "";
 
-  constructor(
-    public api: DatabaseService,
-    public modalController: ModalController,
-    public animationController: AnimationController,
-    private sms: SMS,
-    public alertCtrl: AlertController,
-    public router: Router,
-    private toolsService: ToolsService
-  ) {
+  constructor() {
     addIcons({
       chevronUpOutline,
       chevronDownOutline,
@@ -162,7 +164,37 @@ export class CodesPage implements OnInit {
       Math.abs(this.initial.getTime() - this.expiry.getTime()) / 3600000
     ).toFixed(0);
 
-    this.collectCodes();
+    // this.collectCodes();
+    this.doSync();
+  }
+
+  async doSync() {
+    await this.syncService.syncCodes(this.userId);
+    await this.loadData();
+  }
+
+  async loadData() {
+    const codes: any = await this.syncService.getLocalCodes();
+    console.log("codes recent: ", codes);
+    this.codigosCargados = true;
+    Object.entries(codes).forEach(async ([_, item]) => {
+      const code = item as any;
+      if (new Date(code.expiry) < new Date()) {
+        code.expired = true;
+      } else {
+        code.expired = false;
+      }
+
+      code.range = (
+        (new Date(code.expiry).getTime() - new Date().getTime()) /
+        3600000
+      ).toFixed(1);
+    });
+
+    this.CodeList = codes;
+    this.CodeList[0].open = true;
+    this.initial = this.CodeList[0].initial;
+    this.expiry = this.CodeList[0].expiry;
   }
 
   async collectCodes() {
@@ -196,7 +228,8 @@ export class CodesPage implements OnInit {
   }
 
   async doRefresh(event: any) {
-    this.collectCodes();
+    // this.collectCodes();
+    this.doSync();
 
     setTimeout(() => {
       event.target.complete();

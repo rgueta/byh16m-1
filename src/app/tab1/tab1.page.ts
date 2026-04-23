@@ -130,7 +130,7 @@ export class Tab1Page implements OnInit {
   public networkService = inject(NetworkService);
 
   //#region  variables-------------------------
-  public localInfo: any = [];
+  public localInfo: any;
   public codes: [] = [];
   @Input() msg: string = "";
   @Input() sim: string = "";
@@ -185,7 +185,6 @@ export class Tab1Page implements OnInit {
   }
 
   async ngOnInit() {
-    this.doSync();
     this.version = environment.app.version;
 
     if (isPlatform("cordova") || isPlatform("ios")) {
@@ -296,10 +295,11 @@ export class Tab1Page implements OnInit {
     }
 
     this.infoPanel = document.getElementById("infoSection");
+    this.doSync();
   }
 
   async doSync() {
-    await this.syncService.synchronize();
+    await this.syncService.syncInfo();
     await this.loadData();
   }
 
@@ -453,99 +453,6 @@ export class Tab1Page implements OnInit {
     });
     return await modal.present();
   }
-
-  // async collectInfo() {
-  //   console.log("---------------- En collectInfo      ----------");
-  //   let timestamp: any;
-
-  //   // Limpiando datos del info storage
-  //   await this.toolService.setSecureStorage("info", {});
-
-  //   if (await this.networkService.checkInternetConnection()) {
-  //     timestamp = await this.toolService.getSecureStorage<string>(
-  //       "lastInfoUpdated",
-  //       ""
-  //     );
-
-  //     if (timestamp.value === null) {
-  //       timestamp = await this.toolService.convDate(new Date());
-  //     }
-
-  //     const info = await this.toolService.getSecureStorage<any>("info", null);
-  //     console.log("SecureStorage info: ", info);
-
-  //     if (this.localInfo.length == 0 && !info) {
-  //       let d = new Date();
-  //       d.setDate(d.getDate() - 180);
-  //       timestamp = this.toolService.convDate(d);
-  //     }
-
-  //     if (this.localInfo.length == 0 && info) {
-  //       this.localInfo = info;
-  //     }
-
-  //     try {
-  //       this.api
-  //         .getData("api/info/" + this.userId + "/" + timestamp)
-  //         .subscribe({
-  //           next: async (result: any) => {
-  //             if (Object.keys(result).length > 0) {
-  //               // get last api call variable
-  //               if (this.localInfo.length > 0) {
-  //                 Object.entries(result).forEach(async ([key, item]) => {
-  //                   // this.localInfo.push(item);
-  //                   // this.localInfo = [...this.localInfo, item];
-  //                 });
-  //               } else {
-  //                 this.localInfo = await result;
-  //               }
-
-  //               this.localInfo = await this.toolService.sortJsonVisitors(
-  //                 this.localInfo,
-  //                 "updatedAt",
-  //                 false
-  //               );
-
-  //               // cleanup info
-  //               if (this.localInfo.length > 1000) {
-  //                 this.localInfo.splice(1000);
-  //               }
-
-  //               this.toolService.setSecureStorage("info", this.localInfo);
-  //             }
-  //           },
-  //           error: (error: any) => {
-  //             console.error("collect info error : ", error);
-  //           },
-  //         });
-
-  //       this.toolService.setSecureStorage(
-  //         "lastInfoUpdated",
-  //         this.toolService.convDate(new Date())
-  //       );
-  //     } catch (e) {
-  //       this.toolService.toastAlert(
-  //         "Error api/info/ call: " + e,
-  //         0,
-  //         ["Ok"],
-  //         "middle"
-  //       );
-  //     }
-  //   } else {
-  //     if (this.localInfo.length == 0 && this.localInfo) {
-  //       this.localInfo = await this.toolService.getSecureStorage<any>(
-  //         "info",
-  //         null
-  //       );
-  //     }
-  //     this.toolService.toastAlert(
-  //       "No hay acceso a internet",
-  //       0,
-  //       ["Ok"],
-  //       "middle"
-  //     );
-  //   }
-  // }
 
   getEncodedUrl(imagePath: string): string {
     return encodeURIComponent(imagePath);
