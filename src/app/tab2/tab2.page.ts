@@ -9,6 +9,12 @@ import {
   IonLabel,
   IonItem,
   IonButton,
+  IonRefresher,
+  IonRefresherContent,
+  IonFab,
+  IonFabButton,
+  IonNote,
+  IonSelectOption,
 } from "@ionic/angular/standalone";
 import { DatabaseService } from "../services/database.service";
 import { ToolsService } from "../services/tools.service";
@@ -43,13 +49,14 @@ const netStatus = "netStatus";
     IonToolbar,
     IonTitle,
     IonContent,
-    IonList,
     IonLabel,
     IonItem,
     IonIcon,
     DatePipe,
     NgFor,
     NgIf,
+    IonRefresher,
+    IonRefresherContent,
   ],
 })
 export class Tab2Page implements OnInit {
@@ -181,22 +188,6 @@ export class Tab2Page implements OnInit {
   toSqliteDatetime(iso: string): string {
     return iso.replace("T", " ").slice(0, 19);
   }
-
-  // async getEvents() {
-  //   this.api.getData("api/auth/info").subscribe({
-  //     next: async (result: any) => {
-  //       // this.EventsList = result.results;
-  //     },
-  //     error: (error) => {
-  //       this.toolService.showAlertBasic(
-  //         "Aviso",
-  //         "Fallo al obtener codeEvents: ",
-  //         error,
-  //         ["Cerrar"]
-  //       );
-  //     },
-  //   });
-  // }
 
   async getEvents() {
     if (!(await this.networkService.checkInternetConnection())) {

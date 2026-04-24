@@ -4,121 +4,30 @@
   </ion-toolbar>
 </ion-header>
 
-<!--<ion-content>
+<ion-content>
+  <div class="spacer-top"></div>
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <div slot="fixed" class="wrapper-dates">
-    <div class="partFlex" id="open-modal1">
-      <div class="tituloFiltro">
-        <ion-label>Desde:</ion-label>
-      </div>
-      <div id="open-mwrapper-filterodal1" class="itemFilter">
-        <ion-note>{{Initial | date}}</ion-note>
-        <ion-icon slot="end" name="calendar"></ion-icon>
-      </div>
-    </div>
-
-    <div class="partFlex" id="open-modal2">
-      <div class="tituloFiltro">
-        <ion-label>Hasta:</ion-label>
-      </div>
-      <div id="open-modal2" class="itemFilter">
-        <ion-note slot="end">{{Final | date}}</ion-note>
-        <ion-icon slot="end" name="calendar"></ion-icon>
-      </div>
-    </div>
-
-    <div class="partFlex" (click)="getEvents()">
-      <div class="tituloFiltro">
-        <ion-label>Buscar:</ion-label>
-      </div>
-      <div id="open-modal2" class="itemFilterSearch">
-        <ion-icon slot="end" name="search"></ion-icon>
-      </div>
-    </div>
-  </div>
-
-  <div class="wrapper-filter">
-    <ion-list>
-      <ion-modal
-        id="open-modal1"
-        trigger="open-modal1"
-        [cssClass]="'bottom-end'"
-      >
-        <ng-template>
-          <ion-datetime
-            class="dateFilter"
-            locale="es-ES"
-            presentation="date"
-            size="cover"
-            display-format="D MMM YYYY"
-            min="2025-01-01T00:00:00"
-            [(ngModel)]]="Initial"
-            [showDefaultButtons]="true"
-            cancelText="Cancelar"
-            doneText="Aceptar"
-            (ionChange)="getEventsInitial($event)"
-            [showDefaultTitle]="true"
-          >
-            <span slot="title">Selecciona la fecha</span>
-          </ion-datetime>
-        </ng-template>
-      </ion-modal>
-
-      <ion-modal
-        id="open-modal2"
-        trigger="open-modal2"
-        [cssClass]="'bottom-end'"
-      >
-        <ng-template>
-          <ion-datetime
-            class="dateFilter"
-            locale="es-ES"
-            presentation="date"
-            size="cover"
-            display-format="D MMM YYYY"
-            min="2025-01-01T00:00:00"
-            [(ngModel)]]="Final"
-            [showDefaultButtons]="true"
-            cancelText="Cancelar"
-            doneText="Aceptar"
-            (ionChange)="getEventsFinal($event)"
-            [showDefaultTitle]="true"
-          >
-            <span slot="title">Selecciona la fecha</span>
-          </ion-datetime>
-        </ng-template>
-      </ion-modal>
-    </ion-list>
-  </div>
-
-  <div id="codeEvents" class="wrapper-list content-container">
-    <ion-list
-      *ngFor="let item of EventsList; let i = index;"
-      class="accordion-list"
-      lines="none"
-      detail="false"
-      ion-no-padding="true"
+  <div class="compact-container">
+    <div
+      *ngFor="let item of EventsList; let i = index"
+      class="compact-row"
+      [class.is-expired]="false"
+      [class.is-expanded]="item.open"
     >
-      <ion-item tappable class="section" (click)="toggleSection(i)">
-        <ion-icon
-          color="white"
-          slot="end"
-          name="chevron-forward-outline"
-          *ngIf="!item.open"
-        ></ion-icon>
-        <ion-icon
-          color="white"
-          slot="end"
-          name="chevron-down-outline"
-          *ngIf="item.open"
-        ></ion-icon>
-        <ion-label class="ion-text-wrap">
-          Acceso: <strong>{{item.doorName}}</strong><b></b
-        ></ion-label>
-      </ion-item>
+      <div class="row-header" (click)="toggleSection(i)" tappable>
+        <div
+          class="status-indicator"
+          [style.background]="item.expired ? '#9e9e9e' : '#4caf50'"
+        ></div>
+        <ion-label class="time-label">
+          <strong>{{item.code}}</strong> - {{item.doorName}}
+        </ion-label>
+
+        <ion-icon [name]="item.open ? 'chevron-up' : 'chevron-down'"></ion-icon>
+      </div>
 
       <form tappable *ngIf="item.open" class="detail">
         <ion-item class="detail-events-item">
@@ -130,50 +39,10 @@
         <ion-item class="detail-item">
           <ion-label> Casa: <b>{{item.house}}</b></ion-label>
         </ion-item>
-        <ion-item class="detail-item">
-          <ion-label> Codigo: <b>{{item.code}}</b></ion-label>
-        </ion-item>
         <ion-item *ngIf="myEventsList?.length > 0">
           <ion-label class="labelInput" floating>Users:</ion-label>
-           <ion-select ok-text="Seleccionar" cancel-text="Cancelar" (ionChange)="setupCode(visitorId)" >
-            <ion-select-option *ngFor="let user of myEventsList; let i = index;" value={{user.id}}  >{{user.name}}</ion-select-option>
-          </ion-select>
         </ion-item>
       </form>
-    </ion-list>
-  </div>
-</ion-content>-->
-
-<ion-content>
-  <div class="spacer-top"></div>
-
-  <div class="compact-container">
-    <div
-      *ngFor="let item of EventsList; let i = index"
-      class="compact-row"
-      [class.is-expanded]="item.open"
-    >
-      <div class="row-header" (click)="toggleSection(i)" tappable>
-        <div
-          class="status-indicator"
-          [style.background]="item.open ? '#2dd36f' : '#6599ce'"
-        ></div>
-        <span class="time-label">{{ item.createdAt | date:'HH:mm' }}</span>
-        <span class="door-name">Acceso: {{ item.doorName }}</span>
-        <ion-icon [name]="item.open ? 'chevron-up' : 'chevron-down'"></ion-icon>
-      </div>
-
-      <div class="row-detail" *ngIf="item.open">
-        <div class="detail-grid">
-          <div class="detail-item">
-            <strong>Fecha:</strong> {{ item.createdAt | date:'dd/MM/yyyy' }}
-          </div>
-          <div class="detail-item"><strong>Casa:</strong> {{ item.house }}</div>
-          <div class="detail-item">
-            <strong>Código:</strong> {{ item.code }}
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </ion-content>

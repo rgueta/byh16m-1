@@ -39,14 +39,21 @@
         <ion-icon [name]="item.open ? 'chevron-up' : 'chevron-down'"></ion-icon>
       </div>
 
+      <!--seccion cambio de fecha   -->
       <div class="row-detail" *ngIf="item.open">
         <!--  Seccion de INICIO  -->
-        <ion-item id="open-modalInitialToAvoid" class="itemFilter">
+        <ion-item
+          id="open-modalInitialToAvoid"
+          class="itemFilter"
+          [disabled]="MyRole.value != 'admin'"
+        >
           <ion-label class="lblFilterDate">Inicio :</ion-label>
-          <ion-note class="filterDate" slot="end"
-            >{{item.initial | date:'dd MMM yyyy, hh:mm a' |
-            titlecase}}</ion-note
-          >
+          <strong
+            ><ion-note class="filterDate" slot="end"
+              >{{item.initial | date:'dd MMM yyyy, hh:mm a' |
+              titlecase}}</ion-note
+            >
+          </strong>
           <ion-icon color="white" slot="end" name="calendar-outline"></ion-icon>
         </ion-item>
 
@@ -67,10 +74,17 @@
         </ion-modal>
 
         <!--  Seccion de FIN  -->
-        <ion-item id="open-modalExpiryToAvoid" class="itemFilter">
+        <ion-item
+          id="open-modalExpiryToAvoid"
+          class="itemFilter"
+          [disabled]="MyRole != 'admin'"
+        >
           <ion-label class="lblFilterDate">Fin :</ion-label>
-          <ion-note class="filterDate" slot="end"
-            >{{item.expiry | date:'dd MMM yyyy, hh:mm a' | titlecase}}</ion-note
+          <strong
+            ><ion-note class="filterDate" slot="end"
+              >{{item.expiry | date:'dd MMM yyyy, hh:mm a' |
+              titlecase}}</ion-note
+            ></strong
           >
           <ion-icon color="white" slot="end" name="calendar-outline"></ion-icon>
         </ion-item>
@@ -91,45 +105,46 @@
         </ion-modal>
 
         <!-- Seccion de reenvio de codigo -->
-        <ion-item class="detail-item" *ngIf="MyRole != 'admin'">
-          <div class="reenviar">
-            <ion-range
-              id="expiryRange"
-              class="range"
-              aria-label="Tiempo activo: "
-              min="1"
-              max="8"
-              [value]="code_expiry"
-              [pin]="true"
-              [ticks]="true"
-              [snaps]="true"
-              (ionChange)="onRangeChange($event)"
+        <div id="SoloAdmin" *ngIf="MyRole == 'admin'">
+          <ion-item class="detail-item" *ngIf="MyRole != 'admin'">
+            <div class="reenviar">
+              <ion-range
+                id="expiryRange"
+                class="range"
+                aria-label="Tiempo activo: "
+                min="1"
+                max="8"
+                [value]="code_expiry"
+                [pin]="true"
+                [ticks]="true"
+                [snaps]="true"
+                (ionChange)="onRangeChange($event)"
+              >
+                <ion-label class="limits" slot="start">1</ion-label>
+                <ion-label class="limits" slot="end">8</ion-label>
+              </ion-range>
+
+              <input
+                class="button-17"
+                type="button"
+                (click)="ResendCode(item.code,item.id,item.initial,item.expiry)"
+                value="Reenviar a modulo"
+              />
+            </div>
+          </ion-item>
+
+          <!-- Seccion informativa de estatus del codigo  -->
+          <ion-item class="detail-item">
+            <ion-label *ngIf="item.range <= 0">
+              <strong>
+                Expiro en dias: ({{((item.range/24) * -1).toFixed(1)}})</strong
+              ></ion-label
             >
-              <ion-label class="limits" slot="start">1</ion-label>
-              <ion-label class="limits" slot="end">8</ion-label>
-            </ion-range>
-
-            <input
-              class="button-17"
-              type="button"
-              (click)="ResendCode(item.code,item.id,item.initial,item.expiry)"
-              value="Reenviar a modulo"
-            />
-          </div>
-        </ion-item>
-
-        <!-- Seccion informativa de estatus del codigo  -->
-        <ion-item class="detail-item">
-          <ion-label *ngIf="item.range <= 0">
-            <strong>
-              Expiro en dias: ({{((item.range/24) * -1).toFixed(1)}})</strong
-            ></ion-label
-          >
-          <ion-label *ngIf="item.range > 0">
-            <strong> Expira en {{item.range}} horas</strong>
-          </ion-label>
-        </ion-item>
-
+            <ion-label *ngIf="item.range > 0">
+              <strong> Expira en {{item.range}} horas</strong>
+            </ion-label>
+          </ion-item>
+        </div>
         <!-- Seccion del comentario -->
         <ion-item
           *ngIf="item.comment && item.comment !== ''"

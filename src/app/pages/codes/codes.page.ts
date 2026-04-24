@@ -100,7 +100,7 @@ export class CodesPage implements OnInit {
   myRoles: {} = {};
   myToken: any;
   load_codes: boolean = true;
-  public MyRole: string = "visitor";
+  public MyRole: any = { value: "visitor" };
   expiry: any = new Date().toISOString();
   code_expiry: any;
   pkg: any = {};

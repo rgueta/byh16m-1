@@ -72,11 +72,8 @@ export class SyncService {
         this.api.getData(`api/codes/recent/${userId}/${lastSync}/50`)
       );
 
-      console.log("codes: ", codes);
-
       if (codes.length > 0) {
         // guadamos las imagenes localmente
-
         await this.db.codes.bulkPut(codes);
 
         // 2. Obtener el updatedAt más reciente de los nuevos datos para el próximo sync
@@ -86,10 +83,7 @@ export class SyncService {
           lastSync
         );
 
-        console.log("code,latestUpdate: ", latestUpdate);
-
         this.db.setLastSync("codes", latestUpdate);
-        console.log(`Sincronizados ${codes.length} registros nuevos.`);
       }
     } catch (error) {
       console.error("Error en la sincronización:", error);
@@ -105,8 +99,6 @@ export class SyncService {
       const codeEvents: any = await firstValueFrom(
         this.api.getData(`api/codeEvent/recent/${userId}/${lastSync}/50`)
       );
-
-      console.log("codeEvents: ", codeEvents);
 
       if (codeEvents.length > 0) {
         // guadamos las imagenes localmente
@@ -130,41 +122,6 @@ export class SyncService {
     }
   }
 
-  // async synchronize_org() {
-  //   const lastSync = this.db.getLastSync("information");
-
-  //   try {
-  //     // 1. Consultar solo datos modificados/creados desde el último sync
-  //     const news = await firstValueFrom(
-  //       this.http.get<Information[]>(
-  //         `${this.apiURL}api/info/recent/${lastSync}/50`
-  //       )
-  //     );
-
-  //     console.log("news: ", news);
-
-  //     for (const item of news) {
-  //       // Generamos la URL completa de R2/Worker
-  //       const remoteUrl = item.path + encodeURIComponent(item.image);
-  //       console.log("item.path: ", item.path);
-  //       console.log("item.image: ", item.image);
-  //       console.log("remoteUrl: ", remoteUrl);
-
-  //       // Descargamos y guardamos localmente
-  //       const localUri = await this.downloadAndSaveImage(remoteUrl, item.image);
-
-  //       // Guardamos en IndexedDB con la nueva ruta local
-  //       console.log("localUri: ", localUri);
-  //       await this.db.information.put({
-  //         ...item,
-  //         localPath: localUri, // Nuevo campo para la ruta del filesystem
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.error("Error en la sincronización:", error);
-  //   }
-  // }
-
   // Método para obtener todos los datos locales para la UI
   async getLocalInformation() {
     try {
@@ -185,7 +142,7 @@ export class SyncService {
     try {
       const data = await this.db
         .table("codes")
-        .orderBy("id")
+        .orderBy("expiry")
         .reverse()
         .toArray();
 
