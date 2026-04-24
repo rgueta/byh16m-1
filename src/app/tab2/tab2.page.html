@@ -4,7 +4,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<!--<ion-content>
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
@@ -94,7 +94,7 @@
     </ion-list>
   </div>
 
-  <div id="codeEvents" class="wrapper-list">
+  <div id="codeEvents" class="wrapper-list content-container">
     <ion-list
       *ngFor="let item of EventsList; let i = index;"
       class="accordion-list"
@@ -135,11 +135,45 @@
         </ion-item>
         <ion-item *ngIf="myEventsList?.length > 0">
           <ion-label class="labelInput" floating>Users:</ion-label>
-          <!-- <ion-select ok-text="Seleccionar" cancel-text="Cancelar" (ionChange)="setupCode(visitorId)" >
+           <ion-select ok-text="Seleccionar" cancel-text="Cancelar" (ionChange)="setupCode(visitorId)" >
             <ion-select-option *ngFor="let user of myEventsList; let i = index;" value={{user.id}}  >{{user.name}}</ion-select-option>
-          </ion-select> -->
+          </ion-select>
         </ion-item>
       </form>
     </ion-list>
+  </div>
+</ion-content>-->
+
+<ion-content>
+  <div class="spacer-top"></div>
+
+  <div class="compact-container">
+    <div
+      *ngFor="let item of EventsList; let i = index"
+      class="compact-row"
+      [class.is-expanded]="item.open"
+    >
+      <div class="row-header" (click)="toggleSection(i)" tappable>
+        <div
+          class="status-indicator"
+          [style.background]="item.open ? '#2dd36f' : '#6599ce'"
+        ></div>
+        <span class="time-label">{{ item.createdAt | date:'HH:mm' }}</span>
+        <span class="door-name">Acceso: {{ item.doorName }}</span>
+        <ion-icon [name]="item.open ? 'chevron-up' : 'chevron-down'"></ion-icon>
+      </div>
+
+      <div class="row-detail" *ngIf="item.open">
+        <div class="detail-grid">
+          <div class="detail-item">
+            <strong>Fecha:</strong> {{ item.createdAt | date:'dd/MM/yyyy' }}
+          </div>
+          <div class="detail-item"><strong>Casa:</strong> {{ item.house }}</div>
+          <div class="detail-item">
+            <strong>Código:</strong> {{ item.code }}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </ion-content>

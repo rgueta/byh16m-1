@@ -39,7 +39,7 @@
     font-weight: bold;
     font-size: 0.85rem;
     color: #444;
-    width: 50px;
+    width: 100%;
   }
 
   .door-name {
@@ -79,4 +79,11 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+// Vigente (activo, ok) - Verde
+.detail-active {
+  --ion-item-background: #4caf50; // Verde material
+  --ion-item-color: #ffffff;
+  border-left: 4px solid #2e7d32; // Detalle más oscuro
 }

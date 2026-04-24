@@ -8,11 +8,7 @@ import {
   IonList,
   IonLabel,
   IonItem,
-  IonModal,
-  IonDatetime,
-  IonNote,
-  IonRefresher,
-  IonRefresherContent,
+  IonButton,
 } from "@ionic/angular/standalone";
 import { DatabaseService } from "../services/database.service";
 import { ToolsService } from "../services/tools.service";
@@ -23,8 +19,10 @@ import {
   calendar,
   search,
   chevronForwardOutline,
+  chevronDown,
+  chevronUp,
 } from "ionicons/icons";
-import { NgStyle, DatePipe, NgFor, NgIf } from "@angular/common";
+import { DatePipe, NgFor, NgIf } from "@angular/common";
 import { NetworkService } from "../services/network.service";
 import { SyncService } from "../services/sync.service";
 
@@ -40,20 +38,16 @@ const netStatus = "netStatus";
   styleUrls: ["tab2.page.scss"],
   standalone: true,
   imports: [
+    IonButton,
     IonHeader,
     IonToolbar,
     IonTitle,
     IonContent,
     IonList,
-    IonModal,
     IonLabel,
     IonItem,
-    IonDatetime,
-    IonNote,
     IonIcon,
     DatePipe,
-    IonRefresher,
-    IonRefresherContent,
     NgFor,
     NgIf,
   ],
@@ -87,6 +81,8 @@ export class Tab2Page implements OnInit {
       chevronForwardOutline,
       calendar,
       search,
+      chevronDown,
+      chevronUp,
     });
 
     // Si quieres que el mínimo sea dinámico (ej. 1 año atrás)
@@ -113,6 +109,7 @@ export class Tab2Page implements OnInit {
       "coreSim",
       ""
     );
+    this.doSync();
   }
 
   async doSync() {
@@ -270,7 +267,7 @@ export class Tab2Page implements OnInit {
     }, 2000);
   }
 
-  toggleSection(index: any) {
+  toggleSection(index: number) {
     this.EventsList[index].open = !this.EventsList[index].open;
     if (this.automaticClose && this.EventsList[index].open) {
       this.EventsList.filter(
