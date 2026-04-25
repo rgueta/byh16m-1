@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
   FormsModule,
@@ -52,6 +52,9 @@ import { ToolsService } from "../../services/tools.service";
   ],
 })
 export class UpdCoresPage implements OnInit {
+  public api = inject(DatabaseService);
+  public modalController = inject(ModalController);
+  private toolService = inject(ToolsService);
   updCoreForm!: FormGroup;
   @Input() localName: string = "";
   @Input() localAddress: string = "";
@@ -90,11 +93,7 @@ export class UpdCoresPage implements OnInit {
 
   // -- Validators  ------------
 
-  constructor(
-    public api: DatabaseService,
-    public modalController: ModalController,
-    private toolService: ToolsService
-  ) {
+  constructor() {
     addIcons({ arrowBackCircleOutline });
 
     this.updCoreForm = new FormGroup({

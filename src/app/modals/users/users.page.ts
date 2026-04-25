@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import {
@@ -62,6 +62,13 @@ import {
   ],
 })
 export class UsersPage implements OnInit {
+  private modalController = inject(ModalController);
+  private alertCtrl = inject(AlertController);
+  private api = inject(DatabaseService);
+  private toolService = inject(ToolsService);
+  private sms = inject(SMS);
+  public navCtrl = inject(NavController);
+  private loadingController = inject(LoadingController);
   @Input() coreId: string = "";
   @Input() coreName: string = "";
   public locked: boolean = false;
@@ -78,15 +85,7 @@ export class UsersPage implements OnInit {
   public simSectionOpen = false;
   userId: string = "0";
 
-  constructor(
-    private modalController: ModalController,
-    private alertCtrl: AlertController,
-    private api: DatabaseService,
-    private toolService: ToolsService,
-    private sms: SMS,
-    public navCtrl: NavController,
-    private loadingController: LoadingController
-  ) {
+  constructor() {
     addIcons({
       arrowBackCircleOutline,
       lockClosedOutline,

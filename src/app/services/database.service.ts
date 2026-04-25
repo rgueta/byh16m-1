@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { inject, Injectable } from "@angular/core";
 import { environment } from "../../environments/environment";
 import { BehaviorSubject, from, of, Observable, throwError } from "rxjs";
 import { tap, switchMap, catchError } from "rxjs/operators";
@@ -26,21 +26,20 @@ const LOCATION = "location";
   providedIn: "root",
 })
 export class DatabaseService {
+  private http = inject(HttpClient);
+  private router = inject(Router);
+  public toolService = inject(ToolsService);
   isAuthenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
     false
   );
-  public currentAuthToken: any;
 
+  public currentAuthToken: any;
   private REST_API_SERVER = environment.cloud.server_url;
   collection: String = "";
   public roles: any;
   tokens!: { authToken: ""; refreshToken: ""; coreName: ""; location: "" };
 
-  constructor(
-    private http: HttpClient,
-    private router: Router,
-    private toolService: ToolsService
-  ) {
+  constructor() {
     this.loadToken();
   }
 

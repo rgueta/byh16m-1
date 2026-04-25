@@ -95,6 +95,13 @@ const EMAIL_TO_CORE = "emailToCore";
   ],
 })
 export class AdminPage implements OnInit {
+  public animationController = inject(AnimationController);
+  private modalController = inject(ModalController);
+  public api = inject(DatabaseService);
+  private sms = inject(SMS);
+  public alertCtrl = inject(AlertController);
+  private toolService = inject(ToolsService);
+  private loadingController = inject(LoadingController);
   // #region data options menu -----------------
   routineOptions = [
     { cmd: "ModuleRST", name: "Reboot module", confirm: "Reboot module ?" },
@@ -303,17 +310,7 @@ export class AdminPage implements OnInit {
   demoMode: boolean = false;
   userName = "";
 
-  constructor(
-    public animationController: AnimationController,
-    private modalController: ModalController,
-    public api: DatabaseService,
-    private sms: SMS,
-    // private toast: ToastController,
-    public alertCtrl: AlertController,
-    // public routerOutlet :IonRouterOutlet
-    private toolService: ToolsService,
-    private loadingController: LoadingController
-  ) {
+  constructor() {
     addIcons({
       chevronUpOutline,
       chevronDownOutline,

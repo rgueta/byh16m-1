@@ -1,4 +1,4 @@
-import { Injectable, NgZone } from "@angular/core";
+import { Injectable, NgZone, inject } from "@angular/core";
 import { Network, ConnectionStatus } from "@capacitor/network";
 import { BehaviorSubject, Observable, from, of } from "rxjs"; // Import 'from' and 'of'
 import { Platform } from "@ionic/angular";
@@ -9,6 +9,9 @@ import { ToolsService } from "../services/tools.service";
   providedIn: "root",
 })
 export class NetworkService {
+  private platform = inject(Platform);
+  private ngZone = inject(NgZone);
+  private toolsService = inject(ToolsService);
   private networkStatusSubject: BehaviorSubject<ConnectionStatus> =
     new BehaviorSubject<ConnectionStatus>({
       connected: false,
@@ -17,11 +20,7 @@ export class NetworkService {
   public networkStatus$: Observable<ConnectionStatus> =
     this.networkStatusSubject.asObservable();
 
-  constructor(
-    private platform: Platform,
-    private ngZone: NgZone,
-    private toolsService: ToolsService
-  ) {
+  constructor() {
     this.initializeNetworkMonitoring();
   }
 

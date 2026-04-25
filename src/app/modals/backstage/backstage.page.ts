@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { ModalController, AlertController, IonicModule } from "@ionic/angular";
@@ -30,6 +30,10 @@ import {
   imports: [CommonModule, FormsModule, ReactiveFormsModule, IonicModule],
 })
 export class BackstagePage implements OnInit {
+  private modalController = inject(ModalController);
+  private api = inject(DatabaseService);
+  public alertCtrl = inject(AlertController);
+  private toolService = inject(ToolsService);
   @Input() sourcePage!: any;
 
   backstageList: any;
@@ -37,12 +41,7 @@ export class BackstagePage implements OnInit {
   public MyRole: any = "visitor";
   RoleList: any = [];
 
-  constructor(
-    private modalController: ModalController,
-    private api: DatabaseService,
-    public alertCtrl: AlertController,
-    private toolService: ToolsService
-  ) {
+  constructor() {
     addIcons({
       arrowBackCircleOutline,
       chevronForwardOutline,

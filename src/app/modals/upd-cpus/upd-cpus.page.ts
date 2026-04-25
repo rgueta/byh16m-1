@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { AlertController } from "@ionic/angular";
 import { DatabaseService } from "../../services/database.service";
@@ -57,6 +57,11 @@ import { ToolsService } from "../../services/tools.service";
   ],
 })
 export class UpdCpusPage implements OnInit {
+  public modalController = inject(ModalController);
+  public api = inject(DatabaseService);
+  private alertCtrl = inject(AlertController);
+  private toolService = inject(ToolsService);
+
   @Input() cores?: number = 23;
   public userId: string = "0";
   public CpuList: any;
@@ -74,12 +79,7 @@ export class UpdCpusPage implements OnInit {
     school: false,
   };
 
-  constructor(
-    public modalController: ModalController,
-    public api: DatabaseService,
-    private alertCtrl: AlertController,
-    private toolService: ToolsService
-  ) {
+  constructor() {
     addIcons({
       arrowBackCircleOutline,
       chevronForwardOutline,

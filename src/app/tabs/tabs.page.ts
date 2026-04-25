@@ -22,10 +22,11 @@ import { ToolsService } from "../services/tools.service";
   imports: [IonTabs, IonTabBar, IonTabButton, IonIcon],
 })
 export class TabsPage implements OnInit {
+  private toolService = inject(ToolsService);
   MyRole: any | null = "visitor";
   public environmentInjector = inject(EnvironmentInjector);
 
-  constructor(private toolService: ToolsService) {
+  constructor() {
     addIcons({
       settingsOutline,
       peopleOutline,

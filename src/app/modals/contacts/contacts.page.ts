@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
@@ -54,6 +54,10 @@ import { NgFor, NgIf } from "@angular/common";
   ],
 })
 export class ContactsPage implements OnInit {
+  private modalController = inject(ModalController);
+  private loadingController = inject(LoadingController);
+  public alertCtrl = inject(AlertController);
+  private toolService = inject(ToolsService);
   myToast: any;
   // public contacts: Observable<[Contact]>;
   // contacts: Observable<Contact[]>;
@@ -62,12 +66,7 @@ export class ContactsPage implements OnInit {
   public contacts: any = [];
   // Contacts : {}
   contact = {};
-  constructor(
-    private modalController: ModalController,
-    private loadingController: LoadingController,
-    public alertCtrl: AlertController,
-    private toolService: ToolsService
-  ) {
+  constructor() {
     addIcons({
       peopleCircleOutline,
       arrowBackCircleOutline,

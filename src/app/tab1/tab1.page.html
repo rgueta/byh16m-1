@@ -227,10 +227,12 @@
     </ion-card>
   </div>
 
-  <!-- fab placed to the bottom end -->
-  <!-- <ion-fab  vertical="bottom" horizontal="end" slot="fixed"> -->
-
-  <ion-fab slot="fixed" vertical="center" horizontal="end">
+  <ion-fab
+    slot="fixed"
+    [hidden]="MyRole != 'admin'"
+    vertical="center"
+    horizontal="end"
+  >
     <ion-fab-button class="button-green">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>

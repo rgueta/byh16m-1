@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import {
   IonHeader,
   IonToolbar,
@@ -53,20 +53,19 @@ import { NgFor, NgIf } from "@angular/common";
   ],
 })
 export class Tab4Page implements OnInit {
+  public animationController = inject(AnimationController);
+  public modalController = inject(ModalController);
+  public api = inject(DatabaseService);
+  private sms = inject(SMS);
+  private toolService = inject(ToolsService);
+  private alertCtrl = inject(AlertController);
   public VisitorsList: any;
   public myVisitorsList: any;
   automaticClose = false;
   userId: {} | null = {};
   public alertButtons = ["OK"];
 
-  constructor(
-    public animationController: AnimationController,
-    public modalController: ModalController,
-    public api: DatabaseService,
-    private sms: SMS,
-    private toolService: ToolsService,
-    private alertCtrl: AlertController
-  ) {
+  constructor() {
     addIcons({
       chevronDownOutline,
       chevronForwardOutline,

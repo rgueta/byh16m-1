@@ -138,15 +138,15 @@ export class SyncService {
     }
   }
 
-  async getLocalCodes() {
+  async getLocalCodes(userId: any) {
     try {
       const data = await this.db
         .table("codes")
-        .orderBy("expiry")
-        .reverse()
-        .toArray();
+        .where("userId")
+        .equals(userId)
+        .sortBy("expiry");
 
-      return data;
+      return data.reverse();
     } catch (err) {
       console.error("Error crítico en Dexie:", err);
       return [];

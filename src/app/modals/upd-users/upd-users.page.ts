@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, inject } from "@angular/core";
 import { CommonModule, NgFor, NgIf } from "@angular/common";
 import { Observable, from, of } from "rxjs";
 import {
@@ -45,6 +45,14 @@ import { arrowBackCircleOutline } from "ionicons/icons";
   ],
 })
 export class UpdUsersPage implements OnInit {
+  private modalController = inject(ModalController);
+  private api = inject(DatabaseService);
+  private sms = inject(SMS);
+  private toolService = inject(ToolsService);
+  public alertCtrl = inject(AlertController);
+  private loadingController = inject(LoadingController);
+  private popoverCtrl = inject(PopoverController);
+  private fb = inject(FormBuilder);
   RegisterForm: FormGroup | any;
   @Input() cpu: string = "";
   @Input() core: string = "";
@@ -93,16 +101,7 @@ export class UpdUsersPage implements OnInit {
   selectedCore: any = {};
   deviceUuid: string = "";
 
-  constructor(
-    private modalController: ModalController,
-    private api: DatabaseService,
-    private sms: SMS,
-    private toolService: ToolsService,
-    public alertCtrl: AlertController,
-    private loadingController: LoadingController,
-    private popoverCtrl: PopoverController,
-    private fb: FormBuilder
-  ) {
+  constructor() {
     addIcons({ arrowBackCircleOutline });
 
     if (this.MyRole == "admin") {

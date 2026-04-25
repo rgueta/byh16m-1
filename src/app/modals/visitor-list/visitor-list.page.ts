@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import {
@@ -48,15 +48,14 @@ import { ToolsService } from "../../services/tools.service";
   ],
 })
 export class VisitorListPage implements OnInit {
+  private modalController = inject(ModalController);
+  private alertController = inject(AlertController);
+  private toolService = inject(ToolsService);
   myVisitors: any = [];
   selectedVisitor: {} = {};
   permission: any;
 
-  constructor(
-    private modalController: ModalController,
-    private alertController: AlertController,
-    private toolService: ToolsService
-  ) {
+  constructor() {
     addIcons({ trashOutline, addOutline, arrowBackCircleOutline });
   }
 

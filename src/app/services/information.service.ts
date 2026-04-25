@@ -1,5 +1,5 @@
 // services/information.service.ts
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { ToolsService } from "../services/tools.service";
 import { BehaviorSubject, lastValueFrom } from "rxjs";
@@ -24,6 +24,8 @@ export interface Information {
 
 @Injectable({ providedIn: "root" })
 export class InformationService {
+  private http = inject(HttpClient);
+  private toolService = inject(ToolsService);
   REST_API_SERVER = environment.cloud.server_url;
   private apiUrl = this.REST_API_SERVER + "api/r2";
   private informationSubject = new BehaviorSubject<Information[]>([]);
@@ -32,7 +34,7 @@ export class InformationService {
   private lastSyncDate: string | null = null;
   private storageInitialized = false;
 
-  constructor(private http: HttpClient, private toolService: ToolsService) {}
+  constructor() {}
 
   private async initStorage() {
     this.storageInitialized = true;

@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { AlertController, ToastController } from "@ionic/angular";
 import { Preferences } from "@capacitor/preferences";
 import { Observable, from, of, firstValueFrom } from "rxjs";
@@ -10,10 +10,9 @@ const netStatus = "netStatus";
   providedIn: "root",
 })
 export class ToolsService {
-  constructor(
-    private alertCtrl: AlertController,
-    public toast: ToastController
-  ) {}
+  private alertCtrl = inject(AlertController);
+  public toast = inject(ToastController);
+  constructor() {}
 
   // Función básica para verificar si es público
   isPublicEndpoint(endpoint: string) {

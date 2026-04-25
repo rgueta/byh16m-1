@@ -11,10 +11,6 @@ import {
   IonButton,
   IonRefresher,
   IonRefresherContent,
-  IonFab,
-  IonFabButton,
-  IonNote,
-  IonSelectOption,
 } from "@ionic/angular/standalone";
 import { DatabaseService } from "../services/database.service";
 import { ToolsService } from "../services/tools.service";
@@ -44,7 +40,6 @@ const netStatus = "netStatus";
   styleUrls: ["tab2.page.scss"],
   standalone: true,
   imports: [
-    IonButton,
     IonHeader,
     IonToolbar,
     IonTitle,

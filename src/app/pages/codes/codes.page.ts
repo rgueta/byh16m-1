@@ -29,12 +29,6 @@ import {
   IonFab,
   IonRefresherContent,
   IonRefresher,
-  IonDatetimeButton,
-  IonBadge,
-  IonListHeader,
-  IonButton,
-  IonCard,
-  IonCardContent,
   ModalController,
 } from "@ionic/angular/standalone";
 import { addIcons } from "ionicons";
@@ -48,6 +42,7 @@ import {
   chevronForward,
   calendarClearOutline,
   chevronDown,
+  chevronUp,
 } from "ionicons/icons";
 import { SyncService } from "../../services/sync.service";
 
@@ -70,7 +65,6 @@ import { SyncService } from "../../services/sync.service";
     IonIcon,
     IonNote,
     IonRange,
-    IonList,
     IonFabButton,
     IonFab,
     IonRefresherContent,
@@ -100,7 +94,7 @@ export class CodesPage implements OnInit {
   myRoles: {} = {};
   myToken: any;
   load_codes: boolean = true;
-  public MyRole: any = { value: "visitor" };
+  public MyRole: string = "visitor";
   expiry: any = new Date().toISOString();
   code_expiry: any;
   pkg: any = {};
@@ -118,12 +112,17 @@ export class CodesPage implements OnInit {
       chevronForward,
       calendarClearOutline,
       chevronDown,
+      chevronUp,
     });
   }
 
   async ngOnInit() {
     //   getting role ---------------------------
-    this.MyRole = await this.toolsService.getSecureStorage<string>("role", "");
+    this.MyRole = await this.toolsService.getSecureStorage<string>(
+      "myRole",
+      ""
+    );
+    console.log("ngOnInit MyRole: ", this.MyRole);
 
     //   getting authToken ---------------------------
     this.myToken = await this.toolsService.getSecureStorage<string>(
@@ -174,7 +173,7 @@ export class CodesPage implements OnInit {
   }
 
   async loadData() {
-    const codes: any = await this.syncService.getLocalCodes();
+    const codes: any = await this.syncService.getLocalCodes(this.userId);
     console.log("codes recent: ", codes);
     this.codigosCargados = true;
     Object.entries(codes).forEach(async ([_, item]) => {

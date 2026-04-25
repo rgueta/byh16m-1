@@ -45,7 +45,7 @@
         <ion-item
           id="open-modalInitialToAvoid"
           class="itemFilter"
-          [disabled]="MyRole.value != 'admin'"
+          [disabled]="MyRole != 'admin'"
         >
           <ion-label class="lblFilterDate">Inicio :</ion-label>
           <strong
@@ -106,7 +106,7 @@
 
         <!-- Seccion de reenvio de codigo -->
         <div id="SoloAdmin" *ngIf="MyRole == 'admin'">
-          <ion-item class="detail-item" *ngIf="MyRole != 'admin'">
+          <ion-item class="detail-item">
             <div class="reenviar">
               <ion-range
                 id="expiryRange"

@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import {
   HttpClient,
   HttpHeaders,
@@ -53,6 +53,9 @@ export interface AuthResponse {
   providedIn: "root",
 })
 export class AuthenticationService {
+  private http = inject(HttpClient);
+  private router = inject(Router);
+  private toolService = inject(ToolsService);
   public user!: Observable<any>;
   private userData = new BehaviorSubject(null);
   Tokens!: tokens;
@@ -68,12 +71,8 @@ export class AuthenticationService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   private refreshTokenInProgress = false;
 
-  constructor(
-    private http: HttpClient,
-    private router: Router,
-    private toolService: ToolsService
-  ) {
-    toolService.setSecureStorage("twilio", "false");
+  constructor() {
+    this.toolService.setSecureStorage("twilio", "false");
     this.loadToken();
   }
 
@@ -99,6 +98,7 @@ export class AuthenticationService {
         tap(async (tokens: any) => {
           this.currentAuthToken = await tokens.authToken;
 
+          console.log("auth_pkg: ", tokens);
           // --------   secure storege  -------------
           let authToken: string | null = null;
           let refreshToken: string | null = null;

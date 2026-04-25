@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, inject } from "@angular/core";
 import { CommonModule, NgFor, NgIf } from "@angular/common";
 import { Capacitor } from "@capacitor/core";
 import {
@@ -102,6 +102,12 @@ interface OfflineQueueItem {
   ],
 })
 export class InfoPage implements OnInit {
+  private fb = inject(FormBuilder);
+  private modalController = inject(ModalController);
+  public loadingCtrl = inject(LoadingController);
+  private api = inject(DatabaseService);
+  private http = inject(HttpClient);
+  private toolService = inject(ToolsService);
   RegisterForm!: FormGroup;
   imageURI: any;
   imageFileName: any;
@@ -139,14 +145,7 @@ export class InfoPage implements OnInit {
 
   REST_API_SERVER = environment.cloud.server_url;
 
-  constructor(
-    private fb: FormBuilder,
-    private modalController: ModalController,
-    public loadingCtrl: LoadingController,
-    private api: DatabaseService,
-    private http: HttpClient,
-    private toolService: ToolsService
-  ) {
+  constructor() {
     addIcons({ arrowBackCircleOutline, imageOutline });
     this.validateControls();
   }

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
   FormsModule,
@@ -62,6 +62,12 @@ const VISITORS = "visitors";
   ],
 })
 export class VisitorsPage implements OnInit {
+  private fb = inject(FormBuilder);
+  private modalController = inject(ModalController);
+  private toast = inject(ToastController);
+  public api = inject(DatabaseService);
+  private animationController = inject(AnimationController);
+  private toolService = inject(ToolsService);
   registerForm!: FormGroup;
   @Input() name: string = "";
   @Input() email: string = "";
@@ -78,14 +84,7 @@ export class VisitorsPage implements OnInit {
   visitors: any = [];
   pkg: {} = {};
 
-  constructor(
-    private fb: FormBuilder,
-    private modalController: ModalController,
-    private toast: ToastController,
-    public api: DatabaseService,
-    private animationController: AnimationController,
-    private toolService: ToolsService
-  ) {
+  constructor() {
     addIcons({ arrowBackCircleOutline });
   }
 

@@ -5,6 +5,7 @@ import {
   ViewChild,
   ViewEncapsulation,
   ElementRef,
+  inject,
 } from "@angular/core";
 import {
   ModalController,
@@ -76,6 +77,17 @@ const USERID = "userId";
   providers: [SocialSharing],
 })
 export class UpdCodesPage implements OnInit {
+  public modalController = inject(ModalController);
+  public api = inject(DatabaseService);
+  public platform = inject(Platform);
+  public libSim = inject(Sim);
+  public sms = inject(SMS);
+  public toast = inject(ToastController);
+  private alertController = inject(AlertController);
+  private loadingController = inject(LoadingController);
+  private toolService = inject(ToolsService);
+  private socialSharing = inject(SocialSharing);
+  private el = inject(ElementRef);
   RegisterForm: FormGroup | any;
   @Input() code: string = "";
   @Input() visitorSim: string = "";
@@ -99,19 +111,7 @@ export class UpdCodesPage implements OnInit {
 
   public code_expiry: any;
 
-  constructor(
-    public modalController: ModalController,
-    public api: DatabaseService,
-    public platform: Platform,
-    public libSim: Sim,
-    public sms: SMS,
-    public toast: ToastController,
-    private alertController: AlertController,
-    private loadingController: LoadingController,
-    private toolService: ToolsService,
-    private socialSharing: SocialSharing,
-    private el: ElementRef
-  ) {
+  constructor() {
     addIcons({ arrowBackCircleOutline });
     this.validateControls();
   }
@@ -200,11 +200,15 @@ export class UpdCodesPage implements OnInit {
       "visitors",
       null
     );
-    this.myVisitors = await this.toolService.sortJsonVisitors(
-      this.myVisitors,
-      "name",
-      true
-    );
+    if (this.myVisitors) {
+      if (this.myVisitors.length() > 0) {
+        this.myVisitors = await this.toolService.sortJsonVisitors(
+          this.myVisitors,
+          "name",
+          true
+        );
+      }
+    }
   }
 
   async setupCode(event: any) {
@@ -524,7 +528,7 @@ export class UpdCodesPage implements OnInit {
     }
   }
 
-  async shareImage(canvas: HTMLCanvasElement) {
+  async shareImage_original(canvas: HTMLCanvasElement) {
     let base64 = canvas.toDataURL();
     let path = "qr.png";
     console.log("entre a shareImage 1");
@@ -563,6 +567,77 @@ export class UpdCodesPage implements OnInit {
       });
   }
 
+  async shareImage(canvas: HTMLCanvasElement) {
+    let base64 = canvas.toDataURL();
+    let path = `qr_${Date.now()}.png`; // Nombre único para evitar conflictos
+
+    const loading = await this.loadingController.create({
+      message: "Preparando código...",
+      translucent: true,
+      spinner: "crescent",
+    });
+    await loading.present();
+
+    try {
+      // 1. Guardar el QR temporalmente
+      const writeResult = await Filesystem.writeFile({
+        path,
+        data: base64,
+        directory: Directory.Cache,
+      });
+
+      const fileUri = writeResult.uri;
+      console.log("QR guardado en:", fileUri);
+
+      // 2. Compartir con el usuario
+      await Share.share({
+        title: "Código de Acceso",
+        text: `Hola ${
+          this.visitorCode || "Visitante"
+        }, tu código de acceso es: ${this.code}`,
+        url: fileUri,
+        dialogTitle: "Enviar código a tu visitante",
+      });
+
+      // 3. Pequeña pausa para asegurar que el share completó
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      // 4. Limpiar archivo temporal
+      await Filesystem.deleteFile({
+        path,
+        directory: Directory.Cache,
+      });
+
+      console.log("Compartido exitosamente, continuando con el registro...");
+
+      // 5. Enviar a MongoDB y cerrar modal
+      await this.onSubmitTemplate(false);
+      await this.closeModal();
+    } catch (err) {
+      console.error("Error al compartir QR:", err);
+
+      // Limpiar archivo si existe
+      try {
+        await Filesystem.deleteFile({
+          path,
+          directory: Directory.Cache,
+        });
+      } catch (e) {
+        // Ignorar error de limpieza
+      }
+
+      // Mostrar mensaje amigable
+      const toast = await this.toast.create({
+        message: "No se pudo compartir el código. Intenta nuevamente.",
+        duration: 3000,
+        color: "danger",
+        position: "bottom",
+      });
+      await toast.present();
+    } finally {
+      await loading.dismiss();
+    }
+  }
   //#endregion -------------------  QR --------------------------------
 
   // -------   show alerts              ---------------------------------
@@ -698,26 +773,17 @@ export class UpdCodesPage implements OnInit {
     return await modal.present();
   }
 
-  async closeModal_borrar() {
-    console.log("antes de cerrar modal:", this.codeCreated);
-    // Buscamos el elemento HTML 'ion-modal' que contiene a este componente
-    const modalElement = this.el.nativeElement.closest("ion-modal");
-
-    if (modalElement) {
-      // Usamos el método dismiss directamente del elemento HTML
-      await modalElement.dismiss(this.codeCreated);
-    } else {
-      // Si falló lo anterior, intentamos el método tradicional como último recurso
-      console.error("Fallo búsqueda por DOM, intentando controller...");
-      await this.modalController.dismiss(this.codeCreated);
-    }
-  }
-
   async closeModal() {
-    await this.loadingController.dismiss();
-    const loader = await this.modalController.getTop();
-    if (loader) {
-      await loader.dismiss(this.codeCreated);
+    // Verificar si hay loading activo
+    const loadingElement = await this.loadingController.getTop();
+    if (loadingElement) {
+      await loadingElement.dismiss();
+    }
+
+    // Verificar si hay modal activo
+    const modalElement = await this.modalController.getTop();
+    if (modalElement) {
+      await modalElement.dismiss(this.codeCreated);
     }
   }
 }
